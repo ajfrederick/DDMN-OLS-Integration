@@ -165,7 +165,7 @@ public class OnlineStoreCustomerHelper {
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
-            handler.handle();
+            handler.debug();
         }
 
         if( job != null ) return;

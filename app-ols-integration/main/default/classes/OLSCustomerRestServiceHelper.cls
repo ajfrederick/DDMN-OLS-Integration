@@ -44,6 +44,8 @@ public with sharing class OLSCustomerRestServiceHelper {
     public Contact getNewContact(){
         if( customer == null ) return null;
 
+        Boolean paymentSuccessful = customer.paymentDetails.paymentSuccessful == 'true' ? true : customer.paymentDetails.paymentSuccessful == 'false' ? false : null;
+
         Contact newContact = new Contact(
             FirstName = customer.firstName,
             LastName = customer.lastName,
@@ -57,7 +59,7 @@ public with sharing class OLSCustomerRestServiceHelper {
             Brochure_Key__c = customer.brochureKey,
             CAID__c = customer.caid,
             Customer_Id__c = customer.paymentDetails.customerId,
-            Payment_Successful__c = customer.paymentDetails.paymentSuccessful,
+            Payment_Successful__c = paymentSuccessful,
             Payment_Type__c = customer.paymentDetails.paymentType,
             Payment_Frequency__c = customer.paymentDetails.paymentFrequency
         );
@@ -97,7 +99,7 @@ public with sharing class OLSCustomerRestServiceHelper {
     }
 
     public class PaymentDetails {
-        public Boolean paymentSuccessful {get;set;}
+        public String paymentSuccessful {get;set;}
         public String paymentType {get;set;}
         public String customerId {get;set;}
         public String paymentAuthNumber {get;set;}

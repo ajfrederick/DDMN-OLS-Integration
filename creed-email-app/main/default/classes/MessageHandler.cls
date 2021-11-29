@@ -53,15 +53,16 @@ public class MessageHandler {
     **/
     private void send( Messaging.SingleEmailMessage[] messages ){
 
-        Utils.EmailLimitsData limitsData = Utils.getEmailLimitsData();
+        //Utils.EmailLimitsData limitsData = Utils.getEmailLimitsData();
 
         try {
-
+            /*
             if( limitsData.totalSentToday == (limitsData.emailTotalLimit - 1) ){
                 throw new EmailException( 'WARNING: This org has reached it\'s email limit of ' + limitsData.emailTotalLimit + ' and this is the final email that can be sent. After this emails will no longer be sent with the Creed email app to avoid operation failures with applications that rely on this one.');
             }
             
             if( limitsData.limitExceeded ) return;
+            */
             
             Messaging.SendEmailResult[] results = Messaging.sendEmail( messages );
 
