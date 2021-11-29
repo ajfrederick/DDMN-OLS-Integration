@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Product_Purchased__c</fullName>
+    <description>Product Purchased by a Contact that is now an Online Store Customer.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Product Purchased by a Contact that is now an Online Store Customer.</inlineHelpText>
+    <label>Product Purchased</label>
+    <length>255</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

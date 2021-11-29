@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Bounce_Reported__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>For the Online Store Customer record type. Indicates whether or not an automated email was bounced after payment registration via the Online Store Web Application and that that bounce was reported.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Indicates whether or not an automated email was bounced after payment registration via the Online Store Web Application and that that bounce was reported.</inlineHelpText>
+    <label>Bounce Reported</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

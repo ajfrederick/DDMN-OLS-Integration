@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Online_Store_Reply_From_Address</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Online Store Reply From Address</shortDescription>
+        <value>creed.sf.test@gmail.com</value>
+    </labels>
+</CustomLabels>

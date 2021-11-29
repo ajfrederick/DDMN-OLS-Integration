@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Brochure_Key__c</fullName>
+    <description>This is the name of a file stored. This file represents a pdf brochure that is sent out in a welcome email to a new Online Store Customer.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>This is the name of a file stored. This file represents a pdf brochure that is sent out in a welcome email to a new Online Store Customer.</inlineHelpText>
+    <label>Brochure Key</label>
+    <length>255</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
