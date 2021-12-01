@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>OLS_Email_Bcc_Address</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>OLS Email Bcc Address</shortDescription>
+        <value>smileinsurance@deltadentalmn.org</value>
+    </labels>
+    <labels>
         <fullName>Online_Store_Reply_From_Address</fullName>
         <language>en_US</language>
         <protected>false</protected>

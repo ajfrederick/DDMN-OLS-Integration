@@ -2,11 +2,11 @@
  * @name EmailMessageHelper
  * @description Helper class for EmailMessage Trigger
 **/
-public class EmailMessageHelper {
+global class EmailMessageHelper {
 
-    public static AttachmentCreator attachmentCreatorForTrigger {get;set;}
+    global static AttachmentCreator attachmentCreatorForTrigger {get;set;}
 
-    public static EmailMessageTriggerHandler[] handlers {
+    global static EmailMessageTriggerHandler[] handlers {
         get {
             if( handlers == null ) handlers = new EmailMessageTriggerHandler[]{};
             return handlers;

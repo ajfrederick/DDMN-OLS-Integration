@@ -2,9 +2,9 @@
  * @name Utils
  * @description general utility class
 **/
-public class Utils {
+global class Utils {
 
-    public static Map<String, String> contentTypes = new Map<String, String>();
+    global static Map<String, String> contentTypes = new Map<String, String>();
 
     static {
         contentTypes.put('css', 'text/css');
@@ -38,7 +38,7 @@ public class Utils {
      * @param String addressName
      * @return OrgWideEmailAddress
     **/
-    public static OrgWideEmailAddress getOrgWideEmailAddress( String addressName ){
+    global static OrgWideEmailAddress getOrgWideEmailAddress( String addressName ){
         OrgWideEmailAddress address;
 
         try {
@@ -65,7 +65,7 @@ public class Utils {
      * @param String name
      * @return EmailTemplate
     **/
-    public static EmailTemplate getTemplate( String name ){
+    global static EmailTemplate getTemplate( String name ){
         EmailTemplate template;
 
         try {
@@ -93,17 +93,18 @@ public class Utils {
      * @param String name
      * @return EmailTemplate
     **/
-    public static EmailLimitsData getEmailLimitsData(){
+    global static EmailLimitsData getEmailLimitsData(){
         return new EmailLimitsData();
     }
 
-    public class EmailLimitsData {
+    global class EmailLimitsData {
 
-        public Integer emailTotalLimit {get;set;}
-        public Integer totalSentToday {get;set;}
-        public Boolean limitExceeded {get;set;}
+        global Integer emailTotalLimit {get;set;}
+        global Integer totalSentToday {get;set;}
+        global Boolean limitExceeded {get;set;}
 
-        public EmailLimitsData(){
+
+        global EmailLimitsData(){
             // set total amount of emails that can be sent in a day
             emailTotalLimit = Limits.getLimitEmailInvocations();
 

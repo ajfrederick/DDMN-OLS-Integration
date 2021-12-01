@@ -81,7 +81,8 @@ public class OnlineStoreCustomerHelper {
         messageCreator.setOrgWideEmailAddressId(fromAddress);
         messageCreator.create();
 
-        EmailMessageHelper.handlers.add( new OLSCustomerEmailMessageHandler() );
+        // TODO: get this to work to update the Contact record to indicate that the email was sent
+        //EmailMessageHelper.handlers.add( new OLSCustomerEmailMessageHandler() );
 
         MessageHandler handler = new MessageHandler( messageCreator );
         handler.handle();

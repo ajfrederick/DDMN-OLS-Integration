@@ -8,6 +8,14 @@
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
 public class OLSCustomerEmailMessageHandler implements EmailMessageTriggerHandler {
+
+/**
+ * CONSTRUCTOR
+ */
+
+    public OLSCustomerEmailMessageHandler(){
+
+    }
  
 /**
  * INTERFACE METHODS
@@ -26,6 +34,7 @@ public class OLSCustomerEmailMessageHandler implements EmailMessageTriggerHandle
     }
 
     public void afterInsert( Map<Id, EmailMessage> newMap ){
+System.debug('messages >>> ' + newMap);
         updateCustomer( newMap );
     }
 

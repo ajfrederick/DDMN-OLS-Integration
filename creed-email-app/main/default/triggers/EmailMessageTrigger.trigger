@@ -10,7 +10,9 @@ trigger EmailMessageTrigger on EmailMessage (
     
     // trigger functionality for inside the email application
     if( Trigger.isBefore ){
+
         if( Trigger.isInsert ){
+
         } else 
         if( Trigger.isUpdate ){
 
@@ -18,8 +20,10 @@ trigger EmailMessageTrigger on EmailMessage (
         if( Trigger.isDelete ){
 
         }
+
     } else 
     if( Trigger.isAfter ){
+
         if( Trigger.isInsert ){
             EmailMessageHelper.updateContentDocumentLinks(Trigger.new);
             EmailMessageRelationHelper.updateRelationIds(Trigger.new);

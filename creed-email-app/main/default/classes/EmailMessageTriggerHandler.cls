@@ -5,7 +5,7 @@
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public interface EmailMessageTriggerHandler {
+global interface EmailMessageTriggerHandler {
     void beforeInsert( Map<Id, EmailMessage> newMap );
     void beforeUpdate( Map<Id, EmailMessage> oldMap, Map<Id, EmailMessage> newMap );
     void beforeDelete( Map<Id, EmailMessage> oldMap, Map<Id, EmailMessage> newMap );

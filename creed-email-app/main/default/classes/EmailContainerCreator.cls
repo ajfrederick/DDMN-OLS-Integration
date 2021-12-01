@@ -3,7 +3,7 @@
  * @description gets proper email info from object for email message. Abstract so you can define
  * the process of getting email addresses for different Objects
 **/
-public virtual class EmailContainerCreator {
+global virtual class EmailContainerCreator {
 
 /**
  * FIELDS
@@ -11,7 +11,7 @@ public virtual class EmailContainerCreator {
 
     // a list of central understandable ubiquitis containers for the whole email application. These get passed around and loaded up
     // with info and then unpacked
-    protected EmailContainer[] containers {
+    global EmailContainer[] containers {
         get {
             if( containers == null ) containers = new EmailContainer[]{};
             return containers;
@@ -20,7 +20,7 @@ public virtual class EmailContainerCreator {
     }
 
     // to add ContentVersions (files) to container that are already in the database and will be used to send an attachment
-    public Map<String, String[]> versionIdsByTitle {
+    global Map<String, String[]> versionIdsByTitle {
         get {
             if( versionIdsByTitle == null ) versionIdsByTitle = new Map<String, String[]>();
             return versionIdsByTitle;
@@ -28,19 +28,19 @@ public virtual class EmailContainerCreator {
         set;
     }
 
-    protected EmailTemplate template {get;set;}
+    global EmailTemplate template {get;set;}
 
-    public Id relatedToId {get;set;}
+    global Id relatedToId {get;set;}
     
 /**
  * CONSTRUCTOR
 **/
 
-    public EmailContainerCreator(){
+    global EmailContainerCreator(){
         
     }
 
-    public EmailContainerCreator( EmailContainer[] ws ){
+    global EmailContainerCreator( EmailContainer[] ws ){
         containers = ws;
     }
 
@@ -54,7 +54,7 @@ public virtual class EmailContainerCreator {
      * @param SObject[] objs
      * @return void
     **/
-    public virtual void create( SObject[] objs ){
+    global virtual void create( SObject[] objs ){
 
     }
 
@@ -64,7 +64,7 @@ public virtual class EmailContainerCreator {
      * @param Messaging.InboundEmail[] emails 
      * @return void
     **/
-    public void create( Messaging.InboundEmail[] emails ){
+    global void create( Messaging.InboundEmail[] emails ){
 
         for( Messaging.InboundEmail email : emails ){
             EmailContainer container = new EmailContainer();
@@ -114,7 +114,7 @@ public virtual class EmailContainerCreator {
      * @description returns containers
      * @return EmailContainer[]
     **/
-    public EmailContainer[] getContainers(){
+    global EmailContainer[] getContainers(){
         return containers;
     }
 
@@ -127,7 +127,7 @@ public virtual class EmailContainerCreator {
      * @description returns true if this class has found email address
      * @return Boolean
     **/
-    public Boolean hasContainers(){
+    global Boolean hasContainers(){
         return !containers.isEmpty();
     }
 
@@ -137,7 +137,7 @@ public virtual class EmailContainerCreator {
      * @param String name
      * @return void
     **/
-    public void setTemplate( String name ){
+    global void setTemplate( String name ){
         template = Utils.getTemplate( name );
     }
 
@@ -147,7 +147,7 @@ public virtual class EmailContainerCreator {
      * @param ContentVersion version
      * @return void
     **/
-    public void addVersionId( ContentVersion version ){
+    global void addVersionId( ContentVersion version ){
         String key = version.Title;
 
         if( versionIdsByTitle.containsKey(key) ){

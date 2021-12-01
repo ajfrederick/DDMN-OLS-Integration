@@ -2,13 +2,13 @@
  * @name AttachmentCreatorOutbound
  * @description this child class helps create and insert attachments for outgoing emails
  */
-public class AttachmentCreatorOutbound extends AttachmentCreator {
+global class AttachmentCreatorOutbound extends AttachmentCreator {
 
 /**
  * CONSTRUCTOR
  */
 
-    public AttachmentCreatorOutbound( EmailContainer[] containers ) {
+    global AttachmentCreatorOutbound( EmailContainer[] containers ) {
         super(containers);
     }
 
@@ -22,7 +22,7 @@ public class AttachmentCreatorOutbound extends AttachmentCreator {
      * @param EmailMessage message
      * @return String
      */
-    protected override String getMessageId( EmailMessage message ){
+    global override String getMessageId( EmailMessage message ){
         return message.Headers.substringAfter('In-Reply-To: ');
     }
 
@@ -32,7 +32,7 @@ public class AttachmentCreatorOutbound extends AttachmentCreator {
      * @param EmailContainer container
      * @return String
      */
-    protected override String getMessageId( EmailContainer container ){
+    global override String getMessageId( EmailContainer container ){
         return container.inReplyTo;
     }
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Customer_Id__c</fullName>
+    <description>For Online Store Customer record type. This is the customer Id that is store over at DDMI after an Online Store Customer is processed by DDMI&apos;s application.</description>
+    <externalId>true</externalId>
+    <label>Customer Id</label>
+    <length>50</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

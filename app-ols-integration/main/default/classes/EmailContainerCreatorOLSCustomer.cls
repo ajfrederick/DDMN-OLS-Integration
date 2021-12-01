@@ -6,6 +6,8 @@
 **/
 public class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
 
+    private static final String bccAddress = System.Label.OLS_Email_Bcc_Address;
+
 /**
  * CONSTRUCTOR
 **/
@@ -33,6 +35,7 @@ public class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
             EmailContainer container = new EmailContainer();
     
             container.ToAddresses.add(obj.Email);
+            container.BccAddresses.add(bccAddress);
             container.whoId = obj.Id; // since this is a contact set the whoId
             container.template = template;
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Payment_Successful__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>For the Online Store Customer record type. Indicates whether or not the payment was successful.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Indicates whether or not the payment was successful.</inlineHelpText>
+    <label>Payment Successful</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

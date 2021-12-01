@@ -2,7 +2,7 @@
  * @name MessageCreatorOutbound
  * @description creates email messages that are outgoing
 **/
-public class MessageCreatorOutbound extends MessageCreator {
+global class MessageCreatorOutbound extends MessageCreator {
 
 /**
  * FIELDS
@@ -15,7 +15,7 @@ public class MessageCreatorOutbound extends MessageCreator {
  * CONSTRUCTOR
 **/
 
-    public MessageCreatorOutbound( EmailContainer[] containers ) {
+    global MessageCreatorOutbound( EmailContainer[] containers ) {
         super(containers);
     }
 
@@ -28,7 +28,7 @@ public class MessageCreatorOutbound extends MessageCreator {
      * @description loop through containers and get an email message
      * @return void
     **/
-    public override void create(){
+    global override void create(){
 
         for( EmailContainer container : containers ){
             if( !isVaild( container ) ) continue;
@@ -172,7 +172,7 @@ public class MessageCreatorOutbound extends MessageCreator {
      * @description sets Org Wide Email Address for From Address
      * @param String address
     **/
-    public void setOrgWideEmailAddressId( String addressName ){
+    global void setOrgWideEmailAddressId( String addressName ){
         OrgWideEmailAddress oweAddress = Utils.getOrgWideEmailAddress( addressName );
 
         if( oweAddress != null ){

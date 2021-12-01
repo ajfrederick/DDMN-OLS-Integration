@@ -2,13 +2,13 @@
  * @name MessageHandler
  * @description handles inbound and outbound messages
 **/
-public class MessageHandler {
+global class MessageHandler {
 
     private MessageCreator messageCreator {get;set;}
 
     private OutboundEmailResults outboundResults {get;set;}
 
-    public static Boolean triggerEnabled {
+    global static Boolean triggerEnabled {
         get {
             if( triggerEnabled == null ) triggerEnabled = false;
 
@@ -21,7 +21,7 @@ public class MessageHandler {
  * CONSTRUCTOR
 **/
 
-    public MessageHandler( MessageCreator mc ) {
+    global MessageHandler( MessageCreator mc ) {
         messageCreator = mc;
     }
 
@@ -33,7 +33,7 @@ public class MessageHandler {
      * @description sends outbound and recieves inbound messages
      * @return void
     **/
-    public void handle(){
+    global void handle(){
         triggerEnabled = true;
 
         if( messageCreator.hasOutboundMessages() ){
@@ -103,7 +103,7 @@ public class MessageHandler {
      * @description return the results of the outbound messages to get failures
      * @return OutboundEmailResults
     **/
-    public OutboundEmailResults getOutboundEmailResults(){
+    global OutboundEmailResults getOutboundEmailResults(){
         return outboundResults;
     }
 
@@ -111,5 +111,5 @@ public class MessageHandler {
  * CLASSES
 **/
 
-    public class EmailException extends Exception {}
+    global class EmailException extends Exception {}
 }

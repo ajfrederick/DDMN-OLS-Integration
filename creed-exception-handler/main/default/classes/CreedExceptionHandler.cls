@@ -2,7 +2,7 @@
  * @name CreedExceptionHandler
  * @description custom exception handler for robust debugging and sends an email notification
 **/
-public class CreedExceptionHandler {
+global class CreedExceptionHandler {
 
 /**
  * CONSTRUCTOR
@@ -32,13 +32,13 @@ public class CreedExceptionHandler {
 /**
  * CONSTRUCTOR
 **/
-
-    public CreedExceptionHandler( Exception e ) {
+    
+    global CreedExceptionHandler( Exception e ) {
         ex = e;
     }
 
     // Overloaded Constuctor
-    public CreedExceptionHandler( Exception e, SObject[] errorRecs ) {
+    global CreedExceptionHandler( Exception e, SObject[] errorRecs ) {
         ex = e;
         errorRecords = errorRecs;
     }
@@ -52,7 +52,7 @@ public class CreedExceptionHandler {
      * @description handles with an email and debud
      * @return void
     **/
-    public void handle(){
+    global void handle(){
         debug();
         email();
     }
@@ -62,7 +62,7 @@ public class CreedExceptionHandler {
      * @description logs a full debug of exception
      * @return void
     **/
-    public void debug(){
+    global void debug(){
         System.debug('Exception type caught: ' + ex.getTypeName());    
         System.debug('Exception Message: ' + ex.getMessage());
 
@@ -87,7 +87,7 @@ public class CreedExceptionHandler {
      *
      * @return void
     **/
-    public void email(){
+    global void email(){
         EmailLimitsData limitsData = new EmailLimitsData();
 
 System.debug(limitsData);
@@ -114,7 +114,7 @@ System.debug(limitsData);
      * @param String message
      * @return void
     **/
-    public void addMessage( String message ){
+    global void addMessage( String message ){
         appendedMessage = message;
     }
 
@@ -202,13 +202,13 @@ System.debug(limitsData);
 /**
  * CLASSES
 **/
-
-    public class EmailLimitsData {
+    global class EmailLimitsData {
 
         public Integer emailTotalLimit {get;set;}
         public Integer totalSentToday {get;set;}
         public Boolean limitExceeded {get;set;}
 
+        @namespaceAccessible
         public EmailLimitsData(){
             // set total amount of emails that can be sent in a day
             emailTotalLimit = Limits.getLimitEmailInvocations();

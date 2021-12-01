@@ -2,14 +2,14 @@
  * @name AttachmentCreator
  * @description this base class helps create and insert attachments for outgoing and incoming emails
  */
-public abstract class AttachmentCreator {
+global abstract class AttachmentCreator {
 
 /**
  * FIELDS
  */
 
     // Class containers that contain email to info
-    protected EmailContainer[] containers {get;set;}
+    global EmailContainer[] containers {get;set;}
 
     private ContentVersion[] versions {
         get {
@@ -28,7 +28,7 @@ public abstract class AttachmentCreator {
     }
 
     // used for when it's necessary to save one content version for many emails
-    public Boolean useFirstAttachmentsForAllMessages {
+    global Boolean useFirstAttachmentsForAllMessages {
         get {
             if( useFirstAttachmentsForAllMessages == null ) useFirstAttachmentsForAllMessages = false;
             return useFirstAttachmentsForAllMessages;
@@ -40,7 +40,7 @@ public abstract class AttachmentCreator {
  * CONSTRUCTOR
  */
 
-    public AttachmentCreator( EmailContainer[] ws ) {
+    global AttachmentCreator( EmailContainer[] ws ) {
         containers = ws;
     }
 
@@ -53,7 +53,7 @@ public abstract class AttachmentCreator {
      * @param EmailMessage message
      * @return String
      */
-    protected abstract String getMessageId( EmailMessage message );
+    global abstract String getMessageId( EmailMessage message );
 
     /**
      * @name getMessageId
@@ -61,7 +61,7 @@ public abstract class AttachmentCreator {
      * @param EmailContainer container
      * @return String
      */
-    protected abstract String getMessageId( EmailContainer container );
+    global abstract String getMessageId( EmailContainer container );
 
     /**
      * @name insertAttachments
@@ -70,7 +70,7 @@ public abstract class AttachmentCreator {
      * @param EmailContainer containers
      * @return void
      */
-    public void insertAttachments(){
+    global void insertAttachments(){
 
         for( EmailContainer container : containers ){
             String messageId = getMessageId( container );
@@ -101,7 +101,7 @@ public abstract class AttachmentCreator {
      * @param EmailMessage[] messages
      * @return void
     **/
-    public void insertContentDocumentLinks( EmailMessage[] messages ){
+    global void insertContentDocumentLinks( EmailMessage[] messages ){
         if( versionsByMessageId.isEmpty() ) return;
 
         // put the fresh list of versions in a map keyed on their Id to access below
@@ -189,7 +189,7 @@ public abstract class AttachmentCreator {
      * @description returns all versions that where created. Used in creating outbound messages
      * @return ContentVersion[]
      */
-    public ContentVersion[] getContentVersions(){
+    global ContentVersion[] getContentVersions(){
         return versions;
     }
 
@@ -200,7 +200,7 @@ public abstract class AttachmentCreator {
      * type String[] as an argument
      * @return String[]
      */
-    public String[] getContentVersionIds(){
+    global String[] getContentVersionIds(){
         String[] ids = new String[]{};
 
         for( ContentVersion version : versions ){
@@ -215,7 +215,7 @@ public abstract class AttachmentCreator {
      * @description returns all version Ids that where created by the external messageId
      * @return Map<String, String[]>
      */
-    public Map<String, String[]> getContentVersionIdsByMessageId(){
+    global Map<String, String[]> getContentVersionIdsByMessageId(){
         Map<String, String[]> contentVersionIdsByMessageId = new Map<String, String[]>();
 
         for( String messageId : versionsByMessageId.keyset() ){

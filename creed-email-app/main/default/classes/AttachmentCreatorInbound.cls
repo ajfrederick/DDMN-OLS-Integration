@@ -2,13 +2,13 @@
  * @name AttachmentCreatorInbound
  * @description this child class helps create and insert attachments for incoming emails
  */
-public class AttachmentCreatorInbound extends AttachmentCreator {
+global class AttachmentCreatorInbound extends AttachmentCreator {
     
 /**
  * CONSTRUCTOR
  */
 
-    public AttachmentCreatorInbound( EmailContainer[] containers ) {
+    global AttachmentCreatorInbound( EmailContainer[] containers ) {
         super(containers);
     }
 
@@ -22,7 +22,7 @@ public class AttachmentCreatorInbound extends AttachmentCreator {
      * @param EmailMessage message
      * @return String
      */
-    protected override String getMessageId( EmailMessage message ){
+    global override String getMessageId( EmailMessage message ){
         return message.MessageIdentifier;
     }
 
@@ -32,7 +32,7 @@ public class AttachmentCreatorInbound extends AttachmentCreator {
      * @param EmailContainer container
      * @return String
      */
-    protected override String getMessageId( EmailContainer container ){
+    global override String getMessageId( EmailContainer container ){
         return container.messageId;
     }
 }

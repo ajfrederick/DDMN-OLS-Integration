@@ -3,13 +3,13 @@
  * @description Contains Email Sent email results for further activites (ie creating feed Items or error handling) 
  * after sending an email
 **/
-public class OutboundEmailResults {
+global class OutboundEmailResults {
 
 /**
  * FIELDS
 **/
 
-    public Messaging.SendEmailResult[] results {
+    global Messaging.SendEmailResult[] results {
         get {
             if( results == null ) results = new Messaging.SendEmailResult[]{};
             return results;
@@ -17,7 +17,7 @@ public class OutboundEmailResults {
         set;
     }
 
-    public Map<String, Messaging.SingleEmailMessage[]> successesByObjId {
+    global Map<String, Messaging.SingleEmailMessage[]> successesByObjId {
         get {
             if( successesByObjId == null ) successesByObjId = new Map<String, Messaging.SingleEmailMessage[]>();
             return successesByObjId;
@@ -25,7 +25,7 @@ public class OutboundEmailResults {
         set;
     }
 
-    public Messaging.SendEmailResult[] failures {
+    global Messaging.SendEmailResult[] failures {
         get {
             if( failures == null ) failures = new Messaging.SendEmailResult[]{};
             return failures;
@@ -33,7 +33,7 @@ public class OutboundEmailResults {
         set;
     }
     
-    public String failedIds {
+    global String failedIds {
         get {
             if( failedIds == null ) failedIds = '';
             return failedIds;
@@ -44,8 +44,8 @@ public class OutboundEmailResults {
 /**
  * CONSTRUCTOR
 **/
-    
-    public OutboundEmailResults( Messaging.SendEmailResult[] res ){
+
+    global OutboundEmailResults( Messaging.SendEmailResult[] res ){
         results = res;
 
         setFailures();
@@ -61,7 +61,7 @@ public class OutboundEmailResults {
      * if the messages are NOT in the failed list then they were sent successfully
      * @return void
     **/
-    public void setSuccesses( Messaging.SingleEmailMessage[] messages ){
+    global void setSuccesses( Messaging.SingleEmailMessage[] messages ){
 
         for( Messaging.SendEmailResult result : failures ){
             Messaging.SendEmailError[] errors = result.getErrors();
@@ -96,7 +96,7 @@ public class OutboundEmailResults {
      * @description returns all successfully sent messages
      * @return void
     **/
-    public Messaging.SingleEmailMessage[] getSuccesses(){
+    global Messaging.SingleEmailMessage[] getSuccesses(){
         Messaging.SingleEmailMessage[] successes = new Messaging.SingleEmailMessage[]{};
 
         for( String objId : successesByObjId.keyset() ){
@@ -113,7 +113,7 @@ public class OutboundEmailResults {
      * @description returns all successfully sent messages but record Id
      * @return void
     **/
-    public Map<String, Messaging.SingleEmailMessage[]> getSuccessesByObjId(){
+    global Map<String, Messaging.SingleEmailMessage[]> getSuccessesByObjId(){
         return successesByObjId;
     }
 
@@ -137,7 +137,7 @@ public class OutboundEmailResults {
      * @description returns failures
      * @return void
     **/
-    public Messaging.SendEmailResult[] getFailures(){
+    global Messaging.SendEmailResult[] getFailures(){
         return failures;
     }
 
@@ -150,7 +150,7 @@ public class OutboundEmailResults {
      * @description returns a list of all the error messages for failed emails
      * @return String[]
     **/
-    public String[] getErrorMessages(){
+    global String[] getErrorMessages(){
         String[] messages = new String[]{};
 
         for( Messaging.SendEmailResult result : failures ){
@@ -176,7 +176,7 @@ public class OutboundEmailResults {
      * @description checks if email was sent successfully or not
      * @return Boolean
     **/
-    public Boolean hasSuccesses(){
+    global Boolean hasSuccesses(){
         return !successesByObjId.isEmpty();
     }
     
@@ -185,7 +185,7 @@ public class OutboundEmailResults {
      * @description checks if email has any failures
      * @return Boolean
     **/
-    public Boolean hasFailures(){
+    global Boolean hasFailures(){
         return !failures.isEmpty();
     }
 }

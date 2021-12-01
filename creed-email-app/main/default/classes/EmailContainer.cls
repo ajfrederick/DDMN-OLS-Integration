@@ -3,14 +3,14 @@
  * @description wrapper class to get email content and info predictably no matter the source.
  * These get loaded up and passed around and unloaded by the entire application.
 **/
-public class EmailContainer {
+global class EmailContainer {
 
 /**
  * FIELDS
 **/
 
     // email to addresses
-    public String[] ToAddresses {
+    global String[] ToAddresses {
         get {
             if( ToAddresses == null ) ToAddresses = new String[]{};
             return ToAddresses;
@@ -19,7 +19,7 @@ public class EmailContainer {
     }
 
     // email cc addresses
-    public String[] CcAddresses {
+    global String[] CcAddresses {
         get {
             if( CcAddresses == null ) CcAddresses = new String[]{};
             return CcAddresses;
@@ -28,7 +28,7 @@ public class EmailContainer {
     }
 
     // email Bcc addresses
-    public String[] BccAddresses {
+    global String[] BccAddresses {
         get {
             if( BccAddresses == null ) BccAddresses = new String[]{};
             return BccAddresses;
@@ -37,7 +37,7 @@ public class EmailContainer {
     }
 
     // all addresses
-    public String[] allAddresses {
+    global String[] allAddresses {
         get {
             allAddresses = new String[]{};
 
@@ -51,31 +51,31 @@ public class EmailContainer {
     }
 
     // email from address
-    public String FromAddress {get;set;}
+    global String FromAddress {get;set;}
 
     // email from name
-    public String FromName {get;set;}
+    global String FromName {get;set;}
 
     // email template
-    public EmailTemplate template {get;set;}
+    global EmailTemplate template {get;set;}
 
     // email content
     private EmailContent content {get;set;}
 
     // optional record Id to be used for whatId
-    public Id whatId {get;set;}
+    global Id whatId {get;set;}
 
     // optional contact, user or lead Id to be used for whoId
-    public Id whoId {get;set;}
+    global Id whoId {get;set;}
 
     // external unique identifier given by email clients and salesforce email client
-    public String messageId  {get;set;}
+    global String messageId  {get;set;}
 
     // external unique identifier given by email clients and salesforce email client
-    public String inReplyTo {get;set;}
+    global String inReplyTo {get;set;}
 
     // attachment data to be used to created ContentVersions (files) if need be
-    public AttachmentData[] attachments {
+    global AttachmentData[] attachments {
         get {
             if( attachments == null ) attachments = new AttachmentData[]{};
             return attachments;
@@ -84,7 +84,7 @@ public class EmailContainer {
     }
 
     // Ids of ContentVersion (file) records that will be used to send attachments
-    public String[] versionIds {
+    global String[] versionIds {
         get {
             if( versionIds == null ) versionIds = new String[]{};
             return versionIds;
@@ -96,7 +96,7 @@ public class EmailContainer {
  * CONSTRUCTOR
 **/
 
-    public EmailContainer(){
+    global EmailContainer(){
 
     }
 
@@ -113,7 +113,7 @@ public class EmailContainer {
      * @param String PlainTextBody
      * @return void
     **/
-    public void setContent( String Subject, String HtmlBody, String PlainTextBody ){
+    global void setContent( String Subject, String HtmlBody, String PlainTextBody ){
 
         HtmlBody = checkBodyLength( HtmlBody );
         PlainTextBody = checkBodyLength( PlainTextBody );
@@ -131,7 +131,7 @@ public class EmailContainer {
      * @description get email contact
      * @return void
     **/
-    public EmailContent getContent(){
+    global EmailContent getContent(){
         return content;
     }
 
@@ -140,7 +140,7 @@ public class EmailContainer {
      * @description gets the email contents subject
      * @return String
     **/
-    public String getSubject(){
+    global String getSubject(){
         if( content == null ) return null;
 
         return content.Subject;
@@ -151,7 +151,7 @@ public class EmailContainer {
      * @description gets the email contents HTML Body
      * @return String
     **/
-    public String getHTMLBody(){
+    global String getHTMLBody(){
         if( content == null ) return null;
         
         return content.HtmlBody;
@@ -162,7 +162,7 @@ public class EmailContainer {
      * @description gets the email contents Plain Text Body
      * @return String
     **/
-    public String getPlainTextBody(){
+    global String getPlainTextBody(){
         if( content == null ) return null;
 
         return content.PlainTextBody;
@@ -174,7 +174,7 @@ public class EmailContainer {
      * @param String Subject
      * @return void
     **/
-    public void setSubject( String Subject ){
+    global void setSubject( String Subject ){
         if( content == null ) content = new EmailContent();
 
         content.Subject = Subject;
@@ -186,7 +186,7 @@ public class EmailContainer {
      * @param String HtmlBody
      * @return void
     **/
-    public void setHTMLBody( String HtmlBody ){
+    global void setHTMLBody( String HtmlBody ){
         if( content == null ) content = new EmailContent();
 
         content.HtmlBody = checkBodyLength( HtmlBody );
@@ -198,7 +198,7 @@ public class EmailContainer {
      * @param String PlainTextBody
      * @return void
     **/
-    public void setPlainTextBody( String PlainTextBody ){
+    global void setPlainTextBody( String PlainTextBody ){
         if( content == null ) content = new EmailContent();
 
         content.PlainTextBody = checkBodyLength( PlainTextBody );
@@ -213,7 +213,7 @@ public class EmailContainer {
      * @param Blob body
      * @return void
     **/
-    public void setAttachment( String filename, Blob body ){
+    global void setAttachment( String filename, Blob body ){
         attachments.add( new AttachmentData( filename, body ) );
     }
 
@@ -225,7 +225,7 @@ public class EmailContainer {
      * @param String (base64) body
      * @return void
     **/
-    public void setAttachment( String filename, String body ){
+    global void setAttachment( String filename, String body ){
         Blob bodyBlob = EncodingUtil.base64Decode(body);
 
         attachments.add( new AttachmentData( filename, bodyBlob ) );
@@ -237,7 +237,7 @@ public class EmailContainer {
      * @param String versionId
      * @return void
     **/
-    public void addVersionId( String versionId ){
+    global void addVersionId( String versionId ){
         versionIds.add(versionId);
     }
 
@@ -247,7 +247,7 @@ public class EmailContainer {
      * @param String ids
      * @return void
     **/
-    public void setVersionIds( String[] ids ){
+    global void setVersionIds( String[] ids ){
         versionIds = ids;
     }
 
@@ -257,7 +257,7 @@ public class EmailContainer {
      * @param none
      * @return String[] versionIds
     **/
-    public String[] getVersionIds(){
+    global String[] getVersionIds(){
         return versionIds;
     }
 
@@ -267,7 +267,7 @@ public class EmailContainer {
      * @param String quote
      * @return void
     **/
-    public void setQuote( String quote ){
+    global void setQuote( String quote ){
         if( content == null ){
             System.debug('Content for EmailContainer.cls must be set before set the quoted email in the body');
             return;
@@ -285,7 +285,7 @@ public class EmailContainer {
      * @description checks to see if ToAddresses of type String[] is empty or not
      * @return Boolean
      */
-    public Boolean hasToAddresses(){
+    global Boolean hasToAddresses(){
         return !ToAddresses.isEmpty();
     }
 
@@ -294,7 +294,7 @@ public class EmailContainer {
      * @description checks to see if template of type EmailTemplate is null or not
      * @return Boolean
      */
-    public Boolean hasTemplate(){
+    global Boolean hasTemplate(){
         return template != null;
     }
 
@@ -303,7 +303,7 @@ public class EmailContainer {
      * @description checks to see if content of type EmailContent is null or not
      * @return Boolean
      */
-    public Boolean hasContent(){
+    global Boolean hasContent(){
         return content != null;
     }
 
@@ -312,7 +312,7 @@ public class EmailContainer {
      * @description checks to see if whatId of type Id is null or not
      * @return Boolean
      */
-    public Boolean hasWhatId(){
+    global Boolean hasWhatId(){
         return whatId != null;
     }
 
@@ -321,7 +321,7 @@ public class EmailContainer {
      * @description checks to see if whoId of type Id is null or not
      * @return Boolean
      */
-    public Boolean hasWhoId(){
+    global Boolean hasWhoId(){
         return whoId != null;
     }
 
@@ -330,7 +330,7 @@ public class EmailContainer {
      * @description checks to see if messageId of type String is blank or not
      * @return Boolean
      */
-    public Boolean hasMessageId(){
+    global Boolean hasMessageId(){
         return !String.isBlank( messageId );
     }
 
@@ -339,7 +339,7 @@ public class EmailContainer {
      * @description checks to see if inReplyTo of type String is empty or not
      * @return Boolean
      */
-    public Boolean hasInReplyTo(){
+    global Boolean hasInReplyTo(){
         return !String.isBlank( inReplyTo );
     }
 
@@ -349,7 +349,7 @@ public class EmailContainer {
      * @param String HtmlBody
      * @return String
      */
-    public String wrapHTMLBody( String HtmlBody ){
+    global String wrapHTMLBody( String HtmlBody ){
         return '<div class="creed-message">' + HtmlBody +'</div>';
     }
 
@@ -375,25 +375,24 @@ public class EmailContainer {
         return body;
     }
 
-
 /**
  * CLASSES
 **/
 
-    public class EmailContent {
-        public String Subject {get;set;}
-        public String HtmlBody {get;set;}
-        public String PlainTextBody {get;set;}
+    global class EmailContent {
+        global String Subject {get;set;}
+        global String HtmlBody {get;set;}
+        global String PlainTextBody {get;set;}
     }
 
-    public class AttachmentData {
+    global class AttachmentData {
 
-        public String filename {get;set;}
-        public String extension {get;set;}
-        public Blob body {get;set;}
-        public String contentType {get;set;}
+        global String filename {get;set;}
+        global String extension {get;set;}
+        global Blob body {get;set;}
+        global String contentType {get;set;}
 
-        public AttachmentData( String fn, Blob b ){
+        global AttachmentData( String fn, Blob b ){
             filename = fn;
             body = b;
 

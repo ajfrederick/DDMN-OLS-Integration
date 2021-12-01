@@ -45,8 +45,11 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
         Blob attachmentBody = Blob.valueOf( getAttachmentBody(customers) );
     
         EmailContainer container = new EmailContainer();
-        container.ToAddresses.add('salesforceteam@creedinteractive.com');
-        //container.BccAddresses.add('salesforceteam@creedinteractive.com');
+        
+        for( OLS_Bounce_Report_Email_Address__mdt record : OLS_Bounce_Report_Email_Address__mdt.getAll().values() ){
+            container.ToAddresses.add(record.Email__c);
+        }
+
         container.setContent( subject, body, body );
         container.setAttachment( filename, attachmentBody );
 

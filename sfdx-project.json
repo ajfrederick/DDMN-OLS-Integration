@@ -1,23 +1,6 @@
 {
     "packageDirectories": [
         {
-            "path": "app-ols-integration",
-            "default": true,
-            "package": "DDMN Online Store Customer Integration",
-            "versionName": "ver 0.1",
-            "versionNumber": "0.1.0.NEXT",
-            "dependencies": [
-                {
-                    "package": "Creed Exception Handler",
-                    "versionNumber": "0.1.0.LATEST"
-                },
-                {
-                    "package": "Creed Email Messaging",
-                    "versionNumber": "0.1.0.LATEST"
-                }
-            ]
-        },
-        {
             "path": "creed-exception-handler",
             "default": false,
             "package": "Creed Exception Handler",
@@ -36,17 +19,35 @@
                     "versionNumber": "0.1.0.LATEST"
                 }
             ]
+        },
+        {
+            "path": "app-ols-integration",
+            "default": true,
+            "package": "DDMN Online Store Integration",
+            "versionName": "ver 0.1",
+            "versionNumber": "0.1.0.NEXT",
+            "dependencies": [
+                {
+                    "package": "Creed Exception Handler",
+                    "versionNumber": "0.1.0.LATEST"
+                },
+                {
+                    "package": "Creed Email Messaging",
+                    "versionNumber": "0.1.0.LATEST"
+                }
+            ]
         }
     ],
     "name": "WebAppsIntegration",
-    "namespace": "",
+    "namespace": "creedint",
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "52.0",
     "packageAliases": {
+        "DDMN Online Store Integration": "0Ho4x000000PBAxCAO",
         "Creed Exception Handler": "0Ho4x000000PBA9CAO",
         "Creed Email Messaging": "0Ho4x000000PB9uCAG",
-        "DDMN Online Store Customer Integration": "0Ho4x000000PBAsCAO",
-        "Creed Exception Handler@0.1.0-2": "04t4x000000AJX1AAO",
-        "Creed Exception Handler@0.1.0-3": "04t4x000000AJX6AAO"
+        "Creed Exception Handler@0.1.0-10": "04t4x000000AJZMAA4",
+        "Creed Email Messaging@0.1.0-12": "04t4x000000AJaAAAW",
+        "DDMN Online Store Integration@0.1.0-11": "04t4x000000AJayAAG"
     }
 }
