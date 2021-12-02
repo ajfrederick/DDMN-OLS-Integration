@@ -82,7 +82,7 @@ public class OnlineStoreCustomerHelper {
         messageCreator.create();
 
         // TODO: get this to work to update the Contact record to indicate that the email was sent
-        //EmailMessageHelper.handlers.add( new OLSCustomerEmailMessageHandler() );
+        EmailMessageHelper.handlers.add( new OLSCustomerEmailMessageHandler() );
 
         MessageHandler handler = new MessageHandler( messageCreator );
         handler.handle();

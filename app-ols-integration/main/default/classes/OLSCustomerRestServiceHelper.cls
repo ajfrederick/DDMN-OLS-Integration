@@ -32,7 +32,7 @@ public with sharing class OLSCustomerRestServiceHelper {
      * @return Contact
      */
     public void parseRequest(){
-        customer = (ClientSideCustomer) JSON.deserializeStrict( requestBody, ClientSideCustomer.class );
+        customer = (ClientSideCustomer) JSON.deserialize( requestBody, ClientSideCustomer.class );
     }
 
     /**
