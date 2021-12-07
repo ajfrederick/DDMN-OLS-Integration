@@ -34,7 +34,6 @@ public class OLSCustomerEmailMessageHandler implements EmailMessageTriggerHandle
     }
 
     public void afterInsert( Map<Id, EmailMessage> newMap ){
-System.debug('messages >>> ' + newMap);
         updateCustomer( newMap );
     }
 

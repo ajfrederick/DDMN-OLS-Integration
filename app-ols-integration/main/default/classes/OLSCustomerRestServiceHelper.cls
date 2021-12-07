@@ -51,18 +51,24 @@ public with sharing class OLSCustomerRestServiceHelper {
             LastName = customer.lastName,
             Email = customer.email,
             Phone = customer.phone,
-            MailingStreet = customer.address.addressLine1 + ' ' + customer.address.addressLine2,
             MailingCity = customer.address.city,
             MailingState = customer.address.state,
             MailingPostalCode = customer.address.zip,
             Product_Purchased__c = customer.product,
             Brochure_Key__c = customer.brochureKey,
+            Brochure_URL__c = customer.brochureUrl,
             CAID__c = customer.caid,
             Customer_Id__c = customer.paymentDetails.customerId,
             Payment_Successful__c = paymentSuccessful,
             Payment_Type__c = customer.paymentDetails.paymentType,
             Payment_Frequency__c = customer.paymentDetails.paymentFrequency
         );
+
+        if( !String.isBlank(customer.address.addressLine2) ){
+            newContact.MailingStreet = customer.address.addressLine1 + ' ' + customer.address.addressLine2;
+        } else {
+            newContact.MailingStreet = customer.address.addressLine1;
+        }
 
         Id olsRecordTypeId = OnlineStoreCustomerHelper.getRecordTypeId('Online_Store_Customer');
 
@@ -86,6 +92,7 @@ public with sharing class OLSCustomerRestServiceHelper {
         public String phone {get;set;}
         public String product {get;set;}
         public String brochureKey {get;set;}
+        public String brochureUrl {get;set;}
         public String caid {get;set;}
         public PaymentDetails paymentDetails {get;set;}
     }

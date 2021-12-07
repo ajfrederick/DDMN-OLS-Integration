@@ -12,12 +12,22 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
  */
 
     private static final String fromAddress = System.Label.Online_Store_Reply_From_Address;
+
+    private Contact[] customers {
+        get {
+            if( customers == null ) customers = new Contact[]{};
+            return customers;
+        }
+        set;
+    }
     
 /**
  * INTERFACE METHODS
  */
 
     public Database.QueryLocator start( Database.BatchableContext context ){
+        String olsCustomer = OnlineStoreCustomerHelper.getRecordTypeId('Online_Store_Customer');
+
         String q = 'SELECT ';
                 q += 'Id, ';
                 q += 'FirstName, ';
@@ -27,22 +37,28 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
                 q += 'CreatedDate, ';
                 q += 'CAID__c, ';
                 q += 'Email_Bounced__c, ';
-                q += 'Bounce_Reported__c ';
+                q += 'Bounce_Reported__c, ';
+                q += 'Product_Purchased__c ';
                     q += 'FROM Contact ';
                     q += 'WHERE EmailBouncedDate != null ';
-                    q += 'AND Bounce_Reported__c = false';
+                    q += 'AND Bounce_Reported__c = false ';
+                    q += 'AND RecordTypeId = ' + olsCustomer;
 
         return Database.getQueryLocator(q);
     }
 
     public void execute( Database.BatchableContext context, Contact[] customers ){
+        this.customers = customers;
+    }
+
+    public void finish( Database.BatchableContext context ){
         Date newDate = Date.today();
 
         String subject = 'Online Store Customer Bounce Report';
         String body = 'Here is the bounce report for all Online Strore Customers who failed to received a brochure via email.';
 
         String filename = 'OLS_BouncedEmails_' + newDate.month() + '-' + newDate.day() + '-' + newDate.year() + '.xlsx';
-        Blob attachmentBody = Blob.valueOf( getAttachmentBody(customers) );
+        Blob attachmentBody = Blob.valueOf( getAttachmentBody() );
     
         EmailContainer container = new EmailContainer();
         
@@ -60,20 +76,19 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
         MessageHandler handler = new MessageHandler( messageCreator );
         handler.handle();
 
-        updateCustomers( customers );
-    }
+System.debug('messages ... ' + messageCreator.getOutboundMessages());
+System.debug('customers ... ' + customers);
 
-    public void finish( Database.BatchableContext context ){
-
+        updateCustomers();
     }
 
 /**
  * ACTION METHODS
  */
 
-    private void updateCustomers( Contact[] customers ){
+    private void updateCustomers(){
 
-        for( Contact customer : customers ){
+        for( Contact customer : this.customers ){
             customer.Bounce_Reported__c = true;
             customer.Email_Bounced__c = true;
         }
@@ -92,13 +107,28 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
  * UTILITY METHODS
  */
 
-    private String getAttachmentBody( Contact[] customers ){
-        String body = 'Id, Name, Email, Mailing Address, CAID, Created Date \n';
+    private String getAttachmentBody(){
+        String body = 'Id, Name, Email, Mailing Address, Product Purchased, CAID, Created Date \n';
 
-        for( Contact customer : customers ){
-            body += customer.Id + ',' + customer.FirstName + ' ' + customer.LastName + ',' + customer.Email + ',' + customer.MailingAddress + ',' + customer.CAID__c + ',' + customer.CreatedDate + ' \n';
+        for( Contact customer : this.customers ){
+            body += customer.Id + ',';
+            body += customer.FirstName + ' ' + customer.LastName + ',';
+            body += customer.Email + ',';
+            body += getMailingAddress(customer) + ',';
+            body += customer.Product_Purchased__c + ',';
+            body += customer.CAID__c + ',';
+            body += customer.CreatedDate + ' \n';
         }
 
         return body;
+    }
+
+    private String getMailingAddress( Contact customer ){
+        String mailingAddress = customer.MailingStreet + ' ';
+        mailingAddress += customer.MailingCity + ', ';
+        mailingAddress += customer.MailingState + ' ';
+        mailingAddress += customer.MailingPostalCode;
+
+        return mailingAddress;
     }
 }

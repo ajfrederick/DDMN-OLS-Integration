@@ -4,7 +4,7 @@
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
 **/
-public class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
+global class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
 
     private static final String bccAddress = System.Label.OLS_Email_Bcc_Address;
 
@@ -12,7 +12,7 @@ public class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
  * CONSTRUCTOR
 **/
 
-    public EmailContainerCreatorOLSCustomer(){
+    global EmailContainerCreatorOLSCustomer(){
 
     }
 
@@ -26,7 +26,7 @@ public class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
      * @param SObject[] objs
      * @return void
     **/
-    public override void create( SObject[] objs ){
+    global override void create( SObject[] objs ){
         Contact[] customers = (Contact[]) objs;
 
         for( Contact obj : customers ){
@@ -46,6 +46,22 @@ public class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
             }
 
             containers.add( container );
+        }
+    }
+
+    /**
+     * @name addVersionId
+     * @description adds a verion id by it's name
+     * @param ContentVersion version
+     * @return void
+    **/
+    global override void addVersionId( ContentVersion version ){
+        String key = version.Brochure_Key__c;
+
+        if( versionIdsByTitle.containsKey(key) ){
+            versionIdsByTitle.get(key).add(version.Id);
+        } else {
+            versionIdsByTitle.put(key, new String[]{version.Id});
         }
     }
 }

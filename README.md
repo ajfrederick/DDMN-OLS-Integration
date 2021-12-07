@@ -16,3 +16,6 @@ There are also Salesforce metadata entities like custom fields, a record type, a
 4) Ensure the page layout assignment is correct for the record type
 5) Take care of field level visibilty on all fields
 6) Creat list view for Online Store Customer record type
+7) Upload Brochure PDFs for attachments
+8) Share files with User "API Integration" User (which is the User who's username DDMN Web Apps is using to make API calls and then subsequently is the User that will "send" the email. So it needs access to the files.)
+9) Register Bounce Report Email addresses as Custom Metadata Types

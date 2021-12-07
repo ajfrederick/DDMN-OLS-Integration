@@ -147,7 +147,7 @@ global virtual class EmailContainerCreator {
      * @param ContentVersion version
      * @return void
     **/
-    global void addVersionId( ContentVersion version ){
+    global virtual void addVersionId( ContentVersion version ){
         String key = version.Title;
 
         if( versionIdsByTitle.containsKey(key) ){

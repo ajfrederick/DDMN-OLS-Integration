@@ -68,7 +68,7 @@ public class OnlineStoreCustomerHelper {
     public static void sendEmails( Contact[] customers ){
         ContentVersion[] versions = getContentVersions(customers);
 
-        EmailContainerCreator containerCreator = new EmailContainerCreatorOLSCustomer();
+        EmailContainerCreatorOLSCustomer containerCreator = new EmailContainerCreatorOLSCustomer();
         containerCreator.setTemplate('Online_Store_Customer_Welcome');
         
         for( ContentVersion version : versions ){
@@ -81,7 +81,6 @@ public class OnlineStoreCustomerHelper {
         messageCreator.setOrgWideEmailAddressId(fromAddress);
         messageCreator.create();
 
-        // TODO: get this to work to update the Contact record to indicate that the email was sent
         EmailMessageHelper.handlers.add( new OLSCustomerEmailMessageHandler() );
 
         MessageHandler handler = new MessageHandler( messageCreator );
@@ -114,9 +113,10 @@ public class OnlineStoreCustomerHelper {
             versions.addAll([SELECT
                 Id,
                 Title,
-                VersionData
+                VersionData,
+                Brochure_Key__c
                     FROM ContentVersion
-                    WHERE Title IN :brochureKeys]);
+                    WHERE Brochure_Key__c IN :brochureKeys]);
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
@@ -174,9 +174,15 @@ public class OnlineStoreCustomerHelper {
         OLSCustomerBounceReportSchedulable schedulable = new OLSCustomerBounceReportSchedulable();
 
         // job for every Monday at 6am
-        String cronExp = '0 0 6 ? * MON';
+        String everyWeek = '0 0 6 ? * MON';
 
-        System.schedule(cronJobName, cronExp, schedulable);
+        // FOR TESTING: job for every Day at 6am
+        String everyDay = '0 0 6 * * ?';
+
+        // FOR TESTING: job for 3 minutes from now
+        String threeMinutesFromNow = getThreeMinutesFromNow();
+
+        System.schedule(cronJobName, everyDay, schedulable);
     }
 
     /**
@@ -226,6 +232,26 @@ public class OnlineStoreCustomerHelper {
      */
     public static Boolean isOnlineStoreCustomer( Contact customer ){
         return getRecordTypeId('Online_Store_Customer') != null && customer.RecordTypeId == getRecordTypeId('Online_Store_Customer');
+    }
+
+    /**
+     * @name getThreeMinutesFromNow
+     * @description a cron expression fro 3 minutes from now. For Testing purposes.
+     * @return String
+     */
+    public static String getThreeMinutesFromNow(){
+        DateTime now = DateTime.now();
+
+        Integer threeMinutesFromNow = now.minute() + 3;
+
+        String ret = now.second() + ' ';
+        ret += threeMinutesFromNow + ' ';
+        ret += now.hour() + ' ';
+        ret += now.day() + ' ';
+        ret += now.month() + ' ';
+        ret += '?';
+
+        return ret;
     }
 
 /**

@@ -5,7 +5,7 @@
     <encodingKey>UTF-8</encodingKey>
     <name>Online Store Customer Welcome</name>
     <style>none</style>
-    <subject>Welcome!</subject>
+    <subject>Thank you for purchasing {!Contact.Product_Purchased__c}</subject>
     <textOnly>Dear {!Contact.FirstName},
 
 We’re excited to welcome you to Delta Dental of Minnesota! You have made a great choice. We have attached your Certificate of Coverage for your records.
