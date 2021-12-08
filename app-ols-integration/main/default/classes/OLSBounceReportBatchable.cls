@@ -1,17 +1,17 @@
 /**
- * @name OLSCustomerBounceReportBatchable
+ * @name OLSBounceReportBatchable
  * @description this emails the bounce report of any Online Store Customer (contact) record and then sets the email bounced flag
  * as well as the bounce reported
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObject> {
+public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
 
 /**
  * FIELDS
  */
 
-    private static final String fromAddress = System.Label.Online_Store_Reply_From_Address;
+    private static final String fromAddress = System.Label.OLS_Email_From_Address;
 
     private Contact[] customers {
         get {
@@ -26,7 +26,7 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
  */
 
     public Database.QueryLocator start( Database.BatchableContext context ){
-        String olsCustomer = OnlineStoreCustomerHelper.getRecordTypeId('Online_Store_Customer');
+        String olsCustomer = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
 
         String q = 'SELECT ';
                 q += 'Id, ';
@@ -42,7 +42,7 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
                     q += 'FROM Contact ';
                     q += 'WHERE EmailBouncedDate != null ';
                     q += 'AND Bounce_Reported__c = false ';
-                    q += 'AND RecordTypeId = ' + olsCustomer;
+                    q += 'AND RecordTypeId = :olsCustomer';
 
         return Database.getQueryLocator(q);
     }
@@ -57,7 +57,7 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
         String subject = 'Online Store Customer Bounce Report';
         String body = 'Here is the bounce report for all Online Strore Customers who failed to received a brochure via email.';
 
-        String filename = 'OLS_BouncedEmails_' + newDate.month() + '-' + newDate.day() + '-' + newDate.year() + '.xlsx';
+        String filename = 'OLS_BouncedEmails_' + newDate.month() + '-' + newDate.day() + '-' + newDate.year() + '.csv';
         Blob attachmentBody = Blob.valueOf( getAttachmentBody() );
     
         EmailContainer container = new EmailContainer();
@@ -75,9 +75,6 @@ public class OLSCustomerBounceReportBatchable implements Database.Batchable<SObj
 
         MessageHandler handler = new MessageHandler( messageCreator );
         handler.handle();
-
-System.debug('messages ... ' + messageCreator.getOutboundMessages());
-System.debug('customers ... ' + customers);
 
         updateCustomers();
     }

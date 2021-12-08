@@ -1,11 +1,11 @@
 /**
- * @name OLSCustomerRestServiceHelper
+ * @name OLSRestServiceHelper
  * @description this class helps parse the JSON that is delivered to the apex rest service class OnlineStoreCustomerRestService.cls
  * as well as deliver contact that is loaded with all the values from the parsed JSON.
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public with sharing class OLSCustomerRestServiceHelper {
+public with sharing class OLSRestServiceHelper {
 
 /**
  * FIELDS
@@ -18,7 +18,7 @@ public with sharing class OLSCustomerRestServiceHelper {
 * CONSTRUCTOR
 */
 
-    public OLSCustomerRestServiceHelper( String b ) {
+    public OLSRestServiceHelper( String b ) {
         requestBody = b;
     }
 
@@ -70,7 +70,7 @@ public with sharing class OLSCustomerRestServiceHelper {
             newContact.MailingStreet = customer.address.addressLine1;
         }
 
-        Id olsRecordTypeId = OnlineStoreCustomerHelper.getRecordTypeId('Online_Store_Customer');
+        Id olsRecordTypeId = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
 
         if( olsRecordTypeId != null ){
             newContact.RecordTypeId = olsRecordTypeId;

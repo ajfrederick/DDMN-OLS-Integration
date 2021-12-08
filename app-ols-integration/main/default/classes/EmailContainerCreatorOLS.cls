@@ -1,10 +1,10 @@
 /**
- * @name EmailContainerCreatorOLSCustomer
+ * @name EmailContainerCreatorOLS
  * @description Extracts Email from Online Store Customer Object
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
 **/
-global class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
+global class EmailContainerCreatorOLS extends EmailContainerCreator {
 
     private static final String bccAddress = System.Label.OLS_Email_Bcc_Address;
 
@@ -12,7 +12,7 @@ global class EmailContainerCreatorOLSCustomer extends EmailContainerCreator {
  * CONSTRUCTOR
 **/
 
-    global EmailContainerCreatorOLSCustomer(){
+    global EmailContainerCreatorOLS(){
 
     }
 

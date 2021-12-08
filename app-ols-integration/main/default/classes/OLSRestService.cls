@@ -1,5 +1,5 @@
 /**
- * @name OnlineStoreCustomerRestService
+ * @name OLSRestService
  * @description exposed rest api endpoint that is managed with a Connected App called DDMN Web Apps.
  * 
  * DDMN Web Apps access this end point with a JWT Bearer flow. This particular method is called in the Online Store when
@@ -8,7 +8,7 @@
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
 @RestResource(urlMapping='/CreateOnlineStoreCustomer')
-global without sharing class OnlineStoreCustomerRestService {
+global without sharing class OLSRestService {
    
 /**
  * API METHODS
@@ -22,7 +22,7 @@ global without sharing class OnlineStoreCustomerRestService {
      */
     @HttpPost
     global static void create(){
-        OLSCustomerRestServiceHelper helper = getClientSideCustomer( RestContext.request.requestBody.toString() );
+        OLSRestServiceHelper helper = getClientSideCustomer( RestContext.request.requestBody.toString() );
 
         Contact newContact = insertContact( helper );
 
@@ -42,13 +42,13 @@ global without sharing class OnlineStoreCustomerRestService {
      * @param none
      * @return none
      */
-    private static OLSCustomerRestServiceHelper getClientSideCustomer( String requestBody ){
+    private static OLSRestServiceHelper getClientSideCustomer( String requestBody ){
 
-        OLSCustomerRestServiceHelper helper;
+        OLSRestServiceHelper helper;
 
         try {
             
-            helper = new OLSCustomerRestServiceHelper( requestBody );
+            helper = new OLSRestServiceHelper( requestBody );
             helper.parseRequest();
              
         } catch( Exception e ){
@@ -72,7 +72,7 @@ global without sharing class OnlineStoreCustomerRestService {
      * @param none
      * @return none
      */
-    private static Contact insertContact( OLSCustomerRestServiceHelper helper ){
+    private static Contact insertContact( OLSRestServiceHelper helper ){
         if( helper == null || helper.customer == null ) return null;
 
         Contact newContact;

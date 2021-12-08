@@ -11,7 +11,7 @@ There are also Salesforce metadata entities like custom fields, a record type, a
 ## Post-Install TODOs:
 
 1) Assign Apex class access to Profile
-2) Create Org Wide Email Address that matches the custom label
+2) Create of Change Org Wide Email Address add match to custom label Online_Store_Reply_From_Address
 3) Ensure Profile has page layout and record type permissions
 4) Ensure the page layout assignment is correct for the record type
 5) Take care of field level visibilty on all fields

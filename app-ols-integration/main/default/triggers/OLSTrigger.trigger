@@ -1,10 +1,10 @@
 /**
- * @name OnlineStoreCustomerTrigger
+ * @name OLSTrigger
  * @description Trigger for Contact object
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-trigger OnlineStoreCustomerTrigger on Contact (
+trigger OLSTrigger on Contact (
     //before insert,
     after insert
     //before update,
@@ -30,7 +30,7 @@ trigger OnlineStoreCustomerTrigger on Contact (
     if( Trigger.isAfter ){
 
         if( Trigger.isInsert ){
-            OnlineStoreCustomerHelper.afterInsert( Trigger.new );
+            OLSTriggerHelper.afterInsert( Trigger.new );
         } else
         if( Trigger.isUpdate ){
 

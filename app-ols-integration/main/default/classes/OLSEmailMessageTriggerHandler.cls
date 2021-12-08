@@ -1,5 +1,5 @@
 /**
- * @name OLSCustomerEmailMessageHandler
+ * @name OLSEmailMessageTriggerHandler
  * @description handler that is accessed in the EmailApp EmailMessageTrigger
  * 
  * Updates a Contact record that is an Online Store Customer to indicate that an email was sent and/or bounced after
@@ -7,13 +7,13 @@
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public class OLSCustomerEmailMessageHandler implements EmailMessageTriggerHandler {
+public class OLSEmailMessageTriggerHandler implements EmailMessageTriggerHandler {
 
 /**
  * CONSTRUCTOR
  */
 
-    public OLSCustomerEmailMessageHandler(){
+    public OLSEmailMessageTriggerHandler(){
 
     }
  
@@ -97,7 +97,7 @@ public class OLSCustomerEmailMessageHandler implements EmailMessageTriggerHandle
 
         try {
 
-            Id rtId = OnlineStoreCustomerHelper.getRecordTypeId('Online_Store_Customer');
+            Id rtId = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
 
             customers.addAll([SELECT
                                 Id,

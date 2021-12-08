@@ -1,16 +1,16 @@
 /**
- * @name OnlineStoreCustomerHelper
- * @description helper for OnlineStoreCustomerTrigger.trigger
+ * @name OLSTriggerHelper
+ * @description helper for OnlineStoreCustomerTrigger.trigger and throughout the application
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public class OnlineStoreCustomerHelper {
+public class OLSTriggerHelper {
 
 /**
  * FIELDS
  */
 
-    private static final String fromAddress = System.Label.Online_Store_Reply_From_Address;
+    private static final String fromAddress = System.Label.OLS_Email_From_Address;
 
     // A list of record type developer/api names that we will use to get the recordType Ids to use below
     private static final String[] RecordTypeNames = new String[]{
@@ -68,7 +68,7 @@ public class OnlineStoreCustomerHelper {
     public static void sendEmails( Contact[] customers ){
         ContentVersion[] versions = getContentVersions(customers);
 
-        EmailContainerCreatorOLSCustomer containerCreator = new EmailContainerCreatorOLSCustomer();
+        EmailContainerCreatorOLS containerCreator = new EmailContainerCreatorOLS();
         containerCreator.setTemplate('Online_Store_Customer_Welcome');
         
         for( ContentVersion version : versions ){
@@ -81,7 +81,7 @@ public class OnlineStoreCustomerHelper {
         messageCreator.setOrgWideEmailAddressId(fromAddress);
         messageCreator.create();
 
-        EmailMessageHelper.handlers.add( new OLSCustomerEmailMessageHandler() );
+        EmailMessageHelper.handlers.add( new OLSEmailMessageTriggerHandler() );
 
         MessageHandler handler = new MessageHandler( messageCreator );
         handler.handle();
@@ -171,7 +171,7 @@ public class OnlineStoreCustomerHelper {
 
         if( job != null ) return;
 
-        OLSCustomerBounceReportSchedulable schedulable = new OLSCustomerBounceReportSchedulable();
+        OLSBounceReportSchedulable schedulable = new OLSBounceReportSchedulable();
 
         // job for every Monday at 6am
         String everyWeek = '0 0 6 ? * MON';
@@ -182,7 +182,7 @@ public class OnlineStoreCustomerHelper {
         // FOR TESTING: job for 3 minutes from now
         String threeMinutesFromNow = getThreeMinutesFromNow();
 
-        System.schedule(cronJobName, everyDay, schedulable);
+        System.schedule(cronJobName, threeMinutesFromNow, schedulable);
     }
 
     /**
