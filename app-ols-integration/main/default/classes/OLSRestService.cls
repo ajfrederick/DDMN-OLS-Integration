@@ -22,14 +22,16 @@ global without sharing class OLSRestService {
      */
     @HttpPost
     global static void create(){
-        OLSRestServiceHelper helper = getClientSideCustomer( RestContext.request.requestBody.toString() );
+        String requestBody = RestContext.request.requestBody.toString();
+
+        OLSRestServiceHelper helper = getClientSideCustomer( requestBody );
 
         Contact newContact = insertContact( helper );
 
-        if( newContact != null && newContact.Id != null ){
-            RestContext.response.statusCode = 201;
-            RestContext.response.responseBody = Blob.valueOf( JSON.serialize( newContact ) );
-        }
+        if( newContact == null || newContact.Id == null ) return;
+
+        RestContext.response.statusCode = 201;
+        RestContext.response.responseBody = Blob.valueOf( JSON.serialize( newContact ) );
     }
 
 /**
@@ -81,7 +83,7 @@ global without sharing class OLSRestService {
             
             newContact = helper.getNewContact();
 
-            if( !OnlineStoreCustomerHelper.isOnlineStoreCustomer( newContact ) ){
+            if( !OLSTriggerHelper.isOnlineStoreCustomer( newContact ) ){
                 throw new OnlineStoreCustomerException('This Contact could not be set as an Online Store Customer Record Type.');
             }
 
