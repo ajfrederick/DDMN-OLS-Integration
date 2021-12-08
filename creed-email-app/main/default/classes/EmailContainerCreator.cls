@@ -138,7 +138,7 @@ global virtual class EmailContainerCreator {
      * @return void
     **/
     global void setTemplate( String name ){
-        template = Utils.getTemplate( name );
+        template = EmailMessageUtils.getTemplate( name );
     }
 
     /**

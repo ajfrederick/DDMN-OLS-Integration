@@ -53,7 +53,7 @@ global class MessageHandler {
     **/
     private void send( Messaging.SingleEmailMessage[] messages ){
 
-        //Utils.EmailLimitsData limitsData = Utils.getEmailLimitsData();
+        //EmailMessageUtils.EmailLimitsData limitsData = EmailMessageUtils.getEmailLimitsData();
 
         try {
             /*

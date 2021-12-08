@@ -173,7 +173,7 @@ global class MessageCreatorOutbound extends MessageCreator {
      * @param String address
     **/
     global void setOrgWideEmailAddressId( String addressName ){
-        OrgWideEmailAddress oweAddress = Utils.getOrgWideEmailAddress( addressName );
+        OrgWideEmailAddress oweAddress = EmailMessageUtils.getOrgWideEmailAddress( addressName );
 
         if( oweAddress != null ){
             oweAddressId = oweAddress.Id;

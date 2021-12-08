@@ -400,7 +400,7 @@ global class EmailContainer {
         }
 
         private void setContentType( String filename ){
-            Map<String, String> contentTypes = Utils.contentTypes;
+            Map<String, String> contentTypes = EmailMessageUtils.contentTypes;
 
             extension = filename.substringAfterLast('.');
 
