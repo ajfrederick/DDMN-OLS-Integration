@@ -45,6 +45,10 @@ public with sharing class OLSRestServiceHelper {
         if( customer == null ) return null;
 
         Boolean paymentSuccessful = customer.paymentDetails.paymentSuccessful == 'true' ? true : customer.paymentDetails.paymentSuccessful == 'false' ? false : null;
+        
+        String amount = customer.amount.replace('$','');
+
+        Decimal initalPaymentAmount = isDecimal(amount) ? Decimal.valueOf(amount) : null;
 
         Contact newContact = new Contact(
             FirstName = customer.firstName,
@@ -54,10 +58,12 @@ public with sharing class OLSRestServiceHelper {
             MailingCity = customer.address.city,
             MailingState = customer.address.state,
             MailingPostalCode = customer.address.zip,
+            Initial_Payment_Amount__c = initalPaymentAmount,
             Product_Purchased__c = customer.product,
             Brochure_Key__c = customer.brochureKey,
             Brochure_URL__c = customer.brochureUrl,
-            CAID__c = customer.caid,
+            CAID__c = customer.preEnrollment.caid,
+            State_Acronym__c = customer.preEnrollment.stateAcronym,
             Customer_Id__c = customer.paymentDetails.customerId,
             Payment_Successful__c = paymentSuccessful,
             Payment_Type__c = customer.paymentDetails.paymentType,
@@ -79,6 +85,22 @@ public with sharing class OLSRestServiceHelper {
         return newContact;
     }
 
+    /**
+     * @name isDecimal
+     * @description this is to avoid errors if the amount from the JSON is malformed
+     * @param String amount
+     * @return Decimal
+     */
+    public Boolean isDecimal( String amount ){
+        String isDecimalRegEx = '^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)$';
+
+        Pattern decimalPattern = Pattern.compile( isDecimalRegEx );
+
+        Matcher decimalMatcher = decimalPattern.matcher( amount );
+
+        return decimalMatcher.matches();
+    }
+
 /**
 * CLASSES
 */
@@ -90,11 +112,15 @@ public with sharing class OLSRestServiceHelper {
         public String email {get;set;}
         public AddressData address {get;set;}
         public String phone {get;set;}
+        public String accessCode {get;set;}
+        public String amount {get;set;}
         public String product {get;set;}
         public String brochureKey {get;set;}
         public String brochureUrl {get;set;}
-        public String caid {get;set;}
+        public PreEnrollment preEnrollment {get;set;}
+        public String postBackUrl {get;set;}
         public PaymentDetails paymentDetails {get;set;}
+        public Enrollment enrollment {get;set;}
     }
 
     public class AddressData {
@@ -109,10 +135,24 @@ public with sharing class OLSRestServiceHelper {
         public String paymentSuccessful {get;set;}
         public String paymentType {get;set;}
         public String customerId {get;set;}
+        public String transactionId {get;set;}
+        public String transactionDate {get;set;}
         public String paymentAuthNumber {get;set;}
         public String bankAccountType {get;set;}
         public String paymentFrequency {get;set;}
         public String callingApplication {get;set;}
         public String paymentErrorMessage {get;set;}
+    }
+
+    public class PreEnrollment {
+        public String status {get;set;}
+        public String stateAcronym {get;set;}
+        public String preEnrollmentId {get;set;}
+        public String caid {get;set;}
+    }
+
+    public class Enrollment {
+        public String status {get;set;}
+        public String enrollmentId {get;set;}
     }
 }

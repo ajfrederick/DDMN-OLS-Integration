@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Welcome email for Online Store Customers that come through DDMN Web Apps for Nebraska contacts.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Online Store Customer Welcome NE</name>
+    <style>none</style>
+    <subject>Thank you for purchasing {!Contact.Product_Purchased__c}</subject>
+    <textOnly>Dear {!Contact.FirstName},
+
+We’re excited to welcome you to Delta Dental of Nebraska! You have made a great choice. We have attached your Certificate of Coverage for your records.
+
+As a Delta Dental member, you can access your benefits information anytime via the Member Portal at https://www.deltadentalne.org/myaccount. The Member Portal allows you to manage benefits securely with a tablet, computer or using our mobile application. You can find a participating dentist, check benefits, review explanations of benefits and amounts used toward maximums or deductibles, print ID cards, and more.
+
+Getting Started - Frequently Asked Questions:
+
+Q: When will payment be pulled from my account?
+A: Typically, payments are pulled the 5th of each month.
+
+Q: Will you be sending me receipts for my payment?
+A: We do not send receipts, but you can visit https://www.deltadentalne.org/myaccount anytime to view and print receipts.
+
+Q: When will I receive my ID card?
+A: Your ID card will be available for you to print or download from the Member Portal
+
+Q: How can I update my payment election information?
+A: Your payment election information can be found by logging into https://www.deltadentalne.org/myaccount. If you wish to make changes to your payment information you can do so within the site.
+
+For other general questions and the latest information on your benefits, please visit our FAQs online at https://www.deltadentalne.org/myaccount.
+
+Congratulations on making the smart choice to protect your smile!
+
+Sincerely,
+
+Delta Dental
+
+Please do not reply to this email. This email is sent from a mailbox that does not accept replies.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

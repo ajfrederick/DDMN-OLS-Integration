@@ -29,6 +29,8 @@ global class EmailContainerCreatorOLS extends EmailContainerCreator {
     global override void create( SObject[] objs ){
         Contact[] customers = (Contact[]) objs;
 
+        EmailContainer[] neContainers = new EmailContainer[]{};
+
         for( Contact obj : customers ){
             if( obj.Email == null ) continue;
             
@@ -37,7 +39,14 @@ global class EmailContainerCreatorOLS extends EmailContainerCreator {
             container.ToAddresses.add(obj.Email);
             container.BccAddresses.add(bccAddress);
             container.whoId = obj.Id; // since this is a contact set the whoId
-            container.template = template;
+
+            // this how we'll manage dynamically setting the Nebraska template
+            if( obj.State_Acronym__c != 'DDNE' ){
+                container.template = template;
+            } else 
+            if( obj.State_Acronym__c == 'DDNE' ) {
+                neContainers.add( container );
+            }
 
             if( versionIdsByTitle.containsKey( obj.Brochure_Key__c ) ){
                 String[] versionIds = versionIdsByTitle.get( obj.Brochure_Key__c );
@@ -46,6 +55,15 @@ global class EmailContainerCreatorOLS extends EmailContainerCreator {
             }
 
             containers.add( container );
+        }
+
+        if( !neContainers.isEmpty() ){
+            
+            setTemplate('Online_Store_Customer_Welcome_NE');
+
+            for( EmailContainer container : neContainers ){
+                container.template = template;
+            }
         }
     }
 
