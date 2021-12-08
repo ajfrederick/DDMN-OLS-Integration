@@ -5,7 +5,7 @@
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public with sharing class OLSRestServiceHelper {
+public without sharing class OLSRestServiceHelper {
 
 /**
  * FIELDS
@@ -91,7 +91,7 @@ public with sharing class OLSRestServiceHelper {
      * @param String amount
      * @return Decimal
      */
-    public Boolean isDecimal( String amount ){
+    private Boolean isDecimal( String amount ){
         String isDecimalRegEx = '^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)$';
 
         Pattern decimalPattern = Pattern.compile( isDecimalRegEx );

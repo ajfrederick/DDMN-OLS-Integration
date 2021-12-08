@@ -81,6 +81,7 @@ public class OLSTriggerHelper {
         messageCreator.setOrgWideEmailAddressId(fromAddress);
         messageCreator.create();
 
+        // this get fired in the email app EmailMessageTrigger
         EmailMessageHelper.handlers.add( new OLSEmailMessageTriggerHandler() );
 
         MessageHandler handler = new MessageHandler( messageCreator );
