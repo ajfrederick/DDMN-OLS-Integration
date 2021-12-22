@@ -1,6 +1,8 @@
 /**
  * @name CreedExceptionHandler
  * @description custom exception handler for robust debugging and sends an email notification
+ * 
+ * @author Andrew Frederick (Creed Interactive) 11/23/2021
 **/
 global class CreedExceptionHandler {
 
@@ -12,13 +14,29 @@ global class CreedExceptionHandler {
     private Exception ex {get;set;}
 
     // email address to send error details to
-    private static final String recipientAddress = 'salesforceteam@creedinteractive.com';
+    private static final String creedAddress = 'salesforceteam@creedinteractive.com';
 
     // org name for email subject and body
-    private static final String orgName = ConnectApi.Organization.getSettings().Name;
+    private static String orgName = '';
+
+    static {
+        try {
+            orgName = [SELECT InstanceName FROM Organization LIMIT 1].InstanceName;
+        } catch( Exception e ){
+
+        }
+    }
 
     // optional append a message
     private String appendedMessage {get;set;}
+
+    private String[] recipientAddresses {
+        get {
+            if( recipientAddresses == null ) recipientAddresses = new String[]{};
+            return recipientAddresses;
+        }
+        set;
+    }
 
     // a list of sobjects to derive error info for email
     private SObject[] errorRecords {
@@ -32,7 +50,7 @@ global class CreedExceptionHandler {
 /**
  * CONSTRUCTOR
 **/
-    
+
     global CreedExceptionHandler( Exception e ) {
         ex = e;
     }
@@ -88,19 +106,15 @@ global class CreedExceptionHandler {
      * @return void
     **/
     global void email(){
-        EmailLimitsData limitsData = new EmailLimitsData();
-
-System.debug(limitsData);
-
-        if( limitsData.limitExceeded ) return;
-
         Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
+
+        recipientAddresses.add(creedAddress);
 
         String body = getMessageBody( ex );
 
         message.setHtmlBody( body );
         message.setSubject( 'Caught Apex Exception in org: ' + orgName );
-        message.setToAddresses( new String[]{ recipientAddress } );
+        message.setToAddresses( recipientAddresses );
 
         message.setSaveAsActivity( false );
         message.setUseSignature( false );
@@ -116,6 +130,26 @@ System.debug(limitsData);
     **/
     global void addMessage( String message ){
         appendedMessage = message;
+    }
+
+    /**
+     * @name addAddress
+     * @description appends additional recipient email addresses
+     * @param String address
+     * @return void
+    **/
+    global void addAddress( String address ){
+        String emailRegex = '^[a-zA-Z0-9._|\\\\%#~`=?&/$^*!}{+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$';
+
+        Pattern myPattern = Pattern.compile(emailRegex);
+        Matcher myMatcher = myPattern.matcher(address);
+
+        if( !myMatcher.matches() ){
+            System.debug('Error while attempting to add a recipient address in CreedExceptionHandler. ' + address + ' is an invalid email address.');
+            return;
+        }
+
+        recipientAddresses.add( address );
     }
 
 /**
@@ -197,46 +231,5 @@ System.debug(limitsData);
         }
 
         return message;
-    }
-
-/**
- * CLASSES
-**/
-    global class EmailLimitsData {
-
-        public Integer emailTotalLimit {get;set;}
-        public Integer totalSentToday {get;set;}
-        public Boolean limitExceeded {get;set;}
-
-        @namespaceAccessible
-        public EmailLimitsData(){
-            // set total amount of emails that can be sent in a day
-            emailTotalLimit = Limits.getLimitEmailInvocations();
-
-            Date today = Date.today();
-            DateTime dayStart = DateTime.newInstance( today.year(), today.month(), today.day(), 0, 0, 0 );
-            DateTime dayEnd = DateTime.newInstance( today.year(), today.month(), today.day(), 11, 59, 59 );
-
-            // set total emails sent today
-            try {
-
-                totalSentToday = [SELECT 
-                                    Count() 
-                                        FROM EmailMessage 
-                                        WHERE MessageDate >= :dayStart
-                                        AND MessageDate <= :dayEnd];
-
-            } catch( Exception e ){
-                CreedExceptionHandler handler = new CreedExceptionHandler(e);
-                handler.debug();
-            }
-
-            // set if the limit has been reached or exceeded
-            if( totalSentToday >= emailTotalLimit ){
-                limitExceeded = true;
-            } else {
-                limitExceeded = false;
-            }
-        }
     }
 }

@@ -92,7 +92,9 @@ global class EmailMessageUtils {
      * @description returns data on email limits for the org
      * @param String name
      * @return EmailTemplate
-    **/
+     * 
+     * TODO: finish POC on this
+     * 
     global static EmailLimitsData getEmailLimitsData(){
         return new EmailLimitsData();
     }
@@ -134,4 +136,5 @@ global class EmailMessageUtils {
             }
         }
     }
+    **/
 }

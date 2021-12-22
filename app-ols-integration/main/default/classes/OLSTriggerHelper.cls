@@ -183,7 +183,7 @@ public class OLSTriggerHelper {
         // FOR TESTING: job for 3 minutes from now
         String threeMinutesFromNow = getThreeMinutesFromNow();
 
-        System.schedule(cronJobName, everyDay, schedulable);
+        System.schedule(cronJobName, everyWeek, schedulable);
     }
 
     /**

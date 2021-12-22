@@ -370,6 +370,8 @@ global class EmailContainer {
      * @return String
      */
     private String checkBodyLength( String body ){
+        if( body == null ) return body;
+        
         if( body.length() > 30000 ) body = body.substring( 0, 29999 ) + '... (original message truncated due to size)';
 
         return body;

@@ -17,6 +17,7 @@ public class CreedExceptionHandlerTest {
                 insert contact;
             } catch( Exception e ){
                 CreedExceptionHandler handler = new CreedExceptionHandler(e);
+                handler.addAddress('test@me.com');
                 handler.handle();
             }
 

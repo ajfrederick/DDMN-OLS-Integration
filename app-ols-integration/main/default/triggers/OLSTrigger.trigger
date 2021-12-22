@@ -1,6 +1,6 @@
 /**
  * @name OLSTrigger
- * @description Trigger for Contact object
+ * @description Trigger for Contact object for Online Store Integration
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
@@ -13,7 +13,7 @@ trigger OLSTrigger on Contact (
     //after delete,
     //after undelete,
 ){
-
+    /*
     if( Trigger.isBefore ){
 
         if( Trigger.isInsert ){
@@ -27,11 +27,15 @@ trigger OLSTrigger on Contact (
         }
 
     } else
+    */
     if( Trigger.isAfter ){
 
         if( Trigger.isInsert ){
             OLSTriggerHelper.afterInsert( Trigger.new );
-        } else
+        } 
+        
+        /*
+        else
         if( Trigger.isUpdate ){
 
         } else
@@ -41,5 +45,6 @@ trigger OLSTrigger on Contact (
         if( Trigger.isUndelete ){
 
         }
+        */
     }
 }
