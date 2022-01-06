@@ -24,14 +24,15 @@ global without sharing class OLSRestService {
     global static void create(){
         String requestBody = RestContext.request.requestBody.toString();
 
-        OLSRestServiceHelper helper = getClientSideCustomer( requestBody );
+        // set payment successful param to true
+        OLSRestServiceHelper helper = getClientSideCustomer( requestBody, true );
 
-        Contact newContact = insertContact( helper );
+        Contact contact = upsertContact( helper );
 
-        if( newContact == null || newContact.Id == null ) return;
+        if( contact == null || contact.Id == null ) return;
 
         RestContext.response.statusCode = 201;
-        RestContext.response.responseBody = Blob.valueOf( JSON.serialize( newContact ) );
+        RestContext.response.responseBody = Blob.valueOf( JSON.serialize( contact ) );
     }
 
 /**
@@ -39,18 +40,19 @@ global without sharing class OLSRestService {
  */
 
     /**
-     * @name insertContact
+     * @name getClientSideCustomer
      * @description deconstructs the request JSON into typed class to be worked with in insertContact()
-     * @param none
-     * @return none
+     * @param String requestBody
+     * @param Boolean paymentSuccessful
+     * @return OLSRestServiceHelper
      */
-    private static OLSRestServiceHelper getClientSideCustomer( String requestBody ){
+    public static OLSRestServiceHelper getClientSideCustomer( String requestBody, Boolean paymentSuccessful ){
 
         OLSRestServiceHelper helper;
 
         try {
             
-            helper = new OLSRestServiceHelper( requestBody );
+            helper = new OLSRestServiceHelper( requestBody, paymentSuccessful );
             helper.parseRequest();
              
         } catch( Exception e ){
@@ -69,28 +71,28 @@ global without sharing class OLSRestService {
     }
 
     /**
-     * @name insertContact
-     * @description inserts actual Contact record
-     * @param none
-     * @return none
+     * @name upsertContact
+     * @description inserts new Contact record or updates an old one where the payment was unnsuccessful
+     * @param OLSRestServiceHelper helper
+     * @return Contact
      */
-    private static Contact insertContact( OLSRestServiceHelper helper ){
+    public static Contact upsertContact( OLSRestServiceHelper helper ){
         if( helper == null || helper.customer == null ) return null;
 
-        Contact newContact;
+        Contact contact;
 
         try {
             
-            newContact = helper.getNewContact();
+            contact = helper.getContact();
 
-            if( !OLSTriggerHelper.isOnlineStoreCustomer( newContact ) ){
+            if( !OLSTriggerHelper.isOnlineStoreCustomer( contact ) ){
                 throw new OnlineStoreCustomerException('This Contact could not be set as an Online Store Customer Record Type.');
             }
 
-            insert newContact;
+            upsert contact;
 
         } catch( Exception e ){
-            String JSONContact = JSON.serialize( newContact );
+            String JSONContact = JSON.serialize( contact );
 
             CreedExceptionHandler handler = new CreedExceptionHandler( e );
             handler.addMessage('Online Store Contact\'s Detail: ' + JSONContact );
@@ -103,7 +105,7 @@ global without sharing class OLSRestService {
             RestContext.response.responseBody = Blob.valueOf( JSON.serialize( error ) );
         }
 
-        return newContact;
+        return contact;
     }
 
 /**

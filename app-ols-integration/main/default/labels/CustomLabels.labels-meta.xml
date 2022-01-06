@@ -12,6 +12,13 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>OLS Email From Address</shortDescription>
-        <value>creed.sf.test@gmail.com</value>
+        <value>no-reply@deltadentalmn.org</value>
+    </labels>
+    <labels>
+        <fullName>OLS_Email_From_Address_NE</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>OLS Email From Address NE</shortDescription>
+        <value>no-reply@deltadentalne.org</value>
     </labels>
 </CustomLabels>

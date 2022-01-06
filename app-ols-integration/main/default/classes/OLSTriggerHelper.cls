@@ -12,6 +12,8 @@ public class OLSTriggerHelper {
 
     private static final String fromAddress = System.Label.OLS_Email_From_Address;
 
+    private static final String fromAddressNE = System.Label.OLS_Email_From_Address_NE;
+
     // A list of record type developer/api names that we will use to get the recordType Ids to use below
     private static final String[] RecordTypeNames = new String[]{
         'Online_Store_Customer'
@@ -44,12 +46,24 @@ public class OLSTriggerHelper {
  */
 
     /**
-     * @name beforeInsert
-     * @description gets called in trigger before insert
+     * @name afterInsert
+     * @description gets called in trigger after insert
      * @param Contact[] customers
      * @return none
      */
     public static void afterInsert( Contact[] newList ){
+        Contact[] customers = sortOnlineStoreCustomers( newList );
+
+        sendEmails( customers );
+    }
+
+    /**
+     * @name afterUpdate
+     * @description gets called in trigger after update
+     * @param Contact[] customers
+     * @return none
+     */
+    public static void afterUpdate( Contact[] newList ){
         Contact[] customers = sortOnlineStoreCustomers( newList );
 
         sendEmails( customers );
@@ -61,11 +75,38 @@ public class OLSTriggerHelper {
 
     /**
      * @name sendEmails
-     * @description gets called in trigger after insert handles
+     * @description gets called in trigger after insert handler
      * @param Contact[] customers
      * @return none
      */
-    public static void sendEmails( Contact[] customers ){
+    private static void sendEmails( Contact[] customers ){
+        Contact[] customersNotNE = new Contact[]{};
+        Contact[] customersNE = new Contact[]{};
+
+        for( Contact customer : customers ){
+
+            if( customer.State_Acronym__c == 'NE' ){
+                customersNE.add(customer);
+            } else {
+                customersNotNE.add(customer);
+            }
+        }
+
+        sendEmailsNotNE( customersNotNE );
+        sendEmailsNE( customersNE );
+
+        scheduleJob();
+    }
+
+    /**
+     * @name sendEmailsNotNE
+     * @description sends emails to customers from MN and ND
+     * @param Contact[] customers
+     * @return none
+     */
+    private static void sendEmailsNotNE( Contact[] customers ){
+        if( customers.isEmpty() ) return;
+
         ContentVersion[] versions = getContentVersions(customers);
 
         EmailContainerCreatorOLS containerCreator = new EmailContainerCreatorOLS();
@@ -86,8 +127,38 @@ public class OLSTriggerHelper {
 
         MessageHandler handler = new MessageHandler( messageCreator );
         handler.handle();
+    }
 
-        scheduleJob();
+    /**
+     * @name sendEmails
+     * @description sends emails to customers from NE. The distinction was made to avoid confusion for NE people
+     * since there is a Delta Dental NE "branch" organization.
+     * @param Contact[] customers
+     * @return none
+     */
+    private static void sendEmailsNE( Contact[] customers ){
+        if( customers.isEmpty() ) return;
+
+        ContentVersion[] versions = getContentVersions(customers);
+
+        EmailContainerCreatorOLS containerCreator = new EmailContainerCreatorOLS();
+        containerCreator.setTemplate('Online_Store_Customer_Welcome_NE'); // Template is NE specific
+        
+        for( ContentVersion version : versions ){
+            containerCreator.addVersionId( version );
+        }
+
+        containerCreator.create(customers);
+
+        MessageCreatorOutbound messageCreator = new MessageCreatorOutbound( containerCreator.getContainers() );
+        messageCreator.setOrgWideEmailAddressId(fromAddressNE); // And From Address is NE specific
+        messageCreator.create();
+
+        // this get fired in the email app EmailMessageTrigger
+        EmailMessageHelper.handlers.add( new OLSEmailMessageTriggerHandler() );
+
+        MessageHandler handler = new MessageHandler( messageCreator );
+        handler.handle();
     }
 
 /**
@@ -137,7 +208,7 @@ public class OLSTriggerHelper {
         Contact[] customers = new Contact[]{};
 
         for( Contact customer : newList ){
-            if( isNewOnlineStoreCustomer( customer ) ){
+            if( isNewSuccessfulOnlineStoreCustomer( customer ) ){
                 customers.add( customer );
             }
         }
@@ -212,19 +283,20 @@ public class OLSTriggerHelper {
     }
 
     /**
-     * @name isNewOnlineStoreCustomer
+     * @name isNewSuccessfulOnlineStoreCustomer
      * @description this checks to make sure a contact record is indeed an Online Store Customer.
      * 1) is an online store customer contact record
      * 2) and an email hasn't been sent yet.
+     * 3) and that the payment has been successful
      * @param Contact customer 
      * @return Boolean
      */
-    public static Boolean isNewOnlineStoreCustomer( Contact customer ){
-        return isOnlineStoreCustomer( customer ) && !customer.Email_Sent__c;
+    public static Boolean isNewSuccessfulOnlineStoreCustomer( Contact customer ){
+        return isOnlineStoreCustomer( customer ) && (!customer.Email_Sent__c) && customer.Payment_Successful__c;
     }
 
     /**
-     * @name isNewOnlineStoreCustomer
+     * @name isOnlineStoreCustomer
      * @description this checks to make sure a contact record is indeed an Online Store Customer.
      * 1) First we want to make sure the RecordType exists
      * 2) we want to make sure that the Contact record has a the Online_Store_Customer RecordTypeId
@@ -240,7 +312,7 @@ public class OLSTriggerHelper {
      * @description a cron expression fro 3 minutes from now. For Testing purposes.
      * @return String
      */
-    public static String getThreeMinutesFromNow(){
+    private static String getThreeMinutesFromNow(){
         DateTime now = DateTime.now();
 
         Integer threeMinutesFromNow = now.minute() + 3;

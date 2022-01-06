@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Effective_Date__c</fullName>
+    <description>This is for Online Store Customers. It is the effective date of a policy with a prior carrier.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>This is for Online Store Customers. It is the effective date of a policy with a prior carrier.</inlineHelpText>
+    <label>Effective Date</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Date</type>
+</CustomField>

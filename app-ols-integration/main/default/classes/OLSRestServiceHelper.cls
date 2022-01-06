@@ -9,87 +9,281 @@ public without sharing class OLSRestServiceHelper {
 
 /**
  * FIELDS
- */
+ */ 
 
+    // this is the JSON that comes from the DDMN webapps
     public String requestBody;
+
+    // this is marked by the apex REST service that instantiates this class. There are two entry points.
+    // One for a successful payment upon enrollment and one for an unsuccessful payment.
+    public Boolean paymentSuccessful;
+
+    // this is the parsed customer object for us to extract data into a Contact object
     public ClientSideCustomer customer;
+
+/**
+ * FIELDS FOR DECONSTRUCTION
+ * 
+ * The following lazy loaded fields exist to hold the deconstructed data from the customer object.
+ * Doing this will help avoid de-referencing a null object in the case that one of the objects from the request is missing.
+ * The contact will still be created just missing some data if it is indeed missing.
+ * 
+ */
+    private AddressData address {
+        get {
+            if( address == null ) address = new AddressData();
+            return address;
+        }
+        set;
+    }
+
+    private ExistingCoverage existingCoverage {
+        get {
+            if( existingCoverage == null ) existingCoverage = new ExistingCoverage();
+            return existingCoverage;
+        }
+        set;
+    }
+
+    private PaymentDetails paymentDetails {
+        get {
+            if( paymentDetails == null ) paymentDetails = new PaymentDetails();
+            return paymentDetails;
+        }
+        set;
+    }
+
+    private PreEnrollment preEnrollment {
+        get {
+            if( preEnrollment == null ) preEnrollment = new PreEnrollment();
+            return preEnrollment;
+        }
+        set;
+    }
+
+    private Enrollment enrollment {
+        get {
+            if( enrollment == null ) enrollment = new Enrollment();
+            return enrollment;
+        }
+        set;
+    }
+
+    // let's just grab the record type id once to be referenced here
+    private static final Id olsCustomerRecordTypeId = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
 
 /**
 * CONSTRUCTOR
 */
 
-    public OLSRestServiceHelper( String b ) {
-        requestBody = b;
+    public OLSRestServiceHelper( String requestBody, boolean paymentSuccessful ) {
+        this.requestBody = requestBody;
+        this.paymentSuccessful = paymentSuccessful;
     }
 
 /**
 * ACTION METHODS
-*/  
+*/     
+
     /**
      * @name parseRequest
      * @description parses the JSON sent in the request to the OnlineStoreCustomerRestService.cls
-     * @param ClientSideCustomer customer
-     * @return Contact
+     * @return void
      */
     public void parseRequest(){
-        customer = (ClientSideCustomer) JSON.deserialize( requestBody, ClientSideCustomer.class );
+
+        if( paymentSuccessful ){
+            parseRequestSuccessful();
+        } else {
+            parseRequestUnsuccessful();
+        }
     }
 
     /**
-     * @name getNewContact
+     * @name parseRequestSuccessful
+     * @description parses the JSON sent in the request to the OnlineStoreCustomerRestService.cls
+     * @return void
+     */
+    public void parseRequestSuccessful(){
+        customer = (ClientSideCustomer) JSON.deserialize( requestBody, ClientSideCustomer.class );
+        
+        this.address = customer.address;
+        this.existingCoverage = customer.existingCoverage;
+        this.paymentDetails = customer.paymentDetails;
+        this.preEnrollment = customer.preEnrollment;
+        this.enrollment = customer.enrollment;
+    }
+
+    /**
+     * @name parseRequest
+     * @description parses the JSON sent in the request to the OnlineStoreCustomerRestService.cls
+     * @return void
+     */
+    public void parseRequestUnsuccessful(){
+        customer = (ClientSideCustomer) JSON.deserialize( requestBody, ClientSideCustomer.class );
+
+        this.address = customer.address;
+        this.existingCoverage = customer.existingCoverage;
+        this.paymentDetails = customer.paymentDetails;
+        this.preEnrollment = customer.preEnrollment;
+        this.enrollment = customer.enrollment;
+    }
+
+    /**
+     * @name getContact
      * @description gets Instance of contact (Online Store Customer) for insert
-     * @param ClientSideCustomer customer
      * @return Contact
      */
-    public Contact getNewContact(){
-        if( customer == null ) return null;
+    public Contact getContact(){
+        Contact contact;
 
-        Boolean paymentSuccessful = customer.paymentDetails.paymentSuccessful == 'true' ? true : customer.paymentDetails.paymentSuccessful == 'false' ? false : null;
+        if( paymentSuccessful ){
+            contact = getContactSuccessful();
+        } else {
+            contact = getContactUnsuccessful();
+        }
+
+        return contact;
+    }
+
+    /**
+     * @name getContactSuccessful
+     * @description gets Instance of contact (Online Store Customer) for insert when payment was successful
+     * @return Contact
+     */
+    public Contact getContactSuccessful(){
+        Contact contact = getBaseContact();
+
+        contact.Payment_Successful__c = paymentSuccessful;
+        contact.CAID__c = preEnrollment.caid;
+        contact.Initial_Payment_Amount__c = getAmount();
+        contact.Brochure_Key__c = customer.brochureKey;
+        contact.Brochure_URL__c = customer.brochureUrl;
+        contact.Customer_Id__c = paymentDetails.customerId;
+        contact.Payment_Type__c = paymentDetails.paymentType;
+        contact.Payment_Frequency__c = paymentDetails.paymentFrequency;
+
+        Contact oldContact = queryContact();
+
+        if( oldContact != null ){
+            contact.Id = oldContact.Id;
+        }
         
-        String amount = customer.amount.replace('$','');
+        return contact;
+    }
 
-        Decimal initalPaymentAmount = isDecimal(amount) ? Decimal.valueOf(amount) : null;
+    /**
+     * @name getContact
+     * @description gets Instance of contact (Online Store Customer) for insert when the payment from OLS was unnsuccessful
+     * @return Contact
+     */
+    public Contact getContactUnsuccessful(){
+        Contact contact = getBaseContact();
 
-        Contact newContact = new Contact(
+        contact.Payment_Successful__c = paymentSuccessful;
+
+        return contact;
+    }
+
+    /**
+     * @name getBaseContact
+     * @description both contacts will be formatted as such
+     * @return Contact
+     */
+    public Contact getBaseContact(){
+        return new Contact(
+            RecordTypeId = olsCustomerRecordTypeId,
             FirstName = customer.firstName,
             LastName = customer.lastName,
             Email = customer.email,
             Phone = customer.phone,
-            MailingCity = customer.address.city,
-            MailingState = customer.address.state,
-            MailingPostalCode = customer.address.zip,
-            Initial_Payment_Amount__c = initalPaymentAmount,
+            MailingStreet = getStreet(),
+            MailingCity = address.city,
+            MailingState = address.state,
+            MailingPostalCode = address.zip,
             Product_Purchased__c = customer.product,
-            Brochure_Key__c = customer.brochureKey,
-            Brochure_URL__c = customer.brochureUrl,
-            CAID__c = customer.preEnrollment.caid,
-            State_Acronym__c = customer.preEnrollment.stateAcronym,
-            Customer_Id__c = customer.paymentDetails.customerId,
-            Payment_Successful__c = paymentSuccessful,
-            Payment_Type__c = customer.paymentDetails.paymentType,
-            Payment_Frequency__c = customer.paymentDetails.paymentFrequency
+            CAID__c = preEnrollment.caid,
+            State_Acronym__c = preEnrollment.stateAcronym,
+            Current_Carrier__c = existingCoverage.carrier,
+            Effective_Date__c = getEffectiveDate(),
+            End_Date__c = getEndDate(),
+            Policy_Number__c = existingCoverage.policyNumber
         );
+    }
 
-        if( !String.isBlank(customer.address.addressLine2) ){
-            newContact.MailingStreet = customer.address.addressLine1 + ' ' + customer.address.addressLine2;
+    /**
+     * @name queryContact
+     * @description check to see if an Online Store Customer already exists from an unsuccessful payment
+     * We want to filter on these criteria...
+     * 1) The emails and names match
+     * 2) Payment was indeed unsuccessful before
+     * 3) That it is indeed an online store customer
+     * 4) that the CAID__c is not null as just one more check to enusre we only get an online store customer
+     * @return Contact
+     */
+    public Contact queryContact(){
+        Contact[] contacts = new Contact[]{};
+
+        try {
+
+            contacts.addAll([SELECT
+                                Id,
+                                FirstName,
+                                LastName,
+                                Email,
+                                RecordTypeId,
+                                CAID__c
+                                    FROM Contact
+                                    WHERE Email = :customer.email
+                                    AND FirstName = :customer.firstName
+                                    AND LastName = :customer.lastName
+                                    AND Payment_Successful__c = false
+                                    AND RecordTypeId = :olsCustomerRecordTypeId
+                                    AND CAID__c != null]);
+
+        } catch( Exception e ){
+            CreedExceptionHandler handler = new CreedExceptionHandler(e);
+            handler.debug();
+        }
+
+        if( contacts.isEmpty() ) return null;
+
+        return contacts[0];
+    }
+
+    /**
+     * @name getStreet
+     * @description gets street address
+     * @return String
+     */
+    private String getStreet(){
+        String street = '';
+
+        if( !String.isBlank(address.addressLine2) ){
+            street = address.addressLine1 + ' ' + address.addressLine2;
         } else {
-            newContact.MailingStreet = customer.address.addressLine1;
+            street = address.addressLine1;
         }
 
-        Id olsRecordTypeId = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
+        return street;
+    }
 
-        if( olsRecordTypeId != null ){
-            newContact.RecordTypeId = olsRecordTypeId;
-        }
+    /**
+     * @name getAmount
+     * @description gets payment amount
+     * @return Decimal
+     */
+    private Decimal getAmount(){
+        String amount = customer.amount != null ? customer.amount.replace('$','') : '0';
 
-        return newContact;
+        return isDecimal(amount) ? Decimal.valueOf(amount) : null;
     }
 
     /**
      * @name isDecimal
      * @description this is to avoid errors if the amount from the JSON is malformed
      * @param String amount
-     * @return Decimal
+     * @return Boolean
      */
     private Boolean isDecimal( String amount ){
         String isDecimalRegEx = '^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)$';
@@ -101,10 +295,52 @@ public without sharing class OLSRestServiceHelper {
         return decimalMatcher.matches();
     }
 
+    /**
+     * @name getEffectiveDate
+     * @description returns formatted effective date
+     * @return Date
+     */
+    private Date getEffectiveDate(){
+        return getDate( existingCoverage.effectiveDate );
+    }
+
+    /**
+     * @name getEndDate
+     * @description returns formatted end date
+     * @return Date
+     */
+    private Date getEndDate(){
+        return getDate( existingCoverage.endDate );
+    }
+
+    /**
+     * @name getDate
+     * @description this is to avoid errors if the date string from the JSON is malformed
+     * @param String date
+     * @return Date
+     */
+    private Date getDate( String dateString ){
+        Date newDate;
+
+        if( String.isBlank(dateString) ) return newDate;
+
+        try {
+
+            newDate = Date.valueOf(dateString);
+
+        } catch( Exception e ){
+            CreedExceptionHandler handler = new CreedExceptionHandler(e);
+            handler.debug();
+        }
+
+        return newDate;
+    }
+
 /**
 * CLASSES
 */
-    // this is the exact format we are expecting for a customer object from the DDMN WebApps Online Store
+
+    // These are the exact formats we are expecting for a customer object from the DDMN WebApps Online Store
     
     public class ClientSideCustomer {
         public String firstName {get;set;}
@@ -113,6 +349,7 @@ public without sharing class OLSRestServiceHelper {
         public AddressData address {get;set;}
         public String phone {get;set;}
         public String accessCode {get;set;}
+        public ExistingCoverage existingCoverage {get;set;}
         public String amount {get;set;}
         public String product {get;set;}
         public String brochureKey {get;set;}
@@ -129,6 +366,13 @@ public without sharing class OLSRestServiceHelper {
         public String city {get;set;}
         public String state {get;set;}
         public String zip {get;set;}
+    }
+
+    public class ExistingCoverage {
+        public String carrier {get;set;}
+        public String effectiveDate {get;set;}
+        public String endDate {get;set;}
+        public String policyNumber {get;set;}
     }
 
     public class PaymentDetails {

@@ -92,6 +92,49 @@ public with sharing class OLSTest {
     }
 
     @IsTest
+    public static void testApexRestServiceUnsuccessful(){
+        ContentVersion version = createContentVersion();
+
+        RestRequest req = new RestRequest();
+        RestResponse res = new RestResponse();
+
+        OLSRestServiceHelper.ClientSideCustomer customer = getClientSideCustomer('MN');
+        
+        req.requestURI = 'services/apexrest/creedint/CreateOnlineStoreCustomerUnsuccessful';
+        req.httpMethod = 'POST';
+        req.requestBody = Blob.valueOf( JSON.serialize(customer) );
+
+        RestContext.request = req;
+        RestContext.response = res;
+
+        Integer numberOfEmailsSent = 0;
+
+        Test.startTest();
+
+            OLSRestService.create();
+
+            numberOfEmailsSent = Limits.getEmailInvocations();
+
+        Test.stopTest();
+        
+        // System.assertEquals( 1, numberOfEmailsSent );
+
+        Contact[] contacts = [SELECT 
+                            Id, 
+                            FirstName,
+                            Email
+                                FROM Contact
+                                WHERE CAID__c = :customer.preEnrollment.caid];
+
+        System.assertEquals( 1, contacts.size() );
+
+        Contact contact = contacts[0];
+
+        System.assertEquals( contact.Email, customer.email );
+        System.assertEquals( contact.FirstName, customer.firstName );
+    }
+
+    @IsTest
     public static void testBadRequest(){
         RestRequest req = new RestRequest();
         RestResponse res = new RestResponse();
@@ -209,6 +252,12 @@ public with sharing class OLSTest {
         enrollment.status = 'good';
         enrollment.enrollmentId = 'id1';
 
+        OLSRestServiceHelper.ExistingCoverage existingCoverage = new OLSRestServiceHelper.ExistingCoverage();
+        existingCoverage.carrier = 'BCBS';
+        existingCoverage.policyNumber = 'policy111222';
+        existingCoverage.effectiveDate = '2016-12-29';
+        existingCoverage.endDate = '2021-09-02';
+
         OLSRestServiceHelper.ClientSideCustomer customer = new OLSRestServiceHelper.ClientSideCustomer();
         customer.firstName = 'Crazy New Test';
         customer.lastName = 'Customer';
@@ -216,6 +265,7 @@ public with sharing class OLSTest {
         customer.address = address;
         customer.phone = '222-234-5487';
         customer.accessCode = 'testcode';
+        customer.existingCoverage = existingCoverage;
         customer.amount = '$87.33';
         customer.product = 'Test Product';
         customer.brochureKey = 'Test_Brochure_Key';

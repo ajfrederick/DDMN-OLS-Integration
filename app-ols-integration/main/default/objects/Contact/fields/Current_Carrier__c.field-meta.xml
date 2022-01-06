@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Current_Carrier__c</fullName>
+    <description>This is for Online Store Customers. It is the name a prior carrier.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>This is for Online Store Customers. It is the name a prior carrier.</inlineHelpText>
+    <label>Current Carrier</label>
+    <length>80</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

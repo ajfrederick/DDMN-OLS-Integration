@@ -108,12 +108,12 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
         String body = 'Id, Name, Email, Mailing Address, Product Purchased, CAID, Created Date \n';
 
         for( Contact customer : this.customers ){
-            body += customer.Id + ',';
-            body += customer.FirstName + ' ' + customer.LastName + ',';
-            body += customer.Email + ',';
-            body += getMailingAddress(customer) + ',';
-            body += customer.Product_Purchased__c + ',';
-            body += customer.CAID__c + ',';
+            body += customer.Id + ', ';
+            body += customer.FirstName + ' ' + customer.LastName + ', ';
+            body += customer.Email + ', ';
+            body += getMailingAddress(customer) + ', ';
+            body += customer.Product_Purchased__c + ', ';
+            body += customer.CAID__c + ', ';
             body += customer.CreatedDate + ' \n';
         }
 
