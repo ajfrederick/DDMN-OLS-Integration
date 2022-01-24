@@ -27,7 +27,6 @@ public without sharing class OLSRestServiceHelper {
  * The following lazy loaded fields exist to hold the deconstructed data from the customer object.
  * Doing this will help avoid de-referencing a null object in the case that one of the objects from the request is missing.
  * The contact will still be created just missing some data if it is indeed missing.
- * 
  */
     private AddressData address {
         get {
@@ -373,6 +372,10 @@ public without sharing class OLSRestServiceHelper {
         public String effectiveDate {get;set;}
         public String endDate {get;set;}
         public String policyNumber {get;set;}
+        public String waitingPeriodWaiverEligible {get;set;}
+        public String daysSinceEndOfPriorCoverage {get;set;}
+        public String lengthOfPriorCoverage {get;set;}
+        
     }
 
     public class PaymentDetails {

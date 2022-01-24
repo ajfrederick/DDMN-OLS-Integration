@@ -1,21 +1,14 @@
 /**
- * @name MessageCreatorOutbound
+ * @name EmailFactoryOutbound
  * @description creates email messages that are outgoing
 **/
-global class MessageCreatorOutbound extends MessageCreator {
-
-/**
- * FIELDS
-**/
-
-    // org wide email address Id which is optional. You cannot set a proper 'from address' on outgoing email without one
-    private Id oweAddressId {get;set;}
+global class EmailFactoryOutbound extends EmailFactory {
 
 /**
  * CONSTRUCTOR
 **/
 
-    global MessageCreatorOutbound( EmailContainer[] containers ) {
+    global EmailFactoryOutbound( EmailContainer[] containers ) {
         super(containers);
     }
 
@@ -24,11 +17,11 @@ global class MessageCreatorOutbound extends MessageCreator {
 **/
 
     /**
-     * @name create
+     * @name build
      * @description loop through containers and get an email message
      * @return void
     **/
-    global override void create(){
+    global override void build(){
 
         for( EmailContainer container : containers ){
             if( !isVaild( container ) ) continue;
@@ -99,8 +92,8 @@ global class MessageCreatorOutbound extends MessageCreator {
         message.setBccAddresses( container.BccAddresses );
 
         // we have to do this cause this how SF handles setting the From Address for outgoing emails
-        if( oweAddressId != null ){
-            message.setOrgWideEmailAddressId( oweAddressId );
+        if( container.oweAddressId != null ){
+            message.setOrgWideEmailAddressId( container.oweAddressId );
         }
     }
 
@@ -129,11 +122,12 @@ global class MessageCreatorOutbound extends MessageCreator {
         message.setTreatBodiesAsTemplate(true);
 
         // set Salesforce files as attachments if there are any
-        if( !container.getVersionIds().isEmpty() ){
+        if( !container.hasVersionIds() ){
             message.setEntityAttachments( container.getVersionIds() );
-        } else
-        // or set attachements with Attachment data. These attachments aren't saved in Salesforce as files
-        if( !container.attachments.isEmpty() ){
+        }
+
+        // Set attachements with Attachment data. These attachments aren't saved in Salesforce as files
+        if( !container.hasAttachments() ){
            Messaging.EmailFileAttachment[] attachments = new Messaging.EmailFileAttachment[]{};
 
             for( EmailContainer.AttachmentData attachment : container.attachments ){
@@ -161,22 +155,5 @@ global class MessageCreatorOutbound extends MessageCreator {
     **/
     private Boolean isVaild( EmailContainer container ){
         return container.hasToAddresses();
-    }
-
-/**
- * QUERIES
-**/
-
-    /**
-     * @name setOrgWideEmailAddressId
-     * @description sets Org Wide Email Address for From Address
-     * @param String address
-    **/
-    global void setOrgWideEmailAddressId( String addressName ){
-        OrgWideEmailAddress oweAddress = EmailMessageUtils.getOrgWideEmailAddress( addressName );
-
-        if( oweAddress != null ){
-            oweAddressId = oweAddress.Id;
-        }
     }
 }

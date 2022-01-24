@@ -1,10 +1,10 @@
 /**
- * @name TestEmailMessaging
+ * @name TestEmailApp
  * @description this tests the application as a whole as a 'User'
  * TODO: Write unit tests
  */
 @IsTest(SeeAllData = true)
-public class TestEmailMessaging {
+public class TestEmailApp {
     
     @IsTest
     static void testOutboundEmail(){
@@ -38,28 +38,27 @@ public class TestEmailMessaging {
         EmailContainer[] containers = new EmailContainer[]{container};
 
         // insert our attachments since we have before we set messages so SingleEmailMessage can access the ContentVersionIds
-        AttachmentCreatorOutbound attachmentCreator = new AttachmentCreatorOutbound( containers );
-        attachmentCreator.insertAttachments();
+        ContentVersionPostOutbound versionPost = new ContentVersionPostOutbound( containers );
+        versionPost.post();
 
         // instatiate a message creator, set option, set contentversionids for attatchments and 
         // set messages which unpacks container info into Messaging.SingleEmailMessage
-        MessageCreatorOutbound messageCreator = new MessageCreatorOutbound( containers );
-        messageCreator.create();
-
-        // since the EmailMessage gets created asyncronously after sending the SingleMessage
-        // let's store the object in a static variable to access when the EmailMessage trigger gets
-        // fired on insert. There we will do the work of creating the necessary ContentDocumentLinks
-        // to link the attachment to the EmailMessage. There this variable will get set to null afterward.
-        EmailMessageHelper.attachmentCreatorForTrigger = attachmentCreator;
-
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( containers );
+        emailFactory.build();
         
         Integer numberOfEmailsSent = 0;
 
         Test.startTest();
 
             // send the emails
-            MessageHandler handler = new MessageHandler( messageCreator );
-            handler.handle();
+            EmailPost emailPost = new EmailPost( emailFactory );
+
+            // since the EmailMessage gets created asyncronously after sending the SingleMessage
+            // let's store the object in a static variable to access when the EmailMessage trigger gets
+            // fired on insert. There we will do the work of creating the necessary ContentDocumentLinks
+            // to link the attachment to the EmailMessage. There this variable will get set to null afterward.
+            emailPost.linkContentVersions( versionPost );
+            emailPost.post();
 
             numberOfEmailsSent = Limits.getEmailInvocations();
             
@@ -68,7 +67,7 @@ public class TestEmailMessaging {
         System.assertEquals( 1, numberOfEmailsSent );
 
         // asserts on outbound results
-        OutboundEmailResults outboundResults = handler.getOutboundEmailResults();
+        OutboundEmailResults outboundResults = emailPost.getOutboundEmailResults();
 
         System.assertEquals( 1, outboundResults.getSuccesses().size() );
         System.assertEquals( 1, outboundResults.getSuccessesByObjId().size() );
@@ -117,35 +116,30 @@ public class TestEmailMessaging {
         container.whatId = c.Id;
         container.ToAddresses = new String[]{'me@test.com'};
         container.FromAddress = 'you@test.com';
-        container.template = EmailMessageUtils.getTemplate('Test_Template');
+        container.template = EmailUtils.getTemplate('Test_Template');
         container.whoId = contact.Id;
         
 
         EmailContainer[] containers = new EmailContainer[]{container};
 
         // insert our attachments since we have before we set messages so SingleEmailMessage can access the ContentVersionIds
-        AttachmentCreatorOutbound attachmentCreator = new AttachmentCreatorOutbound( containers );
-        attachmentCreator.useFirstAttachmentsForAllMessages = true; // let's use this opportunity to test this feature.
-        attachmentCreator.insertAttachments();
+        ContentVersionPostOutbound versionPost = new ContentVersionPostOutbound( containers );
+        versionPost.useFirstForAllMessages = true; // let's use this opportunity to test this feature.
+        versionPost.post();
 
         // instatiate a message creator, set option, set contentversionids for attatchments and 
         // set messages which unpacks container info into Messaging.SingleEmailMessage
-        MessageCreatorOutbound messageCreator = new MessageCreatorOutbound( containers );
-        messageCreator.create();
-
-        // since the EmailMessage gets created asyncronously after sending the SingleMessage
-        // let's store the object in a static variable to access when the EmailMessage trigger gets
-        // fired on insert. There we will do the work of creating the necessary ContentDocumentLinks
-        // to link the attachment to the EmailMessage. There this variable will get set to null afterward.
-        EmailMessageHelper.attachmentCreatorForTrigger = attachmentCreator;
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( containers );
+        emailFactory.build();
         
         Integer numberOfEmailsSent = 0;
 
         Test.startTest();
 
             // send the emails
-            MessageHandler handler = new MessageHandler( messageCreator );
-            handler.handle();
+            EmailPost emailPost = new EmailPost( emailFactory );
+            emailPost.linkContentVersions( versionPost );
+            emailPost.post();
 
             numberOfEmailsSent = Limits.getEmailInvocations();
             
@@ -160,7 +154,7 @@ public class TestEmailMessaging {
 
         insert c;
         
-        // Create new inbound email
+        // build new inbound email
         Messaging.InboundEmail email = new Messaging.InboundEmail();
         email.fromAddress = 'test@from.com';
         email.ToAddresses  = new String[]{'test@to.com'};
@@ -169,7 +163,7 @@ public class TestEmailMessaging {
         email.PlainTextBody = 'Body';
         email.messageId = 'messageId';
 
-        // Create an attachment for the email
+        // build an attachment for the email
         Messaging.InboundEmail.BinaryAttachment attachment = new Messaging.InboundEmail.BinaryAttachment();
         attachment.body = Blob.valueOf('Attachment');
         attachment.filename = 'attachment.txt';
@@ -178,22 +172,22 @@ public class TestEmailMessaging {
         email.binaryAttachments = new Messaging.InboundEmail.BinaryAttachment[]{attachment};
 
 
-        EmailContainerCreator containerCreator = new EmailContainerCreator();
-        containerCreator.relatedToId = c.Id;
-        containerCreator.create( new Messaging.InboundEmail[]{ email } );
+        EmailContainerFactory containerFactory = new EmailContainerFactory( new Messaging.InboundEmail[]{ email } );
+        containerFactory.relatedToId = c.Id;
+        containerFactory.build();
 
         // instatiate a message creator then set messages
-        MessageCreatorInbound messageCreator = new MessageCreatorInbound( containerCreator.getContainers() );
-        messageCreator.create();
+        EmailFactoryInbound emailFactory = new EmailFactoryInbound( containerFactory.getContainers() );
+        emailFactory.build();
 
         // recieve the emails
-        MessageHandler handler = new MessageHandler( messageCreator );
-        handler.handle();
+        EmailPost emailPost = new EmailPost( emailFactory );
+        emailPost.post();
 
         // insert our attachments since we have EmailMessage
-        AttachmentCreatorInbound attachmentCreator = new AttachmentCreatorInbound(  containerCreator.getContainers() );
-        attachmentCreator.insertAttachments();
-        attachmentCreator.insertContentDocumentLinks( messageCreator.getInboundMessages() );
+        ContentVersionPostInbound versionPost = new ContentVersionPostInbound(  containerFactory.getContainers() );
+        versionPost.post();
+        versionPost.postContentDocumentLinks( emailFactory.getInboundMessages() );
 
         EmailMessage message = [SELECT Id, ParentId FROM EmailMessage][0];
 
@@ -201,7 +195,9 @@ public class TestEmailMessaging {
     }
     
     @IsTest
-    static void testContainerCreator(){
+    static void testContainerFactory(){
+        Case c = new Case();
+
         ContentVersion version = new ContentVersion(
             Title = 'Title',
             PathOnClient = 'FileName.txt',
@@ -211,18 +207,18 @@ public class TestEmailMessaging {
 
         insert version;
 
-        EmailContainerCreator containerCreator = new EmailContainerCreator();
-        containerCreator.addVersionId(version);
+        EmailContainerFactory containerFactory = new EmailContainerFactory( new SObject[]{c} );
+        containerFactory.addVersionIdByName(version, version.Title);
 
-        System.assertEquals( 1, containerCreator.versionIdsByTitle.get(version.Title).size() );
-        System.assertEquals( version.Id, containerCreator.versionIdsByTitle.get(version.Title)[0] );
-        System.assertEquals( false, containerCreator.hasContainers() );
-        System.assertEquals( 0, containerCreator.getContainers().size() );
+        System.assertEquals( 1, containerFactory.versionIdsByName.get(version.Title).size() );
+        System.assertEquals( version.Id, containerFactory.versionIdsByName.get(version.Title)[0] );
+        System.assertEquals( false, containerFactory.hasContainers() );
+        System.assertEquals( 0, containerFactory.getContainers().size() );
     }
 
     @IsTest
     static void testUtils(){
-        String csvContentType = EmailMessageUtils.contentTypes.get('csv');
+        String csvContentType = EmailUtils.contentTypes.get('csv');
 
         System.assertEquals('text/csv', csvContentType);
     }
@@ -233,10 +229,10 @@ public class TestEmailMessaging {
 
         insert c;
 
-        TestExternalTriggerHandlers handler = new TestExternalTriggerHandlers();
+        TestTriggerHook hook = new TestTriggerHook();
 
-        // ADD handler to trigger and insert
-        EmailMessageHelper.handlers.add( handler );
+        // ADD hood to trigger and insert
+        EmailMessageHelper.hooks.add( hook );
 
         EmailMessage message = new EmailMessage(
             ToAddress = 'me@test.com',
@@ -248,35 +244,35 @@ public class TestEmailMessaging {
 
         insert message;
 
-        System.assertEquals( true, handler.inserted );
+        System.assertEquals( true, hook.inserted );
 
 
-        // ADD handler to trigger and update
-        EmailMessageHelper.handlers.add( handler );
+        // ADD hook to trigger and update
+        EmailMessageHelper.hooks.add( hook );
 
         message.Subject = 'Subject Update';
         update message;
 
-        System.assertEquals( true, handler.updated );
+        System.assertEquals( true, hook.updated );
 
 
-        // ADD handler to trigger and delete
-        EmailMessageHelper.handlers.add( handler );
+        // ADD emailPost to trigger and delete
+        EmailMessageHelper.hooks.add( hook );
 
         delete message;
 
-        System.assertEquals( true, handler.deleted );
+        System.assertEquals( true, hook.deleted );
 
 
-        // ADD handler to trigger and undelete
-        EmailMessageHelper.handlers.add( handler );
+        // ADD emailPost to trigger and undelete
+        EmailMessageHelper.hooks.add( hook );
 
         undelete message;
 
-        System.assertEquals( true, handler.undeleted );
+        System.assertEquals( true, hook.undeleted );
     }
 
-    class TestExternalTriggerHandlers implements EmailMessageTriggerHandler {
+    class TestTriggerHook implements TriggerHook {
 
         public Boolean inserted {get;set;}
         public Boolean updated {get;set;}

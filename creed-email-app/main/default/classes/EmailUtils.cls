@@ -1,8 +1,8 @@
 /**
- * @name EmailMessageUtils
+ * @name EmailUtils
  * @description general utility class
 **/
-global class EmailMessageUtils {
+global class EmailUtils {
 
     global static Map<String, String> contentTypes = new Map<String, String>();
 
@@ -86,55 +86,4 @@ global class EmailMessageUtils {
 
         return template;
     }
-
-    /**
-     * @name getEmailLimitsData
-     * @description returns data on email limits for the org
-     * @param String name
-     * @return EmailTemplate
-     * 
-     * TODO: finish POC on this
-     * 
-    global static EmailLimitsData getEmailLimitsData(){
-        return new EmailLimitsData();
-    }
-
-    global class EmailLimitsData {
-
-        global Integer emailTotalLimit {get;set;}
-        global Integer totalSentToday {get;set;}
-        global Boolean limitExceeded {get;set;}
-
-
-        global EmailLimitsData(){
-            // set total amount of emails that can be sent in a day
-            emailTotalLimit = Limits.getLimitEmailInvocations();
-
-            Date today = Date.today();
-            DateTime dayStart = DateTime.newInstance( today.year(), today.month(), today.day(), 0, 0, 0 );
-            DateTime dayEnd = DateTime.newInstance( today.year(), today.month(), today.day(), 11, 59, 59 );
-
-            // set total emails sent today
-            try {
-
-                totalSentToday = [SELECT 
-                                    Count() 
-                                        FROM EmailMessage 
-                                        WHERE MessageDate >= :dayStart
-                                        AND MessageDate <= :dayEnd];
-
-            } catch( Exception e ){
-                CreedExceptionHandler handler = new CreedExceptionHandler(e);
-                handler.debug();
-            }
-
-            // set if the limit has been reached or exceeded
-            if( totalSentToday >= emailTotalLimit ){
-                limitExceeded = true;
-            } else {
-                limitExceeded = false;
-            }
-        }
-    }
-    **/
 }

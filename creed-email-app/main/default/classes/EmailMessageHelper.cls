@@ -4,12 +4,12 @@
 **/
 global class EmailMessageHelper {
 
-    global static AttachmentCreator attachmentCreatorForTrigger {get;set;}
+    global static ContentVersionPost versionPost {get;set;}
 
-    global static EmailMessageTriggerHandler[] handlers {
+    global static TriggerHook[] hooks {
         get {
-            if( handlers == null ) handlers = new EmailMessageTriggerHandler[]{};
-            return handlers;
+            if( hooks == null ) hooks = new TriggerHook[]{};
+            return hooks;
         }
         set;
     }
@@ -28,15 +28,13 @@ global class EmailMessageHelper {
     **/
     public static void updateContentDocumentLinks( EmailMessage[] messages ){
         
-        if( Test.isRunningTest() ){
-            attachmentCreatorForTrigger = null;
+        if( Test.isRunningTest() || versionPost == null ){
+            versionPost = null;
             return;
         }
 
-        if( attachmentCreatorForTrigger == null ) return;
+        versionPost.postContentDocumentLinks( messages );
 
-        attachmentCreatorForTrigger.insertContentDocumentLinks( messages );
-
-        attachmentCreatorForTrigger = null;
+        versionPost = null;
     }
 }

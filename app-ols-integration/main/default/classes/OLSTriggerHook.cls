@@ -7,13 +7,13 @@
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public class OLSEmailMessageTriggerHandler implements EmailMessageTriggerHandler {
+public class OLSTriggerHook implements TriggerHook {
 
 /**
  * CONSTRUCTOR
  */
 
-    public OLSEmailMessageTriggerHandler(){
+    public OLSTriggerHook(){
 
     }
  

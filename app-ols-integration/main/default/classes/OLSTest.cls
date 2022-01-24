@@ -169,8 +169,7 @@ public with sharing class OLSTest {
 
     @IsTest
     public static void testTriggerHelper(){
-        EmailMessageTriggerHandler handler = new OLSEmailMessageTriggerHandler();
-        EmailMessageHelper.handlers.add(handler);
+        EmailMessageHelper.hooks.add(new OLSTriggerHook());
 
         Contact contact = new Contact(
             FirstName = 'new',

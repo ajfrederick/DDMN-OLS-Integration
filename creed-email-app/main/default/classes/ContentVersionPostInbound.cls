@@ -1,14 +1,14 @@
 /**
- * @name AttachmentCreatorOutbound
- * @description this child class helps create and insert attachments for outgoing emails
+ * @name ContentVersionPostInbound
+ * @description this child class helps create and insert attachments for incoming emails
  */
-global class AttachmentCreatorOutbound extends AttachmentCreator {
-
+global class ContentVersionPostInbound extends ContentVersionPost {
+    
 /**
  * CONSTRUCTOR
  */
 
-    global AttachmentCreatorOutbound( EmailContainer[] containers ) {
+    global ContentVersionPostInbound( EmailContainer[] containers ) {
         super(containers);
     }
 
@@ -23,7 +23,7 @@ global class AttachmentCreatorOutbound extends AttachmentCreator {
      * @return String
      */
     global override String getMessageId( EmailMessage message ){
-        return message.Headers.substringAfter('In-Reply-To: ');
+        return message.MessageIdentifier;
     }
 
     /**
@@ -33,6 +33,6 @@ global class AttachmentCreatorOutbound extends AttachmentCreator {
      * @return String
      */
     global override String getMessageId( EmailContainer container ){
-        return container.inReplyTo;
+        return container.messageId;
     }
 }

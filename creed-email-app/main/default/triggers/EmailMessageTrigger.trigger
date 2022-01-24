@@ -40,34 +40,34 @@ trigger EmailMessageTrigger on EmailMessage (
     }
     
     // this is so someone can add trigger functionality oustide the email app
-    for( EmailMessageTriggerHandler handler : EmailMessageHelper.handlers ){
+    for( TriggerHook hook : EmailMessageHelper.hooks ){
 
         if( Trigger.isBefore ){
             if( Trigger.isInsert ){
-                handler.beforeInsert( Trigger.newMap );
+                hook.beforeInsert( Trigger.newMap );
             } else 
             if( Trigger.isUpdate ){
-                handler.beforeUpdate( Trigger.oldMap, Trigger.newMap );
+                hook.beforeUpdate( Trigger.oldMap, Trigger.newMap );
             } else 
             if( Trigger.isDelete ){
-                handler.beforeDelete( Trigger.oldMap, Trigger.newMap );
+                hook.beforeDelete( Trigger.oldMap, Trigger.newMap );
             }
         } else 
         if( Trigger.isAfter ){
             if( Trigger.isInsert ){ 
-                handler.afterInsert( Trigger.newMap );
+                hook.afterInsert( Trigger.newMap );
             } else 
             if( Trigger.isUpdate ){
-                handler.afterUpdate( Trigger.oldMap, Trigger.newMap );
+                hook.afterUpdate( Trigger.oldMap, Trigger.newMap );
             } else 
             if( Trigger.isDelete ){
-                handler.afterDelete( Trigger.oldMap, Trigger.newMap );
+                hook.afterDelete( Trigger.oldMap, Trigger.newMap );
             } else 
             if( Trigger.isUndelete ){
-                handler.afterUndelete( Trigger.new );
+                hook.afterUndelete( Trigger.new );
             }
         }
     }
 
-    if( Trigger.isAfter ) EmailMessageHelper.handlers.clear();
+    if( Trigger.isAfter ) EmailMessageHelper.hooks.clear();
 }

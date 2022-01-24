@@ -11,8 +11,6 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
  * FIELDS
  */
 
-    private static final String fromAddress = System.Label.OLS_Email_From_Address;
-
     private Contact[] customers {
         get {
             if( customers == null ) customers = new Contact[]{};
@@ -24,7 +22,7 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
 /**
  * INTERFACE METHODS
  */
-
+    
     public Database.QueryLocator start( Database.BatchableContext context ){
         String olsCustomer = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
 
@@ -52,32 +50,25 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
     }
 
     public void finish( Database.BatchableContext context ){
-        Date newDate = Date.today();
 
-        String subject = 'Online Store Customer Bounce Report';
-        String body = 'Here is the bounce report for all Online Strore Customers who failed to received a brochure via email.';
+        CustomEmailTemplate template = new CustomEmailTemplate( this.customers );
 
-        String filename = 'OLS_BouncedEmails_' + newDate.month() + '-' + newDate.day() + '-' + newDate.year() + '.csv';
-        Blob attachmentBody = Blob.valueOf( getAttachmentBody() );
-    
         EmailContainer container = new EmailContainer();
-        
-        for( OLS_Bounce_Report_Email_Address__mdt record : OLS_Bounce_Report_Email_Address__mdt.getAll().values() ){
-            container.ToAddresses.add(record.Email__c);
-        }
+        container.setContent( template.subject, template.body, template.body );
+        container.setAttachment( template.filename, template.attachmentBody );
 
-        container.setContent( subject, body, body );
-        container.setAttachment( filename, attachmentBody );
+        addToAddresses( container );
 
-        MessageCreatorOutbound messageCreator = new MessageCreatorOutbound( new EmailContainer[]{container} );
-        messageCreator.setOrgWideEmailAddressId(fromAddress);
-        messageCreator.create();
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( new EmailContainer[]{container} );
+        emailFactory.build();
 
-        MessageHandler handler = new MessageHandler( messageCreator );
-        handler.handle();
+        EmailPost emailPost = new EmailPost( emailFactory );
+        emailPost.post();
 
         updateCustomers();
     }
+
+
 
 /**
  * ACTION METHODS
@@ -104,28 +95,67 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
  * UTILITY METHODS
  */
 
-    private String getAttachmentBody(){
-        String body = 'Id, Name, Email, Mailing Address, Product Purchased, CAID, Created Date \n';
+    private void addToAddresses( EmailContainer container ){
 
-        for( Contact customer : this.customers ){
-            body += customer.Id + ', ';
-            body += customer.FirstName + ' ' + customer.LastName + ', ';
-            body += customer.Email + ', ';
-            body += getMailingAddress(customer) + ', ';
-            body += customer.Product_Purchased__c + ', ';
-            body += customer.CAID__c + ', ';
-            body += customer.CreatedDate + ' \n';
+        for( OLS_Bounce_Report_Email_Address__mdt record : OLS_Bounce_Report_Email_Address__mdt.getAll().values() ){
+            container.ToAddresses.add(record.Email__c);
         }
-
-        return body;
     }
 
-    private String getMailingAddress( Contact customer ){
-        String mailingAddress = customer.MailingStreet + ' ';
-        mailingAddress += customer.MailingCity + ', ';
-        mailingAddress += customer.MailingState + ' ';
-        mailingAddress += customer.MailingPostalCode;
+/**
+ * CLASSES
+ */
 
-        return mailingAddress;
+    public class CustomEmailTemplate {
+
+        public String subject = 'Online Store Customer Bounce Report';
+        private String body = 'Here is the bounce report for all Online Strore Customers who failed to received a brochure via email.';
+
+        public String filename {get;set;}
+        public Blob attachmentBody {get;set;}
+
+        public Contact[] customers {get;set;}
+
+
+        public CustomEmailTemplate( Contact[] customers ){
+            this.customers = customers;
+
+            setFileName();
+            setAttachmentBody();
+        }
+
+        private void setFileName(){
+            Date newDate = Date.today();
+            filename = 'OLS_BouncedEmails_' + newDate.month() + '-' + newDate.day() + '-' + newDate.year() + '.csv';
+        }
+
+        private void setAttachmentBody(){
+            attachmentBody = Blob.valueOf( getAttachmentBody() );
+        }
+
+        private String getAttachmentBody(){
+            String body = 'Id, Name, Email, Mailing Address, Product Purchased, CAID, Created Date \n';
+    
+            for( Contact customer : this.customers ){
+                body += customer.Id + ', ';
+                body += customer.FirstName + ' ' + customer.LastName + ', ';
+                body += customer.Email + ', ';
+                body += getMailingAddress(customer) + ', ';
+                body += customer.Product_Purchased__c + ', ';
+                body += customer.CAID__c + ', ';
+                body += customer.CreatedDate + ' \n';
+            }
+    
+            return body;
+        }
+    
+        private String getMailingAddress( Contact customer ){
+            String mailingAddress = customer.MailingStreet + ' ';
+            mailingAddress += customer.MailingCity + ', ';
+            mailingAddress += customer.MailingState + ' ';
+            mailingAddress += customer.MailingPostalCode;
+    
+            return mailingAddress;
+        }
     }
 }

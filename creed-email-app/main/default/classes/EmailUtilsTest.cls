@@ -1,19 +1,19 @@
 /**
- * @name TestEmailMessageUtils
- * @description this tests EmailMessageUtils class to cover Exception paths
+ * @name TestEmailUtils
+ * @description this tests EmailUtils class to cover Exception paths
  */
 @isTest(SeeAllData = true)
-public class EmailMessageUtilsTest {
+public class EmailUtilsTest {
 
     @IsTest
-    static void testEmailMessageUtils(){
+    static void testEmailUtils(){
     
         Integer numberOfEmailsSent = 0;
         
         Test.startTest();
 
-            EmailMessageUtils.getOrgWideEmailAddress('');
-            EmailMessageUtils.getTemplate('');
+            EmailUtils.getOrgWideEmailAddress('');
+            EmailUtils.getTemplate('');
 
             numberOfEmailsSent = Limits.getEmailInvocations();
 

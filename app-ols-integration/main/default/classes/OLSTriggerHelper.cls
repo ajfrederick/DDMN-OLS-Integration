@@ -80,6 +80,7 @@ public class OLSTriggerHelper {
      * @return none
      */
     private static void sendEmails( Contact[] customers ){
+        
         Contact[] customersNotNE = new Contact[]{};
         Contact[] customersNE = new Contact[]{};
 
@@ -107,30 +108,15 @@ public class OLSTriggerHelper {
     private static void sendEmailsNotNE( Contact[] customers ){
         if( customers.isEmpty() ) return;
 
-        ContentVersion[] versions = getContentVersions(customers);
+        EmailContainerFactoryOLS containerFactory = new EmailContainerFactoryOLS( customers );
+        containerFactory.setTemplate( 'Online_Store_Customer_Welcome' );
+        containerFactory.setOrgWideEmailAddressId( fromAddress );
 
-        EmailContainerCreatorOLS containerCreator = new EmailContainerCreatorOLS();
-        containerCreator.setTemplate('Online_Store_Customer_Welcome');
-        
-        for( ContentVersion version : versions ){
-            containerCreator.addVersionId( version );
-        }
-
-        containerCreator.create(customers);
-
-        MessageCreatorOutbound messageCreator = new MessageCreatorOutbound( containerCreator.getContainers() );
-        messageCreator.setOrgWideEmailAddressId(fromAddress);
-        messageCreator.create();
-
-        // this get fired in the email app EmailMessageTrigger
-        EmailMessageHelper.handlers.add( new OLSEmailMessageTriggerHandler() );
-
-        MessageHandler handler = new MessageHandler( messageCreator );
-        handler.handle();
+        sendFinal( containerFactory, customers );
     }
 
     /**
-     * @name sendEmails
+     * @name sendEmailsNE
      * @description sends emails to customers from NE. The distinction was made to avoid confusion for NE people
      * since there is a Delta Dental NE "branch" organization.
      * @param Contact[] customers
@@ -139,26 +125,32 @@ public class OLSTriggerHelper {
     private static void sendEmailsNE( Contact[] customers ){
         if( customers.isEmpty() ) return;
 
+        EmailContainerFactoryOLS containerFactory = new EmailContainerFactoryOLS( customers );
+        containerFactory.setTemplate( 'Online_Store_Customer_Welcome_NE' ); // Template is NE specific
+        containerFactory.setOrgWideEmailAddressId( fromAddressNE ); // And From Address is NE specific
+
+        sendFinal( containerFactory, customers );
+    }
+
+    /**
+     * @name sendFinal
+     * @description sends emails to customers from NE. The distinction was made to avoid confusion for NE people
+     * since there is a Delta Dental NE "branch" organization.
+     * @param Contact[] customers
+     * @return none
+     */
+    private static void sendFinal( EmailContainerFactory containerFactory, Contact[] customers ){
         ContentVersion[] versions = getContentVersions(customers);
 
-        EmailContainerCreatorOLS containerCreator = new EmailContainerCreatorOLS();
-        containerCreator.setTemplate('Online_Store_Customer_Welcome_NE'); // Template is NE specific
-        
-        for( ContentVersion version : versions ){
-            containerCreator.addVersionId( version );
-        }
+        containerFactory.addVersionIdsByName( versions );
+        containerFactory.build();
 
-        containerCreator.create(customers);
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( containerFactory.getContainers() );
+        emailFactory.build();
 
-        MessageCreatorOutbound messageCreator = new MessageCreatorOutbound( containerCreator.getContainers() );
-        messageCreator.setOrgWideEmailAddressId(fromAddressNE); // And From Address is NE specific
-        messageCreator.create();
-
-        // this get fired in the email app EmailMessageTrigger
-        EmailMessageHelper.handlers.add( new OLSEmailMessageTriggerHandler() );
-
-        MessageHandler handler = new MessageHandler( messageCreator );
-        handler.handle();
+        EmailPost emailPost = new EmailPost( emailFactory );
+        emailPost.addTriggerHook( new OLSTriggerHook() );
+        emailPost.post();
     }
 
 /**

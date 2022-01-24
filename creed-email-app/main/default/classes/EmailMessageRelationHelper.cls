@@ -11,7 +11,7 @@ public class EmailMessageRelationHelper {
      * @return Map<Id, EmailMessageRelation>
     **/
     public static void updateRelationIds( EmailMessage[] messages ){
-        if( !MessageHandler.triggerEnabled ) return;
+        if( !EmailPost.triggerEnabled ) return;
 
         Set<Id> messageIds = new Map<Id, EmailMessage>( messages ).keyset();
 
@@ -48,7 +48,7 @@ public class EmailMessageRelationHelper {
             handler.handle();
         }
 
-        MessageHandler.triggerEnabled = null;
+        EmailPost.triggerEnabled = null;
     }
 
     /**

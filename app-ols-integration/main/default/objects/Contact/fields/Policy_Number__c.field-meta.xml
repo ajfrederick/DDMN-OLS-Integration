@@ -5,7 +5,7 @@
     <externalId>false</externalId>
     <inlineHelpText>This is for Online Store Customers. It is the number of a policy with a prior carrier.</inlineHelpText>
     <label>Policy Number</label>
-    <length>50</length>
+    <length>150</length>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <type>Text</type>

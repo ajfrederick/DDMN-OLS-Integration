@@ -1,8 +1,8 @@
 /**
- * @name MessageCreator
- * @description creates email messages and is extended by MessageCreatorOutbound and MessageCreatorInbound
+ * @name EmailFactory
+ * @description creates email messages and is extended by EmailFactoryOutbound and EmailFactoryInbound
 **/
-global abstract class MessageCreator {
+global abstract class EmailFactory {
 
 /**
  * FIELDS
@@ -33,8 +33,8 @@ global abstract class MessageCreator {
  * CONSTRUCTOR
 **/
 
-    global MessageCreator( EmailContainer[] ws ){
-        containers = ws;
+    global EmailFactory( EmailContainer[] containers ){
+        this.containers = containers;
     }
 
 /**
@@ -42,11 +42,11 @@ global abstract class MessageCreator {
 **/
 
     /**
-     * @name create
+     * @name build
      * @description loop through containers and get an email message
      * @return void
     **/
-    global abstract void create();
+    global abstract void build();
 
     /**
      * @name getOutboundMessages

@@ -1,10 +1,10 @@
 /**
- * @name EmailContainerCreatorOLS
+ * @name EmailContainerFactoryOLS
  * @description Extracts Email from Online Store Customer Object
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
 **/
-global class EmailContainerCreatorOLS extends EmailContainerCreator {
+global class EmailContainerFactoryOLS extends EmailContainerFactory {
 
     private static final String bccAddress = System.Label.OLS_Email_Bcc_Address;
 
@@ -12,8 +12,8 @@ global class EmailContainerCreatorOLS extends EmailContainerCreator {
  * CONSTRUCTOR
 **/
 
-    global EmailContainerCreatorOLS(){
-
+    global EmailContainerFactoryOLS( SObject[] objs ){
+        super(objs);
     }
 
 /**
@@ -21,12 +21,12 @@ global class EmailContainerCreatorOLS extends EmailContainerCreator {
 **/ 
     
     /**
-     * @name create
+     * @name build
      * @description creates email containers from Online Store Customer object
      * @param SObject[] objs
      * @return void
     **/
-    global override void create( SObject[] objs ){
+    global override void build( SObject[] objs ){
         Contact[] customers = (Contact[]) objs;
 
         for( Contact obj : customers ){
@@ -37,11 +37,12 @@ global class EmailContainerCreatorOLS extends EmailContainerCreator {
             container.ToAddresses.add(obj.Email);
             container.BccAddresses.add(bccAddress);
             container.template = template;
+            container.oweAddressId = oweAddressId;
             container.whoId = obj.Id; // since this is a contact set the whoId
 
 
-            if( versionIdsByTitle.containsKey( obj.Brochure_Key__c ) ){
-                String[] versionIds = versionIdsByTitle.get( obj.Brochure_Key__c );
+            if( versionIdsByName.containsKey( obj.Brochure_Key__c ) ){
+                String[] versionIds = versionIdsByName.get( obj.Brochure_Key__c );
 
                 container.setVersionIds(versionIds);
             }
@@ -51,18 +52,16 @@ global class EmailContainerCreatorOLS extends EmailContainerCreator {
     }
 
     /**
-     * @name addVersionId
-     * @description adds a verion id by it's name
-     * @param ContentVersion version
+     * @name addVersionIdsByName
+     * @description loops a list and adds a verion id by a particular key value this is overrideable
+     * so that a sub class can name a different key
+     * @param ContentVersion[] versions
      * @return void
     **/
-    global override void addVersionId( ContentVersion version ){
-        String key = version.Brochure_Key__c;
+    global override void addVersionIdsByName( ContentVersion[] versions ){
 
-        if( versionIdsByTitle.containsKey(key) ){
-            versionIdsByTitle.get(key).add(version.Id);
-        } else {
-            versionIdsByTitle.put(key, new String[]{version.Id});
+        for( ContentVersion version : versions ){
+            addVersionIdByName( version, version.Brochure_Key__c );
         }
     }
 }

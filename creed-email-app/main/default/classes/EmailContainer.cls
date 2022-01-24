@@ -59,6 +59,9 @@ global class EmailContainer {
     // email template
     global EmailTemplate template {get;set;}
 
+    // Organization Wide Email Address for from address when sending an email
+    global Id oweAddressId {get;set;}
+
     // email content
     private EmailContent content {get;set;}
 
@@ -74,7 +77,8 @@ global class EmailContainer {
     // external unique identifier given by email clients and salesforce email client
     global String inReplyTo {get;set;}
 
-    // attachment data to be used to created ContentVersions (files) if need be
+    // attachment data to be used to create ContentVersions (files) if need be or attachments for the actual email
+    // that will not be saved as files in Salesforce
     global AttachmentData[] attachments {
         get {
             if( attachments == null ) attachments = new AttachmentData[]{};
@@ -299,6 +303,15 @@ global class EmailContainer {
     }
 
     /**
+     * @name hasOweAddressId
+     * @description checks to see if oweAddressId is null
+     * @return Boolean
+     */
+    global Boolean hasOweAddressId(){
+        return oweAddressId != null;
+    }
+
+    /**
      * @name hasContent
      * @description checks to see if content of type EmailContent is null or not
      * @return Boolean
@@ -341,6 +354,24 @@ global class EmailContainer {
      */
     global Boolean hasInReplyTo(){
         return !String.isBlank( inReplyTo );
+    }
+
+    /**
+     * @name hasAttachments
+     * @description checks to see if there are attachments
+     * @return Boolean
+     */
+    global Boolean hasAttachments(){
+        return !attachments.isEmpty();
+    }
+
+    /**
+     * @name hasVersionIds
+     * @description checks to see if there are any ContentVersionIds (file Ids) to send as attachments
+     * @return Boolean
+     */
+    global Boolean hasVersionIds(){
+        return !versionIds.isEmpty();
     }
 
     /**
@@ -402,7 +433,7 @@ global class EmailContainer {
         }
 
         private void setContentType( String filename ){
-            Map<String, String> contentTypes = EmailMessageUtils.contentTypes;
+            Map<String, String> contentTypes = EmailUtils.contentTypes;
 
             extension = filename.substringAfterLast('.');
 

@@ -1,10 +1,10 @@
 /**
- * @name MessageHandler
- * @description handles inbound and outbound messages
+ * @name EmailPost
+ * @description posts inbound and outbound messages
 **/
-global class MessageHandler {
+global class EmailPost {
 
-    private MessageCreator messageCreator {get;set;}
+    private EmailFactory emailFactory {get;set;}
 
     private OutboundEmailResults outboundResults {get;set;}
 
@@ -21,27 +21,28 @@ global class MessageHandler {
  * CONSTRUCTOR
 **/
 
-    global MessageHandler( MessageCreator mc ) {
-        messageCreator = mc;
+    global EmailPost( EmailFactory emailFactory ) {
+        this.emailFactory = emailFactory;
     }
 
 /**
  * ACTION METHODS
 **/
+
     /**
-     * @name handle
+     * @name post
      * @description sends outbound and recieves inbound messages
      * @return void
     **/
-    global void handle(){
+    global void post(){
         triggerEnabled = true;
 
-        if( messageCreator.hasOutboundMessages() ){
-            send( messageCreator.getOutboundMessages() );
+        if( emailFactory.hasOutboundMessages() ){
+            send( emailFactory.getOutboundMessages() );
         }
 
-        if( messageCreator.hasInboundMessages() ){
-            receive( messageCreator.getInboundMessages() );
+        if( emailFactory.hasInboundMessages() ){
+            receive( emailFactory.getInboundMessages() );
         }
     }
 
@@ -53,16 +54,7 @@ global class MessageHandler {
     **/
     private void send( Messaging.SingleEmailMessage[] messages ){
 
-        //EmailMessageUtils.EmailLimitsData limitsData = EmailMessageUtils.getEmailLimitsData();
-
         try {
-            /*
-            if( limitsData.totalSentToday == (limitsData.emailTotalLimit - 1) ){
-                throw new EmailException( 'WARNING: This org has reached it\'s email limit of ' + limitsData.emailTotalLimit + ' and this is the final email that can be sent. After this emails will no longer be sent with the Creed email app to avoid operation failures with applications that rely on this one.');
-            }
-            
-            if( limitsData.limitExceeded ) return;
-            */
             
             Messaging.SendEmailResult[] results = Messaging.sendEmail( messages );
 
@@ -97,6 +89,30 @@ global class MessageHandler {
             handler.handle();
         }
     }
+
+    /**
+     * @name linkContentVersions
+     * @description adds a version factory to the trigger helper. This inserts the ContentDocumentLinks which links a ContectVersion
+     * to an EmailMessage. It has to be accessible after the trigger fires.
+     * @param  ContentVersionPost versionPost 
+    **/
+    global void linkContentVersions( ContentVersionPost versionPost ){
+        EmailMessageHelper.versionPost = versionPost;
+    }
+
+    /**
+     * @name addTriggerHook
+     * @description adds a hood that gets used on the email message trigger to post operations after or before an email 
+     * message gets inserted, updated or deleted. It gives a developer opportunity to add operations from outside the application.
+     * @param TriggerHook hook
+    **/
+    global void addTriggerHook( TriggerHook hook ){
+        EmailMessageHelper.hooks.add( hook );
+    }
+
+/**
+ * UTILITY METHODS
+**/
 
     /**
      * @name getOutboundEmailResults

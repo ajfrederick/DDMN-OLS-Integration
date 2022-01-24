@@ -1,14 +1,14 @@
 /**
- * @name MessageCreatorInbound
+ * @name EmailFactoryInbound
  * @description creates email messages that are incoming
 **/
-public class MessageCreatorInbound extends MessageCreator {
+public class EmailFactoryInbound extends EmailFactory {
 
 /**
  * CONSTRUCTOR
 **/
 
-    public MessageCreatorInbound( EmailContainer[] containers ) {
+    public EmailFactoryInbound( EmailContainer[] containers ) {
         super(containers);
     }
 
@@ -17,11 +17,11 @@ public class MessageCreatorInbound extends MessageCreator {
 **/
 
     /**
-     * @name create
+     * @name build
      * @description loop through containers and get an email message
      * @return void
     **/
-    public override void create(){
+    public override void build(){
 
         for( EmailContainer container : containers ){
             if( !isVaild( container ) ) continue;
