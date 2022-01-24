@@ -37,7 +37,7 @@ global class EmailContainerFactoryOLS extends EmailContainerFactory {
             container.ToAddresses.add(obj.Email);
             container.BccAddresses.add(bccAddress);
             container.template = template;
-            container.oweAddressId = oweAddressId;
+            container.oweAddressId = oweAddressId; // from address
             container.whoId = obj.Id; // since this is a contact set the whoId
 
 

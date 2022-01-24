@@ -2,14 +2,18 @@
  * @name EmailFactoryInbound
  * @description creates email messages that are incoming
 **/
-public class EmailFactoryInbound extends EmailFactory {
+global class EmailFactoryInbound extends EmailFactory {
 
 /**
- * CONSTRUCTOR
+ * CONSTRUCTORS
 **/
 
-    public EmailFactoryInbound( EmailContainer[] containers ) {
-        super(containers);
+    global EmailFactoryInbound( EmailContainerFactory containerFactory ){
+        super( containerFactory.getContainers() );
+    }
+
+    global EmailFactoryInbound( EmailContainer[] containers ) {
+        super( containers );
     }
 
 /**
@@ -21,7 +25,7 @@ public class EmailFactoryInbound extends EmailFactory {
      * @description loop through containers and get an email message
      * @return void
     **/
-    public override void build(){
+    global override void build(){
 
         for( EmailContainer container : containers ){
             if( !isVaild( container ) ) continue;

@@ -16,5 +16,6 @@ Salesforce entities (fields, objects, classes, etc.) for the "DDMN Online Store 
 6) Creat list view for Online Store Customer record type <br />
 7) Ensure Brochure Key is on ContentVersion Layout <br />
 8) Upload Brochure PDFs for attachments and association Brochure Keys <br />
+9) Ensure Brochure Key field is on Contect Version layout <br />
 9) Share files with User "API Integration" User (which is the User who's username DDMN Web Apps is using to make API calls and then subsequently is the User that will "send" the email. So it needs access to the files.) <br />
 10) Register Bounce Report Email addresses as Custom Metadata Types <br />

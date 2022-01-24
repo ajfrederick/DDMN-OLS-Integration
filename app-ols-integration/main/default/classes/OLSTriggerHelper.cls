@@ -145,7 +145,7 @@ public class OLSTriggerHelper {
         containerFactory.addVersionIdsByName( versions );
         containerFactory.build();
 
-        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( containerFactory.getContainers() );
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( containerFactory );
         emailFactory.build();
 
         EmailPost emailPost = new EmailPost( emailFactory );

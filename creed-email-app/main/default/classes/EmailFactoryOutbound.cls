@@ -5,11 +5,15 @@
 global class EmailFactoryOutbound extends EmailFactory {
 
 /**
- * CONSTRUCTOR
+ * CONSTRUCTORS
 **/
 
+    global EmailFactoryOutbound( EmailContainerFactory containerFactory ){
+        super( containerFactory.getContainers() );
+    }
+
     global EmailFactoryOutbound( EmailContainer[] containers ) {
-        super(containers);
+        super( containers );
     }
 
 /**
@@ -122,12 +126,12 @@ global class EmailFactoryOutbound extends EmailFactory {
         message.setTreatBodiesAsTemplate(true);
 
         // set Salesforce files as attachments if there are any
-        if( !container.hasVersionIds() ){
+        if( container.hasVersionIds() ){
             message.setEntityAttachments( container.getVersionIds() );
         }
 
         // Set attachements with Attachment data. These attachments aren't saved in Salesforce as files
-        if( !container.hasAttachments() ){
+        if( container.hasAttachments() ){
            Messaging.EmailFileAttachment[] attachments = new Messaging.EmailFileAttachment[]{};
 
             for( EmailContainer.AttachmentData attachment : container.attachments ){
