@@ -206,7 +206,10 @@ public without sharing class OLSRestServiceHelper {
             Current_Carrier__c = existingCoverage.carrier,
             Effective_Date__c = getEffectiveDate(),
             End_Date__c = getEndDate(),
-            Policy_Number__c = existingCoverage.policyNumber
+            Policy_Number__c = existingCoverage.policyNumber,
+            Eligible_For_Waiting_Period_Waiver__c = getWaiverEligibility(),
+            Days_Since_End_Of_Prior_Coverage__c = getDaysSinceEndOfPriorCoverage(),
+            Length_Of_Prior_Coverage__c = getLengthOfPriorCoverage()
         );
     }
 
@@ -295,6 +298,46 @@ public without sharing class OLSRestServiceHelper {
     }
 
     /**
+     * @name getDaysSinceEndOfPriorCoverage
+     * @description gets integer from string for this field
+     * @param none
+     * @return Integer
+     */
+    private Integer getDaysSinceEndOfPriorCoverage(){
+        String numberString = existingCoverage.daysSinceEndOfPriorCoverage != null ? existingCoverage.daysSinceEndOfPriorCoverage.replaceAll('[^\\d.]', '') : '0';
+
+        return isInteger(numberString) ? Integer.valueOf(numberString) : null;
+    }
+
+    /**
+     * @name getLengthOfPriorCoverage
+     * @description gets integer from string for this field
+     * @param none
+     * @return Integer
+     */
+    private Integer getLengthOfPriorCoverage(){
+        String numberString = existingCoverage.lengthOfPriorCoverage != null ? existingCoverage.lengthOfPriorCoverage.replaceAll('[^\\d.]', '') : '0';
+
+        return isInteger(numberString) ? Integer.valueOf(numberString) : null;
+    }
+
+    /**
+     * @name isInteger
+     * @description this is to avoid errors if the daysSinceEndOfPriorCoverage from the JSON is malformed
+     * @param String int
+     * @return Boolean
+     */
+    private Boolean isInteger( String numberString ){
+        String isIntRegEx = '^[-+]?\\d+$';
+
+        Pattern intPattern = Pattern.compile( isIntRegEx );
+
+        Matcher intMatcher = intPattern.matcher( numberString );
+
+        return intMatcher.matches();
+    }
+
+    /**
      * @name getEffectiveDate
      * @description returns formatted effective date
      * @return Date
@@ -333,6 +376,16 @@ public without sharing class OLSRestServiceHelper {
         }
 
         return newDate;
+    }
+
+    /**
+     * @name getWaiverEligibility
+     * @description checks the string and returns boolean value
+     * @param none
+     * @return Boolean
+     */
+    private Boolean getWaiverEligibility(){
+        return existingCoverage.waitingPeriodWaiverEligible == 'true' ? true : false;
     }
 
 /**
@@ -375,7 +428,6 @@ public without sharing class OLSRestServiceHelper {
         public String waitingPeriodWaiverEligible {get;set;}
         public String daysSinceEndOfPriorCoverage {get;set;}
         public String lengthOfPriorCoverage {get;set;}
-        
     }
 
     public class PaymentDetails {

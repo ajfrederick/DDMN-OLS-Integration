@@ -256,6 +256,9 @@ public with sharing class OLSTest {
         existingCoverage.policyNumber = 'policy111222';
         existingCoverage.effectiveDate = '2016-12-29';
         existingCoverage.endDate = '2021-09-02';
+        existingCoverage.waitingPeriodWaiverEligible = 'true';
+        existingCoverage.daysSinceEndOfPriorCoverage = '23 days';
+        existingCoverage.lengthOfPriorCoverage = '18 days';
 
         OLSRestServiceHelper.ClientSideCustomer customer = new OLSRestServiceHelper.ClientSideCustomer();
         customer.firstName = 'Crazy New Test';

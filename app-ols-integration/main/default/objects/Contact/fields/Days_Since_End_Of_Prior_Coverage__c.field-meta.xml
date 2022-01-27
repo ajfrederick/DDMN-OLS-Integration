@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Days_Since_End_Of_Prior_Coverage__c</fullName>
+    <description>For an Online Store Customer. This is the amount of days between end of prior coverage and enrollment.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>This is the amount of days between end of prior coverage and enrollment.</inlineHelpText>
+    <label>Days Since End Of Prior Coverage</label>
+    <precision>6</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

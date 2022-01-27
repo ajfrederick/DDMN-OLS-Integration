@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Eligible_For_Waiting_Period_Waiver__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>This is for an Online Store Customer. Indicates whether or not this customer is eligible for a waiting period.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Indicates whether or not this customer is eligible for a waiting period.</inlineHelpText>
+    <label>Eligible For Waiting Period Waiver</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>
