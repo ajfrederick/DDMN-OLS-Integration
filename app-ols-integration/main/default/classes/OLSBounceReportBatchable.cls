@@ -68,8 +68,6 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
         updateCustomers();
     }
 
-
-
 /**
  * ACTION METHODS
  */
@@ -96,7 +94,6 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
  */
 
     private void addToAddresses( EmailContainer container ){
-
         for( OLS_Bounce_Report_Email_Address__mdt record : OLS_Bounce_Report_Email_Address__mdt.getAll().values() ){
             container.ToAddresses.add(record.Email__c);
         }
