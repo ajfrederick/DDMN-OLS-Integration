@@ -80,6 +80,7 @@ public class OLSTriggerHelper {
      * @return none
      */
     private static void sendEmails( Contact[] customers ){
+        if( customers.isEmpty() ) return;
         
         Contact[] customersNotNE = new Contact[]{};
         Contact[] customersNE = new Contact[]{};
@@ -169,10 +170,17 @@ public class OLSTriggerHelper {
         String[] brochureKeys = new String[]{};
 
         for( Contact customer : customers ){
-            brochureKeys.add( customer.Brochure_Key__c );
+
+            if( !String.isBlank( customer.Brochure_Key__c ) ){
+                brochureKeys.add( customer.Brochure_Key__c );
+            }
         }
 
         try {
+
+            if( brochureKeys.isEmpty() ){
+                throw new BrochureKeyException('No brochure keys associated with these customer records.');
+            }
 
             versions.addAll([SELECT
                 Id,
@@ -183,7 +191,7 @@ public class OLSTriggerHelper {
                     WHERE Brochure_Key__c IN :brochureKeys]);
 
         } catch( Exception e ){
-            CreedExceptionHandler handler = new CreedExceptionHandler(e);
+            CreedExceptionHandler handler = new CreedExceptionHandler(e, customers);
             handler.handle();
         }
 
@@ -215,17 +223,21 @@ public class OLSTriggerHelper {
      * @return none
      */
     private static void scheduleJob(){
-        String cronJobName = 'Online Store Customer Bounce Report';
-
-        CronJobDetail job;
+        AsyncApexJob job;
 
         try {
 
             job = [SELECT
-                    Id,
-                    Name
-                        FROM CronJobDetail
-                        WHERE Name = :cronJobName
+                    Id
+                        FROM AsyncApexJob
+                        WHERE ApexClass.Name = 'OLSBounceReportSchedulable'
+                        AND JobType = 'ScheduledApex'
+                        AND 
+                        ( 
+                            Status != 'Aborted'
+                            OR Status != 'Completed'
+                            OR Status != 'Failed'
+                        )
                         LIMIT 1];
 
         } catch( Exception e ){
@@ -235,7 +247,7 @@ public class OLSTriggerHelper {
 
         if( job != null ) return;
 
-        OLSBounceReportSchedulable schedulable = new OLSBounceReportSchedulable();
+        String jobName = 'OLS Bounce Report Email';
 
         // job for every Monday at 6am
         String everyWeek = '0 0 6 ? * MON';
@@ -246,7 +258,9 @@ public class OLSTriggerHelper {
         // FOR TESTING: job for 3 minutes from now
         String threeMinutesFromNow = getThreeMinutesFromNow();
 
-        System.schedule(cronJobName, everyWeek, schedulable);
+        OLSBounceReportSchedulable schedulable = new OLSBounceReportSchedulable();
+
+        System.schedule(jobName, threeMinutesFromNow, schedulable);
     }
 
     /**
@@ -324,4 +338,5 @@ public class OLSTriggerHelper {
  */
 
     public class RecordTypeException extends Exception {}
+    public class BrochureKeyException extends Exception {}
 }

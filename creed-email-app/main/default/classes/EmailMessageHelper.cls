@@ -26,7 +26,7 @@ global class EmailMessageHelper {
      * @param EmailMessage[] messages
      * @return void
     **/
-    public static void updateContentDocumentLinks( EmailMessage[] messages ){
+    global static void updateContentDocumentLinks( EmailMessage[] messages ){
         
         if( Test.isRunningTest() || versionPost == null ){
             versionPost = null;

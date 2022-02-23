@@ -2,7 +2,7 @@
  * @name EmailMessageRelationHelper
  * @description Ensures that system generated EmailMessageRelations get associated with recipient record
 **/
-public class EmailMessageRelationHelper {
+global class EmailMessageRelationHelper {
 
     /**
      * @name updateRelationIds
@@ -10,7 +10,7 @@ public class EmailMessageRelationHelper {
      * @param EmailMessage[] message
      * @return Map<Id, EmailMessageRelation>
     **/
-    public static void updateRelationIds( EmailMessage[] messages ){
+    global static void updateRelationIds( EmailMessage[] messages ){
         if( !EmailPost.triggerEnabled ) return;
 
         Set<Id> messageIds = new Map<Id, EmailMessage>( messages ).keyset();

@@ -38,7 +38,7 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
                 q += 'Bounce_Reported__c, ';
                 q += 'Product_Purchased__c ';
                     q += 'FROM Contact ';
-                    q += 'WHERE EmailBouncedDate != null ';
+                    q += 'WHERE Email_Bounced__c = true ';
                     q += 'AND Bounce_Reported__c = false ';
                     q += 'AND RecordTypeId = :olsCustomer';
 
@@ -76,7 +76,6 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
 
         for( Contact customer : this.customers ){
             customer.Bounce_Reported__c = true;
-            customer.Email_Bounced__c = true;
         }
 
         try {
