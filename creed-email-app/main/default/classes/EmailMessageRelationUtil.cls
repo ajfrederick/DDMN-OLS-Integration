@@ -1,8 +1,8 @@
 /**
- * @name EmailMessageRelationHelper
+ * @name EmailMessageRelationUtil
  * @description Ensures that system generated EmailMessageRelations get associated with recipient record
 **/
-global class EmailMessageRelationHelper {
+global class EmailMessageRelationUtil {
 
     /**
      * @name updateRelationIds

@@ -26,15 +26,15 @@ global abstract class EmailFactory {
         set;
     }
 
-    // Class containers that contain email to info
-    protected EmailContainer[] containers {get;set;}
+    // Class parcels that contain email to info
+    protected EmailParcel[] parcels {get;set;}
 
 /**
  * CONSTRUCTOR
 **/
 
-    global EmailFactory( EmailContainer[] containers ){
-        this.containers = containers;
+    global EmailFactory( EmailParcel[] parcels ){
+        this.parcels = parcels;
     }
 
 /**
@@ -43,7 +43,7 @@ global abstract class EmailFactory {
 
     /**
      * @name build
-     * @description loop through containers and get an email message
+     * @description loop through parcels and get an email message
      * @return void
     **/
     global abstract void build();

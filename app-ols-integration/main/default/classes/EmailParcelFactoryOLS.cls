@@ -1,10 +1,10 @@
 /**
- * @name EmailContainerFactoryOLS
+ * @name EmailParcelFactoryOLS
  * @description Extracts Email from Online Store Customer Object
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
 **/
-global class EmailContainerFactoryOLS extends EmailContainerFactory {
+global class EmailParcelFactoryOLS extends EmailParcelFactory {
 
     private static final String bccAddress = System.Label.OLS_Email_Bcc_Address;
 
@@ -12,7 +12,7 @@ global class EmailContainerFactoryOLS extends EmailContainerFactory {
  * CONSTRUCTOR
 **/
 
-    global EmailContainerFactoryOLS( SObject[] objs ){
+    global EmailParcelFactoryOLS( SObject[] objs ){
         super(objs);
     }
 
@@ -22,7 +22,7 @@ global class EmailContainerFactoryOLS extends EmailContainerFactory {
     
     /**
      * @name build
-     * @description creates email containers from Online Store Customer object
+     * @description creates email parcels from Online Store Customer object
      * @param SObject[] objs
      * @return void
     **/
@@ -32,22 +32,22 @@ global class EmailContainerFactoryOLS extends EmailContainerFactory {
         for( Contact obj : customers ){
             if( obj.Email == null ) continue;
             
-            EmailContainer container = new EmailContainer();
+            EmailParcel parcel = new EmailParcel();
     
-            container.ToAddresses.add(obj.Email);
-            container.BccAddresses.add(bccAddress);
-            container.template = template;
-            container.oweAddressId = oweAddressId; // from address
-            container.whoId = obj.Id; // since this is a contact set the whoId
+            parcel.ToAddresses.add(obj.Email);
+            parcel.BccAddresses.add(bccAddress);
+            parcel.template = template;
+            parcel.oweAddressId = oweAddressId; // from address
+            parcel.whoId = obj.Id; // since this is a contact set the whoId
 
 
             if( versionIdsByName.containsKey( obj.Brochure_Key__c ) ){
                 String[] versionIds = versionIdsByName.get( obj.Brochure_Key__c );
 
-                container.setVersionIds(versionIds);
+                parcel.setVersionIds(versionIds);
             }
 
-            containers.add( container );
+            parcels.add( parcel );
         }
     }
 

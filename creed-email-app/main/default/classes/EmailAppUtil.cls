@@ -1,8 +1,8 @@
 /**
- * @name EmailUtils
+ * @name EmailAppUtil
  * @description general utility class
 **/
-global class EmailUtils {
+global class EmailAppUtil {
 
     global static Map<String, String> contentTypes = new Map<String, String>();
 

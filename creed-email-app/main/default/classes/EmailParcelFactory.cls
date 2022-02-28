@@ -1,25 +1,25 @@
 /**
- * @name EmailContainerFactory
+ * @name EmailParcelFactory
  * @description gets proper email info from object for email message. Abstract so you can define
  * the process of getting email addresses for different Objects
 **/
-global virtual class EmailContainerFactory {
+global virtual class EmailParcelFactory {
 
 /**
  * FIELDS
 **/
 
-    // a list of central, understandable, ubiquitis containers for the whole email application. These get passed around and 
+    // a list of central, understandable, ubiquitis parcels for the whole email application. These get passed around and 
     // loaded up with info and then unpacked
-    global EmailContainer[] containers {
+    global EmailParcel[] parcels {
         get {
-            if( containers == null ) containers = new EmailContainer[]{};
-            return containers;
+            if( parcels == null ) parcels = new EmailParcel[]{};
+            return parcels;
         }
         set;
     }
 
-    // containers can be created from either SObjects or inboundEmails. This is the list of objs.
+    // parcels can be created from either SObjects or inboundEmails. This is the list of objs.
     global SObject[] objs {
         get {
             if( objs == null ) objs = new SObject[]{};
@@ -28,7 +28,7 @@ global virtual class EmailContainerFactory {
         set;
     }
 
-    // containers can be created from either SObjects or inboundEmails. This is the list of Inbound Emails.
+    // parcels can be created from either SObjects or inboundEmails. This is the list of Inbound Emails.
     global Messaging.InboundEmail[] inboundEmails {
         get {
             if( inboundEmails == null ) inboundEmails = new Messaging.InboundEmail[]{};
@@ -37,7 +37,7 @@ global virtual class EmailContainerFactory {
         set;
     }
 
-    // to add ContentVersions (files) to container that are already in the database and will be used to send an attachment
+    // to add ContentVersions (files) to parcel that are already in the database and will be used to send an attachment
     // keyed on an explicitly named value passed into the method below
     global Map<String, String[]> versionIdsByName {
         get {
@@ -57,11 +57,11 @@ global virtual class EmailContainerFactory {
  * CONSTRUCTOR
 **/
 
-    global EmailContainerFactory( SObject[] objs ){
+    global EmailParcelFactory( SObject[] objs ){
         this.objs = objs;
     }
 
-    global EmailContainerFactory( Messaging.InboundEmail[] inboundEmails ){
+    global EmailParcelFactory( Messaging.InboundEmail[] inboundEmails ){
         this.inboundEmails = inboundEmails;
     }
 
@@ -71,7 +71,7 @@ global virtual class EmailContainerFactory {
 
     /**
      * @name build
-     * @description creates email containers from sObjects
+     * @description creates email parcels from sObjects
      * @param none
      * @return void
     **/
@@ -82,8 +82,8 @@ global virtual class EmailContainerFactory {
 
     /**
      * @name build
-     * @description creates email containers from sObjects. This will be extended by sub classes. e.g. if you want a factory
-     * for Cases create EmailContainerFactoryCase.cls
+     * @description creates email parcels from sObjects. This will be extended by sub classes. e.g. if you want a factory
+     * for Cases create EmailParcelFactoryCase.cls
      * @param SObject[] objs
      * @return void
     **/
@@ -93,30 +93,30 @@ global virtual class EmailContainerFactory {
 
     /**
      * @name build
-     * @description creates email containers from InboundEmails
+     * @description creates email parcels from InboundEmails
      * @param Messaging.InboundEmail[] emails 
      * @return void
     **/
     global void build( Messaging.InboundEmail[] emails ){
 
         for( Messaging.InboundEmail email : emails ){
-            EmailContainer container = new EmailContainer();
+            EmailParcel parcel = new EmailParcel();
 
             for( String address : email.ToAddresses ){
-                container.toAddresses.add(address);
+                parcel.toAddresses.add(address);
             }
 
             if( email.CcAddresses != null ){
 
                 for( String address : email.CcAddresses ){
-                    container.ccAddresses.add(address);
+                    parcel.ccAddresses.add(address);
                 }
             }
 
-            container.FromAddress = email.FromAddress;
-            container.FromName = email.FromName;
+            parcel.FromAddress = email.FromAddress;
+            parcel.FromName = email.FromName;
             
-            container.setContent(
+            parcel.setContent(
                 email.Subject, 
                 email.HtmlBody, 
                 email.PlainTextBody
@@ -124,45 +124,45 @@ global virtual class EmailContainerFactory {
 
             if( email.binaryAttachments != null ){
                 for( Messaging.InboundEmail.BinaryAttachment attachment : email.binaryAttachments ){
-                    container.setAttachment( attachment.filename, attachment.body );
+                    parcel.setAttachment( attachment.filename, attachment.body );
                 }
             }
 
             if( email.textAttachments != null ){
                 for( Messaging.InboundEmail.TextAttachment attachment : email.textAttachments ){
-                    container.setAttachment( attachment.filename, attachment.body );
+                    parcel.setAttachment( attachment.filename, attachment.body );
                 }
             }
 
-            container.whatId = relatedToId;
-            container.messageId = email.messageId;
-            container.inReplyTo = email.inReplyTo;
+            parcel.whatId = relatedToId;
+            parcel.messageId = email.messageId;
+            parcel.inReplyTo = email.inReplyTo;
 
-            containers.add( container );
+            parcels.add( parcel );
         }
     }
 
     /**
      * @name transorm
-     * @description takes containers and adds property values to them if need be
-     * @param EmailContainer[] existingContainers
+     * @description takes parcels and adds property values to them if need be
+     * @param EmailParcel[] existingpParcels
      * @return void
     **/
-    global virtual void transorm( EmailContainer[] existingContainers ){
+    global virtual void transorm( EmailParcel[] existingpParcels ){
 
-        for( EmailContainer container : existingContainers ){
-            container.template = template;
-            container.oweAddressId = oweAddressId;
+        for( EmailParcel parcel : existingpParcels ){
+            parcel.template = template;
+            parcel.oweAddressId = oweAddressId;
         }
     }
 
     /**
-     * @name getContainers
-     * @description returns containers
-     * @return EmailContainer[]
+     * @name getParcels
+     * @description returns parcels
+     * @return EmailParcel[]
     **/
-    global EmailContainer[] getContainers(){
-        return containers;
+    global EmailParcel[] getParcels(){
+        return parcels;
     }
 
 /**
@@ -170,12 +170,12 @@ global virtual class EmailContainerFactory {
 **/ 
     
     /**
-     * @name hasContainers
+     * @name hasParcels
      * @description returns true if this class has found email address
      * @return Boolean
     **/
-    global Boolean hasContainers(){
-        return !containers.isEmpty();
+    global Boolean hasParcels(){
+        return !parcels.isEmpty();
     }
 
     /**
@@ -185,7 +185,7 @@ global virtual class EmailContainerFactory {
      * @return void
     **/
     global void setTemplate( String name ){
-        template = EmailUtils.getTemplate( name );
+        template = EmailAppUtil.getTemplate( name );
     }
 
     /**
@@ -194,7 +194,7 @@ global virtual class EmailContainerFactory {
      * @param String address
     **/
     global void setOrgWideEmailAddressId( String addressName ){
-        OrgWideEmailAddress oweAddress = EmailUtils.getOrgWideEmailAddress( addressName );
+        OrgWideEmailAddress oweAddress = EmailAppUtil.getOrgWideEmailAddress( addressName );
 
         if( oweAddress != null ){
             oweAddressId = oweAddress.Id;

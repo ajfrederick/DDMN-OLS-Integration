@@ -1,10 +1,10 @@
 /**
- * @name OLSTriggerHelper
+ * @name OLSUtil
  * @description helper for OnlineStoreCustomerTrigger.trigger and throughout the application
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public class OLSTriggerHelper {
+public class OLSUtil {
 
 /**
  * FIELDS
@@ -87,7 +87,7 @@ public class OLSTriggerHelper {
 
         for( Contact customer : customers ){
 
-            if( customer.State_Acronym__c == 'NE' ){
+            if( customer.State_Acronym__c == 'ddne_core' ){
                 customersNE.add(customer);
             } else {
                 customersNotNE.add(customer);
@@ -109,11 +109,11 @@ public class OLSTriggerHelper {
     private static void sendEmailsNotNE( Contact[] customers ){
         if( customers.isEmpty() ) return;
 
-        EmailContainerFactoryOLS containerFactory = new EmailContainerFactoryOLS( customers );
-        containerFactory.setTemplate( 'Online_Store_Customer_Welcome' );
-        containerFactory.setOrgWideEmailAddressId( fromAddress );
+        EmailParcelFactoryOLS parcelFactory = new EmailParcelFactoryOLS( customers );
+        parcelFactory.setTemplate( 'Online_Store_Customer_Welcome' );
+        parcelFactory.setOrgWideEmailAddressId( fromAddress );
 
-        sendFinal( containerFactory, customers );
+        sendFinal( parcelFactory, customers );
     }
 
     /**
@@ -126,11 +126,11 @@ public class OLSTriggerHelper {
     private static void sendEmailsNE( Contact[] customers ){
         if( customers.isEmpty() ) return;
 
-        EmailContainerFactoryOLS containerFactory = new EmailContainerFactoryOLS( customers );
-        containerFactory.setTemplate( 'Online_Store_Customer_Welcome_NE' ); // Template is NE specific
-        containerFactory.setOrgWideEmailAddressId( fromAddressNE ); // And From Address is NE specific
+        EmailParcelFactoryOLS parcelFactory = new EmailParcelFactoryOLS( customers );
+        parcelFactory.setTemplate( 'Online_Store_Customer_Welcome_NE' ); // Template is NE specific
+        parcelFactory.setOrgWideEmailAddressId( fromAddressNE ); // And From Address is NE specific
 
-        sendFinal( containerFactory, customers );
+        sendFinal( parcelFactory, customers );
     }
 
     /**
@@ -140,13 +140,13 @@ public class OLSTriggerHelper {
      * @param Contact[] customers
      * @return none
      */
-    private static void sendFinal( EmailContainerFactory containerFactory, Contact[] customers ){
+    private static void sendFinal( EmailParcelFactory parcelFactory, Contact[] customers ){
         ContentVersion[] versions = getContentVersions(customers);
 
-        containerFactory.addVersionIdsByName( versions );
-        containerFactory.build();
+        parcelFactory.addVersionIdsByName( versions );
+        parcelFactory.build();
 
-        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( containerFactory );
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( parcelFactory );
         emailFactory.build();
 
         EmailPost emailPost = new EmailPost( emailFactory );
@@ -230,7 +230,7 @@ public class OLSTriggerHelper {
             job = [SELECT
                     Id
                         FROM AsyncApexJob
-                        WHERE ApexClass.Name = 'OLSBounceReportSchedulable'
+                        WHERE ApexClass.Name = 'OLSBounceReportJob'
                         AND JobType = 'ScheduledApex'
                         AND 
                         ( 
@@ -258,9 +258,9 @@ public class OLSTriggerHelper {
         // FOR TESTING: job for 3 minutes from now
         String threeMinutesFromNow = getThreeMinutesFromNow();
 
-        OLSBounceReportSchedulable schedulable = new OLSBounceReportSchedulable();
+        OLSBounceReportJob schedulable = new OLSBounceReportJob();
 
-        System.schedule(jobName, threeMinutesFromNow, schedulable);
+        System.schedule(jobName, everyWeek, schedulable);
     }
 
     /**

@@ -69,7 +69,7 @@ public without sharing class OLSRestServiceHelper {
     }
 
     // let's just grab the record type id once to be referenced here
-    private static final Id olsCustomerRecordTypeId = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
+    private static final Id olsCustomerRecordTypeId = OLSUtil.getRecordTypeId('Online_Store_Customer');
 
 /**
 * CONSTRUCTOR

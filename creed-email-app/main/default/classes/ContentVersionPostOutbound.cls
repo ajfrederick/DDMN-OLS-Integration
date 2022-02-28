@@ -8,8 +8,8 @@ global class ContentVersionPostOutbound extends ContentVersionPost {
  * CONSTRUCTOR
  */
 
-    global ContentVersionPostOutbound( EmailContainer[] containers ) {
-        super(containers);
+    global ContentVersionPostOutbound( EmailParcel[] parcels ) {
+        super(parcels);
     }
 
 /**
@@ -29,10 +29,10 @@ global class ContentVersionPostOutbound extends ContentVersionPost {
     /**
      * @name getMessageId
      * @description returns an external email message Id for insertContentDocumentLinks method
-     * @param EmailContainer container
+     * @param EmailParcel parcel
      * @return String
      */
-    global override String getMessageId( EmailContainer container ){
-        return container.inReplyTo;
+    global override String getMessageId( EmailParcel parcel ){
+        return parcel.inReplyTo;
     }
 }

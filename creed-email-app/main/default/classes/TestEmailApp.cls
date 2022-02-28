@@ -22,28 +22,28 @@ public class TestEmailApp {
 
         insert c;
 
-        EmailContainer container = new EmailContainer();
+        EmailParcel parcel = new EmailParcel();
 
-        container.whatId = c.Id;
-        container.ToAddresses = new String[]{'me@test.com'};
-        container.CcAddresses = new String[]{'me2@test.com'};
-        container.BccAddresses = new String[]{'me3@test.com'};
-        container.FromAddress = 'you@test.com';
-        container.setContent( 'Subject', 'HTMLBody', 'PlainTextBody' );
-        container.setAttachment( 'Attachment.txt', Blob.valueOf('Attachment') );
-        container.whoId = contact.Id;
+        parcel.whatId = c.Id;
+        parcel.ToAddresses = new String[]{'me@test.com'};
+        parcel.CcAddresses = new String[]{'me2@test.com'};
+        parcel.BccAddresses = new String[]{'me3@test.com'};
+        parcel.FromAddress = 'you@test.com';
+        parcel.setContent( 'Subject', 'HTMLBody', 'PlainTextBody' );
+        parcel.setAttachment( 'Attachment.txt', Blob.valueOf('Attachment') );
+        parcel.whoId = contact.Id;
 
-        System.assertEquals(3, container.allAddresses.size());
+        System.assertEquals(3, parcel.allAddresses.size());
 
-        EmailContainer[] containers = new EmailContainer[]{container};
+        EmailParcel[] parcels = new EmailParcel[]{parcel};
 
         // insert our attachments since we have before we set messages so SingleEmailMessage can access the ContentVersionIds
-        ContentVersionPostOutbound versionPost = new ContentVersionPostOutbound( containers );
+        ContentVersionPostOutbound versionPost = new ContentVersionPostOutbound( parcels );
         versionPost.post();
 
         // instatiate a message creator, set option, set contentversionids for attatchments and 
-        // set messages which unpacks container info into Messaging.SingleEmailMessage
-        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( containers );
+        // set messages which unpacks parcel info into Messaging.SingleEmailMessage
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( parcels );
         emailFactory.build();
         
         Integer numberOfEmailsSent = 0;
@@ -67,17 +67,17 @@ public class TestEmailApp {
         System.assertEquals( 1, numberOfEmailsSent );
 
         // asserts on outbound results
-        OutboundEmailResults outboundResults = emailPost.getOutboundEmailResults();
+        EmailResultsOutbound results = emailPost.getEmailResultsOutbound();
 
-        System.assertEquals( 1, outboundResults.getSuccesses().size() );
-        System.assertEquals( 1, outboundResults.getSuccessesByObjId().size() );
+        System.assertEquals( 1, results.getSuccesses().size() );
+        System.assertEquals( 1, results.getSuccessesByObjId().size() );
 
-        System.assertEquals( 0, outboundResults.getErrorMessages().size() );
+        System.assertEquals( 0, results.getErrorMessages().size() );
 
-        System.assertEquals( true, outboundResults.hasSuccesses() );
-        System.assertEquals( false, outboundResults.hasFailures() );
+        System.assertEquals( true, results.hasSuccesses() );
+        System.assertEquals( false, results.hasFailures() );
 
-        System.assertEquals( true, String.isBlank(outboundResults.failedIds) );
+        System.assertEquals( true, String.isBlank(results.failedIds) );
     }
 
     @IsTest
@@ -111,25 +111,25 @@ public class TestEmailApp {
 
         insert c;
 
-        EmailContainer container = new EmailContainer();
+        EmailParcel parcel = new EmailParcel();
 
-        container.whatId = c.Id;
-        container.ToAddresses = new String[]{'me@test.com'};
-        container.FromAddress = 'you@test.com';
-        container.template = EmailUtils.getTemplate('Test_Template');
-        container.whoId = contact.Id;
+        parcel.whatId = c.Id;
+        parcel.ToAddresses = new String[]{'me@test.com'};
+        parcel.FromAddress = 'you@test.com';
+        parcel.template = EmailAppUtil.getTemplate('Test_Template');
+        parcel.whoId = contact.Id;
         
 
-        EmailContainer[] containers = new EmailContainer[]{container};
+        EmailParcel[] parcels = new EmailParcel[]{parcel};
 
         // insert our attachments since we have before we set messages so SingleEmailMessage can access the ContentVersionIds
-        ContentVersionPostOutbound versionPost = new ContentVersionPostOutbound( containers );
+        ContentVersionPostOutbound versionPost = new ContentVersionPostOutbound( parcels );
         versionPost.useFirstForAllMessages = true; // let's use this opportunity to test this feature.
         versionPost.post();
 
         // instatiate a message creator, set option, set contentversionids for attatchments and 
-        // set messages which unpacks container info into Messaging.SingleEmailMessage
-        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( containers );
+        // set messages which unpacks parcel info into Messaging.SingleEmailMessage
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( parcels );
         emailFactory.build();
         
         Integer numberOfEmailsSent = 0;
@@ -172,12 +172,12 @@ public class TestEmailApp {
         email.binaryAttachments = new Messaging.InboundEmail.BinaryAttachment[]{attachment};
 
 
-        EmailContainerFactory containerFactory = new EmailContainerFactory( new Messaging.InboundEmail[]{ email } );
-        containerFactory.relatedToId = c.Id;
-        containerFactory.build();
+        EmailParcelFactory parcelFactory = new EmailParcelFactory( new Messaging.InboundEmail[]{ email } );
+        parcelFactory.relatedToId = c.Id;
+        parcelFactory.build();
 
         // instatiate a message creator then set messages
-        EmailFactoryInbound emailFactory = new EmailFactoryInbound( containerFactory.getContainers() );
+        EmailFactoryInbound emailFactory = new EmailFactoryInbound( parcelFactory.getparcels() );
         emailFactory.build();
 
         // recieve the emails
@@ -185,7 +185,7 @@ public class TestEmailApp {
         emailPost.post();
 
         // insert our attachments since we have EmailMessage
-        ContentVersionPostInbound versionPost = new ContentVersionPostInbound(  containerFactory.getContainers() );
+        ContentVersionPostInbound versionPost = new ContentVersionPostInbound(  parcelFactory.getparcels() );
         versionPost.post();
         versionPost.postContentDocumentLinks( emailFactory.getInboundMessages() );
 
@@ -195,7 +195,7 @@ public class TestEmailApp {
     }
     
     @IsTest
-    static void testContainerFactory(){
+    static void testparcelFactory(){
         Case c = new Case();
 
         ContentVersion version = new ContentVersion(
@@ -207,18 +207,18 @@ public class TestEmailApp {
 
         insert version;
 
-        EmailContainerFactory containerFactory = new EmailContainerFactory( new SObject[]{c} );
-        containerFactory.addVersionIdByName(version, version.Title);
+        EmailParcelFactory parcelFactory = new EmailParcelFactory( new SObject[]{c} );
+        parcelFactory.addVersionIdByName(version, version.Title);
 
-        System.assertEquals( 1, containerFactory.versionIdsByName.get(version.Title).size() );
-        System.assertEquals( version.Id, containerFactory.versionIdsByName.get(version.Title)[0] );
-        System.assertEquals( false, containerFactory.hasContainers() );
-        System.assertEquals( 0, containerFactory.getContainers().size() );
+        System.assertEquals( 1, parcelFactory.versionIdsByName.get(version.Title).size() );
+        System.assertEquals( version.Id, parcelFactory.versionIdsByName.get(version.Title)[0] );
+        System.assertEquals( false, parcelFactory.hasparcels() );
+        System.assertEquals( 0, parcelFactory.getparcels().size() );
     }
 
     @IsTest
     static void testUtils(){
-        String csvContentType = EmailUtils.contentTypes.get('csv');
+        String csvContentType = EmailAppUtil.contentTypes.get('csv');
 
         System.assertEquals('text/csv', csvContentType);
     }
@@ -232,7 +232,7 @@ public class TestEmailApp {
         TestTriggerHook hook = new TestTriggerHook();
 
         // ADD hood to trigger and insert
-        EmailMessageHelper.hooks.add( hook );
+        EmailMessageUtil.hooks.add( hook );
 
         EmailMessage message = new EmailMessage(
             ToAddress = 'me@test.com',
@@ -248,7 +248,7 @@ public class TestEmailApp {
 
 
         // ADD hook to trigger and update
-        EmailMessageHelper.hooks.add( hook );
+        EmailMessageUtil.hooks.add( hook );
 
         message.Subject = 'Subject Update';
         update message;
@@ -257,7 +257,7 @@ public class TestEmailApp {
 
 
         // ADD emailPost to trigger and delete
-        EmailMessageHelper.hooks.add( hook );
+        EmailMessageUtil.hooks.add( hook );
 
         delete message;
 
@@ -265,7 +265,7 @@ public class TestEmailApp {
 
 
         // ADD emailPost to trigger and undelete
-        EmailMessageHelper.hooks.add( hook );
+        EmailMessageUtil.hooks.add( hook );
 
         undelete message;
 

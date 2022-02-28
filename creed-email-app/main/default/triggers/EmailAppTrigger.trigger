@@ -1,4 +1,8 @@
-trigger EmailMessageTrigger on EmailMessage ( 
+/**
+ * @name EmailAppTrigger
+ * @description This trigger is for the Creed Email App
+**/
+trigger EmailAppTrigger on EmailMessage ( 
     before insert, 
     before update,
     before delete,
@@ -25,8 +29,8 @@ trigger EmailMessageTrigger on EmailMessage (
     if( Trigger.isAfter ){
 
         if( Trigger.isInsert ){
-            EmailMessageHelper.updateContentDocumentLinks(Trigger.new);
-            EmailMessageRelationHelper.updateRelationIds(Trigger.new);
+            EmailMessageUtil.updateContentDocumentLinks(Trigger.new);
+            EmailMessageRelationUtil.updateRelationIds(Trigger.new);
         } else 
         if( Trigger.isUpdate ){
 
@@ -40,7 +44,7 @@ trigger EmailMessageTrigger on EmailMessage (
     }
     
     // this is so someone can add trigger functionality oustide the email app
-    for( TriggerHook hook : EmailMessageHelper.hooks ){
+    for( TriggerHook hook : EmailMessageUtil.hooks ){
 
         if( Trigger.isBefore ){
             if( Trigger.isInsert ){
@@ -69,5 +73,5 @@ trigger EmailMessageTrigger on EmailMessage (
         }
     }
 
-    if( Trigger.isAfter ) EmailMessageHelper.hooks.clear();
+    if( Trigger.isAfter ) EmailMessageUtil.hooks.clear();
 }

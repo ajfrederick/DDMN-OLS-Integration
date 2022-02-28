@@ -1,9 +1,9 @@
 /**
- * @name OLSTest
+ * @name TestOLSApp
  * @description Test class for Online Store Customer Package
  */
 @IsTest
-public with sharing class OLSTest {
+public with sharing class TestOLSApp {
     
     @IsTest
     public static void testApexRestServiceMN(){
@@ -168,8 +168,8 @@ public with sharing class OLSTest {
     }
 
     @IsTest
-    public static void testTriggerHelper(){
-        EmailMessageHelper.hooks.add(new OLSTriggerHook());
+    public static void testTrigger(){
+        EmailMessageUtil.hooks.add(new OLSTriggerHook());
 
         Contact contact = new Contact(
             FirstName = 'new',
@@ -204,7 +204,7 @@ public with sharing class OLSTest {
 
     @IsTest
     public static void testBatch(){
-        Database.executeBatch( new OLSBounceReportBatchable() );
+        Database.executeBatch( new OLSBounceReportBatch() );
     }
 
     private static ContentVersion createContentVersion(){

@@ -11,7 +11,7 @@
             "path": "creed-email-app",
             "package": "Creed Email App",
             "versionName": "ver 1.0",
-            "versionNumber": "1.1.0.NEXT",
+            "versionNumber": "1.5.0.NEXT",
             "default": false,
             "dependencies": [
                 {
@@ -25,15 +25,15 @@
             "default": true,
             "package": "DDMN Online Store Integration",
             "versionName": "ver 1.0",
-            "versionNumber": "1.8.0.NEXT",
+            "versionNumber": "2.2.0.NEXT",
             "dependencies": [
                 {
                     "package": "Creed Exception Handler",
                     "versionNumber": "1.1.0.RELEASED"
                 },
                 {
-                    "package": "Creed Email Messaging",
-                    "versionNumber": "1.1.0.RELEASED"
+                    "package": "Creed Email App",
+                    "versionNumber": "1.5.0.RELEASED"
                 }
             ]
         }
@@ -43,21 +43,12 @@
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "52.0",
     "packageAliases": {
-        "DDMN Online Store Integration": "0Ho4x000000PBAxCAO",
         "Creed Exception Handler": "0Ho4x000000PBA9CAO",
-        "Creed Email Messaging": "0Ho4x000000PB9uCAG",
         "Creed Exception Handler@1.1.0-1": "04t4x000000AJjqAAG",
-        "Creed Email Messaging@1.1.0-3": "04t4x000000AJl3AAG",
-        "DDMN Online Store Integration@1.3.0-1": "04t4x000000AJp5AAG",
-        "Creed Email Messaging@1.3.0-1": "04t4x000000AJySAAW",
-        "DDMN Online Store Integration@1.6.0-1": "04t4x000000AK17AAG",
-        "DDMN Online Store Integration@1.6.0-2": "04t4x000000AK2yAAG",
-        "DDMN Online Store Integration@1.6.0-3": "04t4x000000AK33AAG",
-        "DDMN Online Store Integration@1.6.0-4": "04t4x000000AK38AAG",
-        "DDMN Online Store Integration@1.7.0-1": "04t4x000000AK3mAAG",
-        "DDMN Online Store Integration@1.8.0-1": "04t4x000000AK5JAAW",
         "Creed Email App": "0Ho4x000000PBBHCA4",
-        "Creed Email App@1.0.0-1": "04t4x000000AK5OAAW",
-        "Creed Email App@1.1.0-1": "04t4x000000AK5YAAW"
+        "Creed Email App@1.5.0-1": "04t4x000000AK75AAG",
+        "DDMN Online Store Integration": "0Ho4x000000PBAxCAO",
+        "DDMN Online Store Integration@1.3.0-1": "04t4x000000AJp5AAG",
+        "DDMN Online Store Integration@2.2.0-1": "04t4x000000AK7PAAW"
     }
 }

@@ -1,9 +1,9 @@
 /**
- * @name EmailContainer
+ * @name EmailParcel
  * @description wrapper class to get email content and info predictably no matter the source.
  * These get loaded up and passed around and unloaded by the entire application.
 **/
-global class EmailContainer {
+global class EmailParcel {
 
 /**
  * FIELDS
@@ -100,7 +100,7 @@ global class EmailContainer {
  * CONSTRUCTOR
 **/
 
-    global EmailContainer(){
+    global EmailParcel(){
 
     }
 
@@ -273,7 +273,7 @@ global class EmailContainer {
     **/
     global void setQuote( String quote ){
         if( content == null ){
-            System.debug('Content for EmailContainer.cls must be set before set the quoted email in the body');
+            System.debug('Content for EmailParcel.cls must be set before set the quoted email in the body');
             return;
         }
 
@@ -433,7 +433,7 @@ global class EmailContainer {
         }
 
         private void setContentType( String filename ){
-            Map<String, String> contentTypes = EmailUtils.contentTypes;
+            Map<String, String> contentTypes = EmailAppUtil.contentTypes;
 
             extension = filename.substringAfterLast('.');
 

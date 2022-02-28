@@ -1,11 +1,11 @@
 /**
- * @name OLSBounceReportBatchable
+ * @name OLSBounceReportBatch
  * @description this emails the bounce report of any Online Store Customer (contact) record and then sets the email bounced flag
  * as well as the bounce reported
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
+public class OLSBounceReportBatch implements Database.Batchable<SObject> {
 
 /**
  * FIELDS
@@ -24,7 +24,7 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
  */
     
     public Database.QueryLocator start( Database.BatchableContext context ){
-        String olsCustomer = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
+        String olsCustomer = OLSUtil.getRecordTypeId('Online_Store_Customer');
 
         String q = 'SELECT ';
                 q += 'Id, ';
@@ -53,13 +53,13 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
 
         CustomEmailTemplate template = new CustomEmailTemplate( this.customers );
 
-        EmailContainer container = new EmailContainer();
-        container.setContent( template.subject, template.body, template.body );
-        container.setAttachment( template.filename, template.attachmentBody );
+        EmailParcel parcel = new EmailParcel();
+        parcel.setContent( template.subject, template.body, template.body );
+        parcel.setAttachment( template.filename, template.attachmentBody );
 
-        addToAddresses( container );
+        addToAddresses( parcel );
 
-        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( new EmailContainer[]{container} );
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( new EmailParcel[]{parcel} );
         emailFactory.build();
 
         EmailPost emailPost = new EmailPost( emailFactory );
@@ -92,9 +92,9 @@ public class OLSBounceReportBatchable implements Database.Batchable<SObject> {
  * UTILITY METHODS
  */
 
-    private void addToAddresses( EmailContainer container ){
+    private void addToAddresses( EmailParcel parcel ){
         for( OLS_Bounce_Report_Email_Address__mdt record : OLS_Bounce_Report_Email_Address__mdt.getAll().values() ){
-            container.ToAddresses.add(record.Email__c);
+            parcel.ToAddresses.add(record.Email__c);
         }
     }
 

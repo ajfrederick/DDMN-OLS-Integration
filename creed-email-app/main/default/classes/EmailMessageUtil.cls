@@ -1,8 +1,8 @@
 /**
- * @name EmailMessageHelper
- * @description Helper class for EmailMessage Trigger
+ * @name EmailMessageUtil
+ * @description Helper class for EmailMessageTrigger
 **/
-global class EmailMessageHelper {
+global class EmailMessageUtil {
 
     global static ContentVersionPost versionPost {get;set;}
 

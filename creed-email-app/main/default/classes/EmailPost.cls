@@ -6,7 +6,7 @@ global class EmailPost {
 
     private EmailFactory emailFactory {get;set;}
 
-    private OutboundEmailResults outboundResults {get;set;}
+    private EmailResultsOutbound resultsOutbound {get;set;}
 
     global static Boolean triggerEnabled {
         get {
@@ -58,11 +58,11 @@ global class EmailPost {
             
             Messaging.SendEmailResult[] results = Messaging.sendEmail( messages );
 
-            outboundResults = new OutboundEmailResults( results );
-            outboundResults.setSuccesses( messages );
+            resultsOutbound = new EmailResultsOutbound( results );
+            resultsOutbound.setSuccesses( messages );
 
-            if( outboundResults.hasFailures() ){
-                String joinedErrorMessages = String.join( outboundResults.getErrorMessages(), '\n\n' );
+            if( resultsOutbound.hasFailures() ){
+                String joinedErrorMessages = String.join( resultsOutbound.getErrorMessages(), '\n\n' );
 
                 throw new EmailException( joinedErrorMessages );
             }
@@ -97,7 +97,7 @@ global class EmailPost {
      * @param  ContentVersionPost versionPost 
     **/
     global void linkContentVersions( ContentVersionPost versionPost ){
-        EmailMessageHelper.versionPost = versionPost;
+        EmailMessageUtil.versionPost = versionPost;
     }
 
     /**
@@ -107,7 +107,7 @@ global class EmailPost {
      * @param TriggerHook hook
     **/
     global void addTriggerHook( TriggerHook hook ){
-        EmailMessageHelper.hooks.add( hook );
+        EmailMessageUtil.hooks.add( hook );
     }
 
 /**
@@ -115,12 +115,12 @@ global class EmailPost {
 **/
 
     /**
-     * @name getOutboundEmailResults
+     * @name getEmailResultsOutbound
      * @description return the results of the outbound messages to get failures
-     * @return OutboundEmailResults
+     * @return EmailResultsOutbound
     **/
-    global OutboundEmailResults getOutboundEmailResults(){
-        return outboundResults;
+    global EmailResultsOutbound getEmailResultsOutbound(){
+        return resultsOutbound;
     }
 
 /**

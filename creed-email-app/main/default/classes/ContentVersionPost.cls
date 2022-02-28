@@ -8,8 +8,8 @@ global abstract class ContentVersionPost {
  * FIELDS
  */
 
-    // Class containers that contain email to info
-    global EmailContainer[] containers {get;set;}
+    // Class parcels that contain email to info
+    global EmailParcel[] parcels {get;set;}
 
     private ContentVersion[] versions {
         get {
@@ -40,8 +40,8 @@ global abstract class ContentVersionPost {
  * CONSTRUCTOR
  */
 
-    global ContentVersionPost( EmailContainer[] containers ) {
-        this.containers = containers;
+    global ContentVersionPost( EmailParcel[] parcels ) {
+        this.parcels = parcels;
     }
 
 /**
@@ -59,10 +59,10 @@ global abstract class ContentVersionPost {
     /**
      * @name getMessageId
      * @description returns an external email message Id for postContentDocumentLinks method
-     * @param EmailContainer container
+     * @param EmailParcel parcel
      * @return String
      */
-    global abstract String getMessageId( EmailContainer container );
+    global abstract String getMessageId( EmailParcel parcel );
 
 /**
  * ACTION METHODS
@@ -77,13 +77,13 @@ global abstract class ContentVersionPost {
      */
     global void post(){
 
-        for( EmailContainer container : containers ){
-            String messageId = getMessageId( container );
+        for( EmailParcel parcel : parcels ){
+            String messageId = getMessageId( parcel );
 
             if( useFirstForAllMessages ){
-                setFirstForAllMessages( container, messageId );
+                setFirstForAllMessages( parcel, messageId );
             } else {
-                setContentVersions( container, messageId );
+                setContentVersions( parcel, messageId );
             }
         }
 
@@ -96,7 +96,7 @@ global abstract class ContentVersionPost {
             handler.handle();
         }
 
-        setVerionIdsOnContainers();
+        setVerionIdsOnparcels();
     }
 
     /**
@@ -148,13 +148,13 @@ global abstract class ContentVersionPost {
     /**
      * @name setContentVersions
      * @description sets a single or single set of content verions (attachments) for many emails
-     * @param EmailContainer container
+     * @param EmailParcel parcel
      * @param String messageId
      * @return void
      */
-    private void setContentVersions( EmailContainer container, String messageId ){
+    private void setContentVersions( EmailParcel parcel, String messageId ){
 
-        for( EmailContainer.AttachmentData attachment : container.attachments ){
+        for( EmailParcel.AttachmentData attachment : parcel.attachments ){
             ContentVersion version = getContentVersion(attachment);
 
             if( versionsByMessageId.containsKey( messageId ) ){
@@ -171,40 +171,40 @@ global abstract class ContentVersionPost {
          * If we don't clear it the message creator will read the attachments list and creat an attachment that isn't
          * saved as a file and essentially send two of every attachment because of the files created in this class.
          */
-        container.attachments.clear();
+        parcel.attachments.clear();
     }
 
     /**
      * @name setFirstForAllMessages
      * @description sets a single or single set of content verions (attachments) for many emails
-     * @param EmailContainer container
+     * @param EmailParcel parcel
      * @param String messageId
      * @return void
      */
-    private void setFirstForAllMessages( EmailContainer container, String messageId ){
+    private void setFirstForAllMessages( EmailParcel parcel, String messageId ){
 
         if( versions.size() == 0 ){
-            setContentVersions( container, messageId );
+            setContentVersions( parcel, messageId );
         } else {
             versionsByMessageId.put( messageId, versions );
         }
     }
 
      /**
-     * @name setVerionIdsOnContainers
-     * @description set files on container to be accessed by MessageCreator
+     * @name setVerionIdsOnparcels
+     * @description set files on parcel to be accessed by MessageCreator
      * @param none
      * @return none
      */
-    private void setVerionIdsOnContainers(){
+    private void setVerionIdsOnparcels(){
 
-        for( EmailContainer container : containers ){
-            String messageId = getMessageId( container );
+        for( EmailParcel parcel : parcels ){
+            String messageId = getMessageId( parcel );
 
             if( versionsByMessageId.containsKey(messageId) ){
 
                 for( ContentVersion version : versionsByMessageId.get(messageId) ){
-                    container.addVersionId( version.Id );
+                    parcel.addVersionId( version.Id );
                 }
             }
         }
@@ -266,10 +266,10 @@ global abstract class ContentVersionPost {
     /**
      * @name getContentVersion
      * @description returns a predicatably formatted ContentVersion
-     * @param EmailContainer.AttachmentData attachment 
+     * @param EmailParcel.AttachmentData attachment 
      * @return ContentVersion
      */
-    private ContentVersion getContentVersion( EmailContainer.AttachmentData attachment ){
+    private ContentVersion getContentVersion( EmailParcel.AttachmentData attachment ){
         return new ContentVersion(
             Title = attachment.fileName,
             PathOnClient = attachment.fileName,

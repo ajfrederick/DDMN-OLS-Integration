@@ -8,12 +8,12 @@ global class EmailFactoryInbound extends EmailFactory {
  * CONSTRUCTORS
 **/
 
-    global EmailFactoryInbound( EmailContainerFactory containerFactory ){
-        super( containerFactory.getContainers() );
+    global EmailFactoryInbound( EmailParcelFactory parcelFactory ){
+        super( parcelFactory.getParcels() );
     }
 
-    global EmailFactoryInbound( EmailContainer[] containers ) {
-        super( containers );
+    global EmailFactoryInbound( EmailParcel[] parcels ) {
+        super( parcels );
     }
 
 /**
@@ -22,15 +22,15 @@ global class EmailFactoryInbound extends EmailFactory {
 
     /**
      * @name build
-     * @description loop through containers and get an email message
+     * @description loop through parcels and get an email message
      * @return void
     **/
     global override void build(){
 
-        for( EmailContainer container : containers ){
-            if( !isVaild( container ) ) continue;
+        for( EmailParcel parcel : parcels ){
+            if( !isVaild( parcel ) ) continue;
 
-            inboundMessages.add( getMessage( container ) );
+            inboundMessages.add( getMessage( parcel ) );
         }
     }
 
@@ -38,15 +38,15 @@ global class EmailFactoryInbound extends EmailFactory {
      * @name getMessage
      * @description creates a single email massage and sets necessary fields base on certain conditions
      * waterfalls the next 3 methods
-     * @param EmailContainer container
+     * @param EmailParcel parcel
      * @return EmailMessage message
     **/
-    private EmailMessage getMessage( EmailContainer container ){
+    private EmailMessage getMessage( EmailParcel parcel ){
         EmailMessage message = new EmailMessage();
 
-        configureMessage( message, container );
-        setAddressInfo( message, container );
-        setContent( message, container );
+        configureMessage( message, parcel );
+        setAddressInfo( message, parcel );
+        setContent( message, parcel );
 
         return message;
     }
@@ -58,19 +58,19 @@ global class EmailFactoryInbound extends EmailFactory {
     /**
      * @name configureMessage
      * @description called within getMessage, sets and incoming message's
-     *  parentId to the given EmailContainer object's whatId. Message is also identified as an incoming message.
+     *  parentId to the given EmailParcel object's whatId. Message is also identified as an incoming message.
      * 
      * @param EmailMessage message
-     * @param EmailContainer container
+     * @param EmailParcel parcel
      * @return void
     **/
-    private void configureMessage( EmailMessage message, EmailContainer container  ){
+    private void configureMessage( EmailMessage message, EmailParcel parcel  ){
         
-        if( container.hasWhatId() ){
-            message.ParentId = container.whatId;
+        if( parcel.hasWhatId() ){
+            message.ParentId = parcel.whatId;
         }
 
-        message.MessageIdentifier = container.messageId;
+        message.MessageIdentifier = parcel.messageId;
         message.Incoming = true;
     }
 
@@ -79,29 +79,29 @@ global class EmailFactoryInbound extends EmailFactory {
      * @description called within getMessage 
      * sets all the associated addresses (to, cc, bcc, from, and name addresses) for the an inbound message as well as the
      * name of the sender of the email.
-     * @param EmailMessage message, EmailContainer container
+     * @param EmailMessage message, EmailParcel parcel
      * @return void
     **/
-    private void setAddressInfo( EmailMessage message, EmailContainer container ){
-        message.ToAddress = getAddressString( container.ToAddresses );
-        message.CcAddress = getAddressString( container.CcAddresses );
-        message.BccAddress = getAddressString( container.BccAddresses );
+    private void setAddressInfo( EmailMessage message, EmailParcel parcel ){
+        message.ToAddress = getAddressString( parcel.ToAddresses );
+        message.CcAddress = getAddressString( parcel.CcAddresses );
+        message.BccAddress = getAddressString( parcel.BccAddresses );
    
-        message.fromAddress = container.fromAddress;
-        message.fromName = container.fromName;
+        message.fromAddress = parcel.fromAddress;
+        message.fromName = parcel.fromName;
     }
 
     /**
      * @name setContent
      * @description called within getMessage,
      * sets the related content of the message: the Subject, HtmlBody, & TextBody of the inbound message
-     * @param EmailMessage message, EmailContainer container
+     * @param EmailMessage message, EmailParcel parcel
      * @return void
     **/
-    private void setContent( EmailMessage message, EmailContainer container ){
-        message.Subject = container.getSubject();
-        message.HtmlBody = container.getHTMLBody();
-        message.TextBody = container.getPlainTextBody();
+    private void setContent( EmailMessage message, EmailParcel parcel ){
+        message.Subject = parcel.getSubject();
+        message.HtmlBody = parcel.getHTMLBody();
+        message.TextBody = parcel.getPlainTextBody();
     }
 
 /**
@@ -110,12 +110,12 @@ global class EmailFactoryInbound extends EmailFactory {
 
     /**
      * @name isVaild
-     * @description checks container to ensure it has a toAddress and it doesn't match the forward from email address
-     * @param EmailContainer container
+     * @description checks parcel to ensure it has a toAddress and it doesn't match the forward from email address
+     * @param EmailParcel parcel
      * @return Boolean
     **/
-    private Boolean isVaild( EmailContainer container ){
-        return container.hasToAddresses() && container.hasContent();
+    private Boolean isVaild( EmailParcel parcel ){
+        return parcel.hasToAddresses() && parcel.hasContent();
     }
 
     /**

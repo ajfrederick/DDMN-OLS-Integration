@@ -85,8 +85,8 @@ global without sharing class OLSRestService {
             
             contact = helper.getContact();
 
-            if( !OLSTriggerHelper.isOnlineStoreCustomer( contact ) ){
-                throw new OnlineStoreCustomerException('This Contact could not be set as an Online Store Customer Record Type.');
+            if( !OLSUtil.isOnlineStoreCustomer( contact ) ){
+                throw new OLSException('This Contact could not be set as an Online Store Customer Record Type.');
             }
 
             upsert contact;
@@ -122,5 +122,5 @@ global without sharing class OLSRestService {
         }
     }
 
-    public class OnlineStoreCustomerException extends Exception {}
+    public class OLSException extends Exception {}
 }

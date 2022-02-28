@@ -1,9 +1,9 @@
 /**
- * @name OutboundEmailResults
+ * @name EmailResultsOutbound
  * @description Contains Email Sent email results for further activites (ie creating feed Items or error handling) 
  * after sending an email
 **/
-global class OutboundEmailResults {
+global class EmailResultsOutbound {
 
 /**
  * FIELDS
@@ -45,7 +45,7 @@ global class OutboundEmailResults {
  * CONSTRUCTOR
 **/
 
-    global OutboundEmailResults( Messaging.SendEmailResult[] res ){
+    global EmailResultsOutbound( Messaging.SendEmailResult[] res ){
         results = res;
 
         setFailures();

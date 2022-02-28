@@ -8,12 +8,12 @@ global class EmailFactoryOutbound extends EmailFactory {
  * CONSTRUCTORS
 **/
 
-    global EmailFactoryOutbound( EmailContainerFactory containerFactory ){
-        super( containerFactory.getContainers() );
+    global EmailFactoryOutbound( EmailParcelFactory parcelFactory ){
+        super( parcelFactory.getParcels() );
     }
 
-    global EmailFactoryOutbound( EmailContainer[] containers ) {
-        super( containers );
+    global EmailFactoryOutbound( EmailParcel[] parcels ) {
+        super( parcels );
     }
 
 /**
@@ -22,15 +22,15 @@ global class EmailFactoryOutbound extends EmailFactory {
 
     /**
      * @name build
-     * @description loop through containers and get an email message
+     * @description loop through parcels and get an email message
      * @return void
     **/
     global override void build(){
 
-        for( EmailContainer container : containers ){
-            if( !isVaild( container ) ) continue;
+        for( EmailParcel parcel : parcels ){
+            if( !isVaild( parcel ) ) continue;
 
-            outboundMessages.add( getMessage( container ) );
+            outboundMessages.add( getMessage( parcel ) );
         }
     }
 
@@ -38,15 +38,15 @@ global class EmailFactoryOutbound extends EmailFactory {
      * @name getMessage
      * @description creates a single email massage and sets necessary fields base on certain conditions
      * waterfalls the next 3 methods
-     * @param EmailContainer container
+     * @param EmailParcel parcel
      * @return SObject message
     **/
-    private Messaging.SingleEmailMessage getMessage( EmailContainer container ){
+    private Messaging.SingleEmailMessage getMessage( EmailParcel parcel ){
         Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 
-        configureMessage( message, container );
-        setAddressInfo( message, container );
-        setContent( message, container );
+        configureMessage( message, parcel );
+        setAddressInfo( message, parcel );
+        setContent( message, parcel );
 
         return message;
     }
@@ -60,21 +60,21 @@ global class EmailFactoryOutbound extends EmailFactory {
      * @description called within getMessage, configures outgoing email. Message targeted recipitent's 
      * id is set, sets the whatId which helps to further ensure that merge fields in the template contain the correct data, 
      * and also sets InReplyTo which identifies the email or emails to which this email is a reply (parent emails).
-     * @param Messaging.SingleEmailMessage message, EmailContainer container
+     * @param Messaging.SingleEmailMessage message, EmailParcel parcel
      * @return void
     **/
-    private void configureMessage( Messaging.SingleEmailMessage message, EmailContainer container ){
+    private void configureMessage( Messaging.SingleEmailMessage message, EmailParcel parcel ){
         
-        if( container.hasWhoId() ){  
-            message.setTargetObjectId( container.whoId );
+        if( parcel.hasWhoId() ){  
+            message.setTargetObjectId( parcel.whoId );
         }
 
-        if( container.hasWhatId() ){
-            message.setWhatId( container.whatId );
+        if( parcel.hasWhatId() ){
+            message.setWhatId( parcel.whatId );
         }
 
-        if( container.hasInReplyTo() ){
-            message.setInReplyTo( container.inReplyTo );
+        if( parcel.hasInReplyTo() ){
+            message.setInReplyTo( parcel.inReplyTo );
         }
 
         message.setSaveAsActivity( true );
@@ -86,39 +86,39 @@ global class EmailFactoryOutbound extends EmailFactory {
      * @description called within getMessage
      * sets outgoing message's to, cc, and bcc addresses. Sets from Address with org wide email address Id
      * @param Messaging.SingleEmailMessage message
-     * @param EmailContainer container 
+     * @param EmailParcel parcel 
      * @return void
     **/
-    private void setAddressInfo( Messaging.SingleEmailMessage message, EmailContainer container ){
+    private void setAddressInfo( Messaging.SingleEmailMessage message, EmailParcel parcel ){
         
-        message.setToAddresses( container.ToAddresses );
-        message.setCcAddresses( container.CcAddresses );
-        message.setBccAddresses( container.BccAddresses );
+        message.setToAddresses( parcel.ToAddresses );
+        message.setCcAddresses( parcel.CcAddresses );
+        message.setBccAddresses( parcel.BccAddresses );
 
         // we have to do this cause this how SF handles setting the From Address for outgoing emails
-        if( container.oweAddressId != null ){
-            message.setOrgWideEmailAddressId( container.oweAddressId );
+        if( parcel.oweAddressId != null ){
+            message.setOrgWideEmailAddressId( parcel.oweAddressId );
         }
     }
 
     /**
      * @name setContent
-     * @description called within getMessage if there is a message and a container
-     * sets body/subject of the outgoing message with values from the container & sets id's for attatched documents
-     * @param Messaging.SingleEmailMessage message, EmailContainer container 
+     * @description called within getMessage if there is a message and a parcel
+     * sets body/subject of the outgoing message with values from the parcel & sets id's for attatched documents
+     * @param Messaging.SingleEmailMessage message, EmailParcel parcel 
      * @return void
     **/
-    private void setContent( Messaging.SingleEmailMessage message, EmailContainer container ){
+    private void setContent( Messaging.SingleEmailMessage message, EmailParcel parcel ){
         String body = '';
         String subject = '';
 
-        if( container.template != null ){
-            subject = container.template.Subject;
-            body = container.template.HtmlValue;
+        if( parcel.template != null ){
+            subject = parcel.template.Subject;
+            body = parcel.template.HtmlValue;
         } else 
-        if( container.getContent() != null ){
-            subject = container.getSubject();
-            body = container.getHTMLBody();
+        if( parcel.getContent() != null ){
+            subject = parcel.getSubject();
+            body = parcel.getHTMLBody();
         }
 
         message.setSubject( subject );
@@ -126,15 +126,15 @@ global class EmailFactoryOutbound extends EmailFactory {
         message.setTreatBodiesAsTemplate(true);
 
         // set Salesforce files as attachments if there are any
-        if( container.hasVersionIds() ){
-            message.setEntityAttachments( container.getVersionIds() );
+        if( parcel.hasVersionIds() ){
+            message.setEntityAttachments( parcel.getVersionIds() );
         }
 
         // Set attachements with Attachment data. These attachments aren't saved in Salesforce as files
-        if( container.hasAttachments() ){
+        if( parcel.hasAttachments() ){
            Messaging.EmailFileAttachment[] attachments = new Messaging.EmailFileAttachment[]{};
 
-            for( EmailContainer.AttachmentData attachment : container.attachments ){
+            for( EmailParcel.AttachmentData attachment : parcel.attachments ){
                 Messaging.EmailFileAttachment attachmentToAdd = new Messaging.EmailFileAttachment();
                 attachmentToAdd.setFileName( attachment.filename );
                 attachmentToAdd.setBody( attachment.body );
@@ -153,11 +153,11 @@ global class EmailFactoryOutbound extends EmailFactory {
 
     /**
      * @name isVaild
-     * @description checks container to ensure it has a toAddress and it doesn't match the forward from email address
-     * @param EmailContainer container
+     * @description checks parcel to ensure it has a toAddress and it doesn't match the forward from email address
+     * @param EmailParcel parcel
      * @return Boolean
     **/
-    private Boolean isVaild( EmailContainer container ){
-        return container.hasToAddresses();
+    private Boolean isVaild( EmailParcel parcel ){
+        return parcel.hasToAddresses();
     }
 }

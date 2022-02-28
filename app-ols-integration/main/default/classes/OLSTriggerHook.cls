@@ -1,6 +1,6 @@
 /**
- * @name OLSEmailMessageTriggerHandler
- * @description handler that is accessed in the EmailApp EmailMessageTrigger
+ * @name OLSTriggerHook
+ * @description handler that is accessed in the EmailApp EmailAppTrigger
  * 
  * Updates a Contact record that is an Online Store Customer to indicate that an email was sent and/or bounced after
  * an email was sent.
@@ -65,11 +65,6 @@ public class OLSTriggerHook implements TriggerHook {
 
         for( Contact customer : customers ){
             customer.Email_Sent__c = true;
-
-            // do this so it can be exposed to users in the UI
-            if( customer.EmailBouncedDate != null ){
-                customer.Email_Bounced__c = true;
-            }
         }
 
         try {
@@ -97,7 +92,7 @@ public class OLSTriggerHook implements TriggerHook {
 
         try {
 
-            Id rtId = OLSTriggerHelper.getRecordTypeId('Online_Store_Customer');
+            Id rtId = OLSUtil.getRecordTypeId('Online_Store_Customer');
 
             customers.addAll([SELECT
                                 Id,
