@@ -8,6 +8,13 @@
             "versionNumber": "1.1.0.NEXT"
         },
         {
+            "path": "creed-http-handler",
+            "default": false,
+            "package": "Creed Http Handler",
+            "versionName": "ver 1.0",
+            "versionNumber": "1.0.0.NEXT"
+        },
+        {
             "path": "creed-email-app",
             "package": "Creed Email App",
             "versionName": "ver 1.0",

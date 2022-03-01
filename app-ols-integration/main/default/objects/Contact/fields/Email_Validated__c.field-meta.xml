@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Email_Validated__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>For Online Store Customer records. Checked if the email has been validated by an external API at whoisxmlapi.com.</description>
+    <externalId>false</externalId>
+    <label>Email Validated</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -10,16 +10,16 @@ public class OLSUtil {
  * FIELDS
  */
 
-    private static final String fromAddress = System.Label.OLS_Email_From_Address;
+    private static final String FROM_ADDRESS = System.Label.OLS_Email_From_Address;
+    private static final String FROM_ADDRESS_NE = System.Label.OLS_Email_From_Address_NE;
 
-    private static final String fromAddressNE = System.Label.OLS_Email_From_Address_NE;
+    // OLS Contact Record Type developerName
+    public static final String OLS_CONTACT = 'Online_Store_Customer';
 
     // A list of record type developer/api names that we will use to get the recordType Ids to use below
-    private static final String[] RecordTypeNames = new String[]{
-        'Online_Store_Customer'
-    };
+    private static String[] recordTypeNames = new String[]{};
     
-    private static Map<String, Id> RecordTypeIdsByName = new Map<String, Id>();
+    private static Map<String, Id> recordTypeIdsByName = new Map<String, Id>();
 
     /**
      * This static block is to ensure there are no problems constructing the class when accessing the Schema describe and the 
@@ -27,16 +27,18 @@ public class OLSUtil {
      * incur an 'attempt to de-referece a null object error'.
      */
     static {
+        recordTypeNames.add( OLS_CONTACT );
+
         DescribeSobjectResult describe = Contact.SObjectType.getDescribe();
         
         Map<String, Schema.RecordTypeInfo> recordTypes = describe.getRecordTypeInfosByDeveloperName();
 
-        for( String name : RecordTypeNames ){
+        for( String name : recordTypeNames ){
 
             if( recordTypes.containsKey( name ) ){
-                RecordTypeIdsByName.put( name, recordTypes.get( name ).getRecordTypeId() );
+                recordTypeIdsByName.put( name, recordTypes.get( name ).getRecordTypeId() );
             } else {
-                RecordTypeIdsByName.put( name, null ); // this will only happen if the record type was deleted or the name was changed for the list above
+                recordTypeIdsByName.put( name, null ); // this will only happen if the record type was deleted or the name was changed for the list above
             }
         }
     }
@@ -111,7 +113,7 @@ public class OLSUtil {
 
         EmailParcelFactoryOLS parcelFactory = new EmailParcelFactoryOLS( customers );
         parcelFactory.setTemplate( 'Online_Store_Customer_Welcome' );
-        parcelFactory.setOrgWideEmailAddressId( fromAddress );
+        parcelFactory.setOrgWideEmailAddressId( FROM_ADDRESS );
 
         sendFinal( parcelFactory, customers );
     }
@@ -128,7 +130,7 @@ public class OLSUtil {
 
         EmailParcelFactoryOLS parcelFactory = new EmailParcelFactoryOLS( customers );
         parcelFactory.setTemplate( 'Online_Store_Customer_Welcome_NE' ); // Template is NE specific
-        parcelFactory.setOrgWideEmailAddressId( fromAddressNE ); // And From Address is NE specific
+        parcelFactory.setOrgWideEmailAddressId( FROM_ADDRESS_NE ); // And From Address is NE specific
 
         sendFinal( parcelFactory, customers );
     }
@@ -287,6 +289,16 @@ public class OLSUtil {
 
         return recordTypeId;
     }
+
+    /**
+     * @name getOLSRecordTypeId
+     * @description get RecordTypeId for OLS Contact record type name
+     * @return Id
+     */
+    public static Id getOLSRecordTypeId(){
+        return OLSUtil.getRecordTypeId( OLSUtil.OLS_CONTACT );
+    }
+
 
     /**
      * @name isNewSuccessfulOnlineStoreCustomer

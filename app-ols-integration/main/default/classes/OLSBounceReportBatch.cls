@@ -24,7 +24,7 @@ public class OLSBounceReportBatch implements Database.Batchable<SObject> {
  */
     
     public Database.QueryLocator start( Database.BatchableContext context ){
-        String olsCustomer = OLSUtil.getRecordTypeId('Online_Store_Customer');
+        String olsCustomer = OLSUtil.getOLSRecordTypeId();
 
         String q = 'SELECT ';
                 q += 'Id, ';

@@ -69,7 +69,7 @@ public without sharing class OLSRestServiceHelper {
     }
 
     // let's just grab the record type id once to be referenced here
-    private static final Id olsCustomerRecordTypeId = OLSUtil.getRecordTypeId('Online_Store_Customer');
+    private static final Id olsContact = OLSUtil.getOLSRecordTypeId();
 
 /**
 * CONSTRUCTOR
@@ -191,7 +191,7 @@ public without sharing class OLSRestServiceHelper {
      */
     public Contact getBaseContact(){
         return new Contact(
-            RecordTypeId = olsCustomerRecordTypeId,
+            RecordTypeId = olsContact,
             FirstName = customer.firstName,
             LastName = customer.lastName,
             Email = customer.email,
@@ -240,7 +240,7 @@ public without sharing class OLSRestServiceHelper {
                                     AND FirstName = :customer.firstName
                                     AND LastName = :customer.lastName
                                     AND Payment_Successful__c = false
-                                    AND RecordTypeId = :olsCustomerRecordTypeId
+                                    AND RecordTypeId = :olsContact
                                     AND CAID__c != null]);
 
         } catch( Exception e ){

@@ -92,7 +92,7 @@ public class OLSTriggerHook implements TriggerHook {
 
         try {
 
-            Id rtId = OLSUtil.getRecordTypeId('Online_Store_Customer');
+            Id olsContact = OLSUtil.getOLSRecordTypeId();
 
             customers.addAll([SELECT
                                 Id,
@@ -100,7 +100,7 @@ public class OLSTriggerHook implements TriggerHook {
                                 EmailBouncedDate
                                     FROM Contact
                                     WHERE Id IN :customerIds
-                                    AND RecordTypeId = :rtId]);
+                                    AND RecordTypeId = :olsContact]);
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
