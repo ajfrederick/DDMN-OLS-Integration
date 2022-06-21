@@ -8,6 +8,19 @@
             "versionNumber": "1.1.0.NEXT"
         },
         {
+            "path": "creed-record-type-util",
+            "default": false,
+            "package": "Creed Record Type Util",
+            "versionName": "ver 1.0",
+            "versionNumber": "1.0.0.NEXT",
+            "dependencies": [
+                {
+                    "package": "Creed Exception Handler",
+                    "versionNumber": "1.1.0.RELEASED"
+                }
+            ]
+        },
+        {
             "path": "creed-http-handler",
             "default": false,
             "package": "Creed Http Handler",
@@ -39,6 +52,14 @@
                     "versionNumber": "1.1.0.RELEASED"
                 },
                 {
+                    "package": "Creed Record Type Util",
+                    "versionNumber": "1.0.0.LATEST"
+                },
+                {
+                    "package": "Creed Http Handler",
+                    "versionNumber": "1.0.0.LATEST"
+                },
+                {
                     "package": "Creed Email App",
                     "versionNumber": "1.5.0.RELEASED"
                 }
@@ -56,6 +77,13 @@
         "Creed Email App@1.5.0-1": "04t4x000000AK75AAG",
         "DDMN Online Store Integration": "0Ho4x000000PBAxCAO",
         "DDMN Online Store Integration@1.3.0-1": "04t4x000000AJp5AAG",
-        "DDMN Online Store Integration@2.2.0-1": "04t4x000000AK7PAAW"
+        "DDMN Online Store Integration@2.2.0-1": "04t4x000000AK7PAAW",
+        "DDMN Online Store Integration@2.2.0-2": "04t4x000000AKs3AAG",
+        "Creed Http Handler": "0Ho4x000000PBC5CAO",
+        "Creed Http Handler@1.0.0-1": "04t4x000000AKrUAAW",
+        "Creed Http Handler@1.0.0-2": "04t4x000000AKryAAG",
+        "Creed Record Type Util": "0Ho4x000000PBCACA4",
+        "Creed Record Type Util@1.0.0-1": "04t4x000000AKreAAG",
+        "DDMN Online Store Integration@2.2.0-3": "04t4x000000AKswAAG"
     }
 }

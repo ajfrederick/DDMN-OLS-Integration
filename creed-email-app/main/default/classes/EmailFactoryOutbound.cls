@@ -158,6 +158,6 @@ global class EmailFactoryOutbound extends EmailFactory {
      * @return Boolean
     **/
     private Boolean isVaild( EmailParcel parcel ){
-        return parcel.hasToAddresses();
+        return parcel.hasToAddresses() || parcel.hasWhoId();
     }
 }

@@ -11,7 +11,9 @@ trigger EmailAppTrigger on EmailMessage (
     after delete,
     after undelete
 ) {
-    
+
+    System.debug('Emails Sent To IN TRIGGER >>>' + Trigger.new);
+
     // trigger functionality for inside the email application
     if( Trigger.isBefore ){
 
@@ -73,5 +75,5 @@ trigger EmailAppTrigger on EmailMessage (
         }
     }
 
-    if( Trigger.isAfter ) EmailMessageUtil.hooks.clear();
+    if( Trigger.isAfter ){ EmailMessageUtil.hooks.clear(); }
 }

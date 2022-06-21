@@ -30,18 +30,16 @@ global class EmailParcelFactoryOLS extends EmailParcelFactory {
         Contact[] customers = (Contact[]) objs;
 
         for( Contact obj : customers ){
-            if( obj.Email == null ) continue;
+            if( obj.Email == null ){ continue; }
             
             EmailParcel parcel = new EmailParcel();
-    
-            parcel.ToAddresses.add(obj.Email);
+            
             parcel.BccAddresses.add(bccAddress);
             parcel.template = template;
             parcel.oweAddressId = oweAddressId; // from address
             parcel.whoId = obj.Id; // since this is a contact set the whoId
 
-
-            if( versionIdsByName.containsKey( obj.Brochure_Key__c ) ){
+            if( obj.Brochure_Key__c != null && versionIdsByName.containsKey( obj.Brochure_Key__c ) ){
                 String[] versionIds = versionIdsByName.get( obj.Brochure_Key__c );
 
                 parcel.setVersionIds(versionIds);

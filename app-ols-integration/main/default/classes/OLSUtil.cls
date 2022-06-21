@@ -4,7 +4,7 @@
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public class OLSUtil {
+public without sharing class OLSUtil {
 
 /**
  * FIELDS
@@ -16,32 +16,7 @@ public class OLSUtil {
     // OLS Contact Record Type developerName
     public static final String OLS_CONTACT = 'Online_Store_Customer';
 
-    // A list of record type developer/api names that we will use to get the recordType Ids to use below
-    private static String[] recordTypeNames = new String[]{};
-    
-    private static Map<String, Id> recordTypeIdsByName = new Map<String, Id>();
-
-    /**
-     * This static block is to ensure there are no problems constructing the class when accessing the Schema describe and the 
-     * getRecordTypeInfosByDeveloperName. If the record type was deleted or the name was changed then you will
-     * incur an 'attempt to de-referece a null object error'.
-     */
-    static {
-        recordTypeNames.add( OLS_CONTACT );
-
-        DescribeSobjectResult describe = Contact.SObjectType.getDescribe();
-        
-        Map<String, Schema.RecordTypeInfo> recordTypes = describe.getRecordTypeInfosByDeveloperName();
-
-        for( String name : recordTypeNames ){
-
-            if( recordTypes.containsKey( name ) ){
-                recordTypeIdsByName.put( name, recordTypes.get( name ).getRecordTypeId() );
-            } else {
-                recordTypeIdsByName.put( name, null ); // this will only happen if the record type was deleted or the name was changed for the list above
-            }
-        }
-    }
+    private static final RecordTypeUtil RECORD_TYPE_UTIL = new RecordTypeUtil( new Contact() );
     
 /**
  * TRIGGER METHODS
@@ -247,7 +222,7 @@ public class OLSUtil {
             handler.debug();
         }
 
-        if( job != null ) return;
+        if( job != null ){ return;}
 
         String jobName = 'OLS Bounce Report Email';
 
@@ -272,22 +247,7 @@ public class OLSUtil {
      * @return Id
      */
     public static Id getRecordTypeId( String name ){
-        Id recordTypeId;
-        
-        try {
-
-            recordTypeId = RecordTypeIdsByName.get( name );
-
-            if( recordTypeId == null ){
-                throw new RecordTypeException('Record Type ' + name + ' for Contacts does not exist. Or the developer is searching for this record type on the wrong Object.');
-            }
-
-        } catch( Exception e ){
-            CreedExceptionHandler handler = new CreedExceptionHandler(e);
-            handler.handle();
-        }
-
-        return recordTypeId;
+        return RECORD_TYPE_UTIL.getRecordTypeId(name);
     }
 
     /**
@@ -296,7 +256,7 @@ public class OLSUtil {
      * @return Id
      */
     public static Id getOLSRecordTypeId(){
-        return OLSUtil.getRecordTypeId( OLSUtil.OLS_CONTACT );
+        return RECORD_TYPE_UTIL.getRecordTypeId( OLS_CONTACT );
     }
 
 
@@ -327,17 +287,50 @@ public class OLSUtil {
 
     /**
      * @name getThreeMinutesFromNow
-     * @description a cron expression fro 3 minutes from now. For Testing purposes.
+     * @description a cron expression for 3 minutes from now. For Testing purposes.
      * @return String
      */
-    private static String getThreeMinutesFromNow(){
+    public static String getThreeMinutesFromNow(){
         DateTime now = DateTime.now();
 
         Integer threeMinutesFromNow = now.minute() + 3;
+        Integer hour = now.hour();
+
+        if( threeMinutesFromNow > 60 ){
+            threeMinutesFromNow = threeMinutesFromNow - 60;
+            hour = hour + 1;
+        }
 
         String ret = now.second() + ' ';
         ret += threeMinutesFromNow + ' ';
-        ret += now.hour() + ' ';
+        ret += hour + ' ';
+        ret += now.day() + ' ';
+        ret += now.month() + ' ';
+        ret += '?';
+
+        return ret;
+    }
+
+    /**
+     * @name getMinutesFromNow
+     * @description a cron expression which adds a certain number of minutes from now to the expression.
+     * @param Integer minutesToAdd
+     * @return String
+     */
+    public static String getMinutesFromNow( Integer minutesToAdd ){
+        DateTime now = DateTime.now();
+
+        Integer minutesFromNow = now.minute() + minutesToAdd;
+        Integer hour = now.hour();
+
+        if( minutesFromNow > 60 ){
+            minutesFromNow = minutesFromNow - 60;
+            hour = hour + 1;
+        }
+
+        String ret = now.second() + ' ';
+        ret += minutesFromNow + ' ';
+        ret += hour + ' ';
         ret += now.day() + ' ';
         ret += now.month() + ' ';
         ret += '?';

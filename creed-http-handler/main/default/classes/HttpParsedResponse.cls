@@ -1,6 +1,6 @@
-public class HttpParsedResponse {
+global class HttpParsedResponse {
 
-    public String responseBody {
+    global String responseBody {
         get {
 
             if( responseBody == null ){
@@ -12,7 +12,7 @@ public class HttpParsedResponse {
         set;
     }
 
-    public HttpParsedResponseError[] errors {
+    global HttpParsedResponseError[] errors {
         get {
 
             if( errors == null ){

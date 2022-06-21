@@ -1,5 +1,5 @@
-public class HttpParsedResponseError {
-    public String errorMessage {get;set;}
-    public Integer statusCode {get;set;}
-    public String status {get;set;}
+global class HttpParsedResponseError {
+    global String errorMessage {get;set;}
+    global Integer statusCode {get;set;}
+    global String status {get;set;}
 }

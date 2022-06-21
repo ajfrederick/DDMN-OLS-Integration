@@ -66,6 +66,8 @@ public class OLSTriggerHook implements TriggerHook {
         for( Contact customer : customers ){
             customer.Email_Sent__c = true;
         }
+        
+System.debug('Emails Sent To >>>' + customers);
 
         try {
 
@@ -92,15 +94,13 @@ public class OLSTriggerHook implements TriggerHook {
 
         try {
 
-            Id olsContact = OLSUtil.getOLSRecordTypeId();
-
             customers.addAll([SELECT
                                 Id,
                                 Email_Sent__c,
                                 EmailBouncedDate
                                     FROM Contact
                                     WHERE Id IN :customerIds
-                                    AND RecordTypeId = :olsContact]);
+                                    AND RecordTypeId = :OLSUtil.getOLSRecordTypeId()]);
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);

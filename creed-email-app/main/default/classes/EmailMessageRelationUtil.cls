@@ -64,13 +64,13 @@ global class EmailMessageRelationUtil {
         try {
 
             relations.addAll([SELECT
-                                    Id,
-                                    RelationAddress,
-                                    RelationId,
-                                    RelationType,
-                                    EmailMessageId
-                                        FROM EmailMessageRelation
-                                        WHERE EmailMessageId IN :messageIds]);
+                                Id,
+                                RelationAddress,
+                                RelationId,
+                                RelationType,
+                                EmailMessageId
+                                    FROM EmailMessageRelation
+                                    WHERE EmailMessageId IN :messageIds]);
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);

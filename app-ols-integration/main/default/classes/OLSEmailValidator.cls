@@ -3,7 +3,7 @@
  * @description this class is an http callout to an external api at whoisxmlapi.com to verify email addresses and mark OLS Contact
  * records as bounced for a weekly bounce report.
  * 
- * Documentation for api found at https://emailverification.whoisxmlapi.com/api/documentation/making-requests
+ * Documentation for api found at https://emailverification.whoisxmlapi.com/bulk-api/documentation
  * 
  * @author Creed Interactive (Andrew Frederick) March 2022
  */
@@ -13,45 +13,40 @@ public without sharing class OLSEmailValidator {
  * FIELDS
  */
 
-    public String emailAddress {get;set;}
+    public Contact[] customers {get;set;}
 
-    public Map<String, String> params {
+
+    public Id cronJobId {get;set;}
+
+    public Integer apexCronIndex {
         get {
-            
-            if( params == null ){
-                params = new Map<String, String>();
+            if( apexCronIndex == null ){
+                apexCronIndex = 1;
             }
-            
-            return params;
+            return apexCronIndex;
         }
         set;
     }
 
-    public EmailValidationResponse response {
+    public Integer apiJobId {get;set;}
+
+    private StatusResponse statusResponse {get;set;}
+
+
+    public String[] invalidEmails {
         get {
 
-            if( response == null ){
-                response = new EmailValidationResponse();
+            if( invalidEmails == null ){
+                invalidEmails = new String[]{};
             }
 
-            return response;
+            return invalidEmails;
         }
         set;
     }
 
-    public EmailValidationHttpHandler httpHandler {
-        get {
 
-            if( httpHandler == null ){
-                httpHandler = new EmailValidationHttpHandler();
-            }
-
-            return httpHandler;
-        }
-        set;
-    }
-
-    private static ols_api_credential__mdt credential;
+    public static OLS_api_credential__mdt credential;
 
     /**
     * Static block to set credential variable
@@ -60,7 +55,7 @@ public without sharing class OLSEmailValidator {
 
         try {
             
-            credential = ols_api_credential__mdt.getInstance('Email_Validation_Credentials');
+           credential = OLS_api_credential__mdt.getInstance('Bulk_Email_Verification');
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
@@ -72,14 +67,12 @@ public without sharing class OLSEmailValidator {
  * CONSTRUCTORS
  */
 
-    public OLSEmailValidator( String emailAddress ){
-        this.emailAddress = emailAddress;
-        
-        params.put( 'apiKey', credential.API_Key__c );
+    public OLSEmailValidator( Contact[] customers ){
+        this.customers = customers;
     }
 
 /**
- * ACTION METHODS
+ * CALLOUT METHODS
  */
 
     /**
@@ -91,19 +84,16 @@ public without sharing class OLSEmailValidator {
     public void validate(){
         
         try {
-        
-            if( !apiHasCredits() ){
-                throw new EmailValidationException('Email Validation API has no credit.');
+
+            EmailVerificationRequestBody requestBody = new EmailVerificationRequestBody( customers );
+            EmailVerificationHttpHandler httpHandler = new EmailVerificationHttpHandler();
+            httpHandler.send( getHttpRequest( JSON.serialize(requestBody) ) );
+
+            EmailVerificationResponse response = httpHandler.getParsedResponse();
+
+            if( response != null && response.response.id != null ){
+                apiJobId = response.response.id;
             }
-    
-            params.put( 'emailAddress', emailAddress );
-
-            httpHandler.setQueryParams( params );
-            httpHandler.send();
-
-            response = httpHandler.getParsedResponse();
-
-            System.debug( httpHandler.parsedResponse.responseBody );
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
@@ -111,90 +101,262 @@ public without sharing class OLSEmailValidator {
         }
     }
 
-    /**
-     * @name validate
-     * @description Checks to ensure we have enough credit on our balance. As of 3/1/2022 we have a free account which
-     * has 1000 requests per month rolling. We want to make sure to not do anything if cannot due to are request limit.
-     * @param none
-     * @return none
-     */
-    public Boolean apiHasCredits(){
-        BalanceCheckHttpHandler ccHttpHandler = new BalanceCheckHttpHandler();
 
-        BalanceCheckResponse ccResponse;
+
+    /**
+     * @name checkStatus
+     * @description Makes on http request to the Email Validation api
+     * @param String id
+     * @return void
+     */
+    public void checkStatus(){
 
         try {
 
-            ccHttpHandler.setQueryParams( params );
-            ccHttpHandler.send();
+            StatusRequestBody requestBody = new StatusRequestBody( apiJobId );
+            StatusHttpHandler httpHandler = new StatusHttpHandler();
+            httpHandler.send( getHttpRequest( JSON.serialize(requestBody) ) );
 
-            ccResponse = ccHttpHandler.getParsedResponse();
-            
+            statusResponse = httpHandler.getParsedResponse();
+
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
             handler.handle();
         }
 
-        if( ccResponse == null ){
-            return false;
-        }
-
-        return ccResponse.hasCredits();
     }
+
+    /**
+     * @name retrieveResults
+     * @description Makes on http request to the Email Validation api
+     * @param String id
+     * @return none
+     */
+    public void retrieveResults(){
+
+        try {
+
+            RetrieveResultsRequestBody requestBody = new RetrieveResultsRequestBody( apiJobId );
+            RetriveResultsHttpHandler httpHandler = new RetriveResultsHttpHandler();
+            httpHandler.send( getHttpRequest( JSON.serialize(requestBody) ) );
+
+            RetrieveResultsResponse response = httpHandler.getParsedResponse();
+
+            if( response == null || response.response.isEmpty() ){ return; }
+
+            for( RetrieveResultsResponseResponse result : response.response ){
+
+                if( !result.isValid() ){
+                    invalidEmails.add( result.emailAddress );
+                }
+            }
+
+        } catch( Exception e ){
+            CreedExceptionHandler handler = new CreedExceptionHandler(e);
+            handler.handle();
+        }
+    } 
 
 /**
  * UTILITY METHODS
- */
+ */ 
 
     /**
-     * @name isValid
+     * @name getHttpRequest
+     * @description sends http request
+     * @param none 
+     * @return none
+     */
+    private HttpRequest getHttpRequest( String requestBody ){
+
+        HttpRequest request = new HttpRequest();
+        request.setBody( requestBody );
+        request.setHeader( 'Content-Type', 'application/json' );
+
+        return request;
+    }
+
+    /**
+     * @name scheduleStatusCheck
+     * @description Makes on http request to the Email Validation api
+     * @param StatusResponse response 
+     * @return none
+     */
+    public void scheduleStatusCheck(){
+
+        try {
+
+            if( apiJobId == null ){
+                throw new EmailVerificationException('Job Id from initial api request is null.');
+            }
+
+            String apexJobName = 'OLS Email Verification Status Check ' + apexCronIndex++;
+
+            OLSEmailValidationCheckStatus statusCheck = new OLSEmailValidationCheckStatus( this );
+
+            System.schedule( apexJobName, OLSUtil.getMinutesFromNow(1), statusCheck );
+
+        } catch( Exception e ){
+            CreedExceptionHandler handler = new CreedExceptionHandler(e);
+            handler.handle();
+        }
+    }
+
+    /**
+     * @name abortCronJob
+     * @description aborts job
+     * @param StatusResponse response 
+     * @return none
+     */
+    public void abortCronJob(){
+        if( cronJobId == null ){ return; }
+        
+        System.abortJob( cronJobId );
+    }
+
+    /**
+     * @name isReady
+     * @description if the job that is bulk processing the emails for invalid emails is done it will return
+     * ready as an integer greater than 0
+     * @param none
+     * @return none
+     */
+    public Boolean isReady(){
+        return statusResponse != null && (!statusResponse.response.isEmpty()) && statusResponse.response[0].ready > 0;
+    }       
+
+    /**
+     * @name isInvalid
      * @description the final check if the address is valid or not.
      * @param none
      * @return none
      */
-    public Boolean isValid(){
-        return response.isValid();
+    public Boolean isInvalid( String email ){
+        return invalidEmails.contains(email);
     }
 
 /**
  * HTTP HANDLER CLASSES
  */
 
-    public class EmailValidationHttpHandler extends HttpHandler {
+    public class EmailVerificationHttpHandler extends HttpHandler {
+
+        public EmailVerificationHttpHandler(){
+            setMethod('POST');
+        }
         
         public override String getEndpoint(){
-            return credential.Endpoint_URL__c + getQuery();
+            return credential.Request_URL__c;
         }
 
-        public EmailValidationResponse getParsedResponse(){
-            return (EmailValidationResponse) JSON.deserialize( parsedResponse.responseBody, EmailValidationResponse.class );
+        public EmailVerificationResponse getParsedResponse(){
+            return (EmailVerificationResponse) JSON.deserialize( parsedResponse.responseBody, EmailVerificationResponse.class );
         }
     }
 
-    public class BalanceCheckHttpHandler extends HttpHandler {
+    public class StatusHttpHandler extends HttpHandler {
         
-        public override String getEndpoint(){
-            return credential.Balance_Check_URL__c + getQuery();
+        public StatusHttpHandler(){
+            setMethod('POST');
         }
 
-        public BalanceCheckResponse getParsedResponse(){
-            return (BalanceCheckResponse) JSON.deserialize( parsedResponse.responseBody, BalanceCheckResponse.class );
+        public override String getEndpoint(){
+            return credential.Request_URL__c + '/status';
+        }
+
+        public StatusResponse getParsedResponse(){
+            return (StatusResponse) JSON.deserialize( parsedResponse.responseBody, StatusResponse.class );
+        }
+    }
+
+    public class RetriveResultsHttpHandler extends HttpHandler {
+        
+        public RetriveResultsHttpHandler(){
+            setMethod('POST');
+        }
+
+        public override String getEndpoint(){
+            return credential.Request_URL__c + '/completed';
+        }
+
+        public RetrieveResultsResponse getParsedResponse(){
+            return (RetrieveResultsResponse) JSON.deserialize( parsedResponse.responseBody, RetrieveResultsResponse.class );
         }
     }
 
 /**
- * FORMATTED RESPONSE CLASSES
+ * FORMATTED HTTP REQUEST AND RESPONSE CLASSES
+ * 
+ * All documentation for request and response formatting can be found at https://emailverification.whoisxmlapi.com/bulk-api/documentation
  */
 
-    public class EmailValidationResponse {
+    // Initial Email Verification Call
+    public class EmailVerificationRequestBody {
+        public String apiKey {get;set;}
+        public String[] emails {get;set;}
+
+        public EmailVerificationRequestBody( Contact[] customers ){
+            this.apiKey = credential.API_Key__c;
+            this.emails = new String[]{};
+
+            for( Contact customer : customers ){
+                this.emails.add( customer.Email );
+            }
+        }
+    }
+
+    public class EmailVerificationResponse {
+        public EmailVerificationResponseResponse response {get;set;}
+    }
+
+    public class EmailVerificationResponseResponse {
+        public Integer id {get;set;}
+        public String[] errors {get;set;}
+    }
+
+
+    // API Job Status Call
+    public class StatusRequestBody {
+        public String apiKey {get;set;}
+        public Integer[] ids {get;set;}
+
+        public StatusRequestBody( Integer id ){
+            this.apiKey = credential.API_Key__c;
+            this.ids = new Integer[]{id};
+        }
+    }
+
+    public class StatusResponse {
+        public StatusResponseResponse[] response {get;set;}
+    }
+
+    public class StatusResponseResponse {
+        public Integer ready {get;set;}
+    }
+
+
+    // Retrieve Invalid Results Call
+    public class RetrieveResultsRequestBody {
+        public String apiKey {get;set;}
+        public Integer id {get;set;}
+
+        public RetrieveResultsRequestBody( Integer id ){
+            this.apiKey = credential.API_Key__c;
+            this.id = id;
+        }
+    }
+
+    public class RetrieveResultsResponse {
+        public RetrieveResultsResponseResponse[] response {get;set;}
+    }
+
+    public class RetrieveResultsResponseResponse {
+
+        public String emailAddress {get;set;}
 
         public String formatCheck {
             get {
-    
-                if( formatCheck == null ){
-                    formatCheck = '';
-                }
-    
+                if( formatCheck == null ){ formatCheck = 'false'; }
                 return formatCheck;
             }
             set;
@@ -202,11 +364,7 @@ public without sharing class OLSEmailValidator {
 
         public String smtpCheck {
             get {
-
-                if( smtpCheck == null ){
-                    smtpCheck = '';
-                }
-
+                if( smtpCheck == null ){ smtpCheck = 'false'; }
                 return smtpCheck;
             }
             set;
@@ -214,49 +372,20 @@ public without sharing class OLSEmailValidator {
 
         public String dnsCheck {
             get {
-    
-                if( dnsCheck == null ){
-                    dnsCheck = '';
-                }
-    
+                if( dnsCheck == null ){ dnsCheck = 'false'; }
                 return dnsCheck;
             }
             set;
         }
 
         public Boolean isValid(){
-            return Boolean.valueOf( formatCheck ) && Boolean.valueOf( smtpCheck ) && Boolean.valueOf( dnsCheck );
+            return Boolean.valueOf(formatCheck) && Boolean.valueOf(smtpCheck) && Boolean.valueOf(dnsCheck);
         }
-    }
-
-    public class BalanceCheckResponse {
-        public APIProduct[] data {get;set;}
-
-        public Boolean hasCredits(){
-            Boolean hasCredits = true;
-
-            for( APIProduct product : data ){
-
-                // Email Verification API product_id is 7 according to the reponse as of 3/1/2022
-                // for more info go here https://emailverification.whoisxmlapi.com/api/documentation/account-balance-information
-                if( product.product_id == 7 ){
-                    hasCredits = product.credits > 0;
-                    break;
-                }
-            }
-
-            return hasCredits;
-        }
-    }
-
-    public class APIProduct {
-        public Integer product_id {get;set;}
-        public Integer credits {get;set;}
     }
 
 /**
  * EXCEPTION CLASSES
  */
 
-    public class EmailValidationException extends Exception {}
+    public class EmailVerificationException extends Exception {}
 }

@@ -1,9 +1,11 @@
 /**
- * @name TestOLSApp
+ * @name OLSTestApp
  * @description Test class for Online Store Customer Package
+ * 
+ * @author Andrew Frederick (Creed Interactive) October 2021
  */
 @IsTest
-public with sharing class TestOLSApp {
+public with sharing class OLSTestApp {
     
     @IsTest
     public static void testApexRestServiceMN(){
@@ -200,6 +202,101 @@ public with sharing class TestOLSApp {
         contact = [SELECT Id, Email_Sent__c FROM Contact WHERE Id = :contact.Id];
 
         // System.assertEquals( true, contact.Email_Sent__c );
+    }
+
+    @IsTest
+    public static void testEmailValidation(){
+
+        Contact contact = new Contact(
+            FirstName = 'New Customer',
+            LastName = 'Bad Email',
+            email = 'noemail@noemail.com',
+            RecordTypeId = OLSUtil.getOLSRecordTypeId()
+        );
+
+        insert contact;
+
+
+       
+
+        Test.startTest();
+
+            OLSEmailValidator validator = new OLSEmailValidator( new Contact[]{ contact } );
+
+            // Check Initial Callout that creates the job on the other end of the callout
+            Test.setMock( HttpCalloutMock.class, new OLSEmailValidationCalloutMock() );
+            validator.validate();
+
+            // Check Status Check on Job
+            Test.setMock( HttpCalloutMock.class, new OLSValidationStatusCheckCalloutMock() );
+            validator.checkStatus();
+
+            // Check retrieving results. This is the final call which gets any invalid emails from api
+            Test.setMock( HttpCalloutMock.class, new OLSValidationRetrieveResultsCalloutMock() );
+            validator.retrieveResults();
+
+        Test.stopTest();
+
+
+        System.assertEquals( 1, validator.apiJobId );
+        System.assertEquals( true, validator.isReady() );
+        System.assertEquals( true, !validator.invalidEmails.isEmpty() );
+    }
+
+    @IsTest
+    public static void testEmailValidationInitialJob(){
+
+        Contact contact = new Contact(
+            FirstName = 'New Customer',
+            LastName = 'Bad Email',
+            email = 'noemail@noemail.com',
+            RecordTypeId = OLSUtil.getOLSRecordTypeId()
+        );
+
+        insert contact;
+
+
+        Test.startTest();
+
+            // Check Status Check on Job
+            Test.setMock( HttpCalloutMock.class, new OLSEmailValidationCalloutMock() );
+            System.schedule( 'Test Shell Cron Job', OLSUtil.getMinutesFromNow(1), new OLSEmailValidation() );
+
+        Test.stopTest();
+
+    }
+
+    @IsTest
+    public static void testEmailValidationStatusCheckCronJob(){
+
+        Contact contact = new Contact(
+            FirstName = 'New Customer',
+            LastName = 'Bad Email',
+            email = 'noemail@noemail.com',
+            RecordTypeId = OLSUtil.getOLSRecordTypeId()
+        );
+
+        insert contact;
+
+
+        Test.startTest();
+
+            OLSEmailValidator validator = new OLSEmailValidator( new Contact[]{ contact } );
+
+            // Check Initial Callout that creates the job on the other end of the callout
+            Test.setMock( HttpCalloutMock.class, new OLSEmailValidationCalloutMock() );
+            validator.validate();
+            
+            // Check Status Check on Job
+            Test.setMock( HttpCalloutMock.class, new OLSValidationStatusCheckCalloutMock() );
+            validator.scheduleStatusCheck();
+
+        Test.stopTest();
+
+        //System.assertNotEquals( null, validator.cronJobId );
+        //System.assertEquals( true, validator.isReady() );
+
+        System.assertEquals( 1, validator.apiJobId );
     }
 
     @IsTest

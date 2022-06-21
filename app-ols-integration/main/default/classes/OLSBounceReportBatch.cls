@@ -8,18 +8,6 @@
 public class OLSBounceReportBatch implements Database.Batchable<SObject> {
 
 /**
- * FIELDS
- */
-
-    private Contact[] customers {
-        get {
-            if( customers == null ) customers = new Contact[]{};
-            return customers;
-        }
-        set;
-    }
-    
-/**
  * INTERFACE METHODS
  */
     
@@ -31,14 +19,16 @@ public class OLSBounceReportBatch implements Database.Batchable<SObject> {
                 q += 'FirstName, ';
                 q += 'LastName, ';
                 q += 'Email, ';
-                q += 'MailingAddress, ';
+                q += 'MailingStreet, ';
+                q += 'MailingCity, ';
+                q += 'MailingState, ';
+                q += 'MailingPostalCode, ';
                 q += 'CreatedDate, ';
                 q += 'CAID__c, ';
-                q += 'Email_Bounced__c, ';
-                q += 'Bounce_Reported__c, ';
                 q += 'Product_Purchased__c ';
                     q += 'FROM Contact ';
-                    q += 'WHERE Email_Bounced__c = true ';
+                    q += 'WHERE Email_Validated__c = true ';
+                    q += 'AND Email_Bounced__c = true ';
                     q += 'AND Bounce_Reported__c = false ';
                     q += 'AND RecordTypeId = :olsCustomer';
 
@@ -46,12 +36,8 @@ public class OLSBounceReportBatch implements Database.Batchable<SObject> {
     }
 
     public void execute( Database.BatchableContext context, Contact[] customers ){
-        this.customers = customers;
-    }
 
-    public void finish( Database.BatchableContext context ){
-
-        CustomEmailTemplate template = new CustomEmailTemplate( this.customers );
+        CustomEmailTemplate template = new CustomEmailTemplate( customers );
 
         EmailParcel parcel = new EmailParcel();
         parcel.setContent( template.subject, template.body, template.body );
@@ -65,16 +51,20 @@ public class OLSBounceReportBatch implements Database.Batchable<SObject> {
         EmailPost emailPost = new EmailPost( emailFactory );
         emailPost.post();
 
-        updateCustomers();
+        updateCustomers( customers );
+    }
+
+    public void finish( Database.BatchableContext context ){
+
     }
 
 /**
  * ACTION METHODS
  */
 
-    private void updateCustomers(){
+    private void updateCustomers( Contact[] customers ){
 
-        for( Contact customer : this.customers ){
+        for( Contact customer : customers ){
             customer.Bounce_Reported__c = true;
         }
 
