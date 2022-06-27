@@ -13,7 +13,7 @@ global virtual class EmailParcelFactory {
     // loaded up with info and then unpacked
     global EmailParcel[] parcels {
         get {
-            if( parcels == null ) parcels = new EmailParcel[]{};
+            if( parcels == null ){ parcels = new EmailParcel[]{}; }
             return parcels;
         }
         set;
@@ -22,7 +22,7 @@ global virtual class EmailParcelFactory {
     // parcels can be created from either SObjects or inboundEmails. This is the list of objs.
     global SObject[] objs {
         get {
-            if( objs == null ) objs = new SObject[]{};
+            if( objs == null ){ objs = new SObject[]{}; }
             return objs;
         }
         set;
@@ -31,18 +31,27 @@ global virtual class EmailParcelFactory {
     // parcels can be created from either SObjects or inboundEmails. This is the list of Inbound Emails.
     global Messaging.InboundEmail[] inboundEmails {
         get {
-            if( inboundEmails == null ) inboundEmails = new Messaging.InboundEmail[]{};
+            if( inboundEmails == null ){ inboundEmails = new Messaging.InboundEmail[]{}; }
             return inboundEmails;
         }
         set;
     }
 
-    // to add ContentVersions (files) to parcel that are already in the database and will be used to send an attachment
-    // keyed on an explicitly named value passed into the method below
-    global Map<String, String[]> versionIdsByName {
+    // OLD: To Be Deprecated
+    global Map<String, Id[]> versionIdsByName {
         get {
-            if( versionIdsByName == null ) versionIdsByName = new Map<String, String[]>();
+            if( versionIdsByName == null ){ versionIdsByName = new Map<String, Id[]>(); }
             return versionIdsByName;
+        }
+        set;
+    }
+
+    // Deconstructed ContentVersions (files) that are already in the database which are added to parcel and will be used to send an attachment
+    // keyed on an explicitly named value passed into the method below
+    global Map<String, AttachmentData[]> attachmentsByName {
+        get {
+            if( attachmentsByName == null ){ attachmentsByName = new Map<String, AttachmentData[]>(); }
+            return attachmentsByName;
         }
         set;
     }
@@ -201,9 +210,40 @@ global virtual class EmailParcelFactory {
         }
     }
 
+     /**
+     * @name addAttachmentByName
+     * @description adds an  attachment id by a particular key value
+     * @param String filename
+     * @param String base64Body
+     * @param String key
+     * @return void
+    **/
+    global virtual void addAttachmentByName( String filename, Blob blobBody, String key ){
+        AttachmentData attachment = new AttachmentData( filename, blobBody );
+
+        if( attachmentsByName.containsKey(key) ){
+            attachmentsByName.get(key).add(attachment);
+        } else {
+            attachmentsByName.put(key, new AttachmentData[]{attachment});
+        }
+    }
+
+    /**
+     * @name addVersionIdsByName
+     * @description loops a list of versions and deconstructs it into raw attachment data
+     * @param ContentVersion[] versions
+     * @return void
+    **/
+    global virtual void addAttachmentsByName( ContentVersion[] versions ){
+
+        for( ContentVersion version : versions ){
+            addAttachmentByName( version.PathOnClient, version.VersionData, version.Title );
+        }
+    }
+
     /**
      * @name addVersionIdByName
-     * @description adds a verion id by a particular key value
+     * @description adds a version id by a particular key value
      * @param ContentVersion version
      * @return void
     **/
@@ -227,6 +267,21 @@ global virtual class EmailParcelFactory {
 
         for( ContentVersion version : versions ){
             addVersionIdByName( version, version.Title );
+        }
+    }
+
+/**
+ * CLASSES
+**/
+
+    global class AttachmentData {
+
+        global String filename {get;set;}
+        global Blob blobBody {get;set;}
+
+        global AttachmentData( String filename, Blob blobBody ){
+            this.filename = filename;
+            this.blobBody = blobBody;
         }
     }
 }

@@ -208,12 +208,11 @@ public class TestEmailApp {
         insert version;
 
         EmailParcelFactory parcelFactory = new EmailParcelFactory( new SObject[]{c} );
-        parcelFactory.addVersionIdByName(version, version.Title);
+        parcelFactory.addAttachmentsByName(new ContentVersion[]{version});
 
-        System.assertEquals( 1, parcelFactory.versionIdsByName.get(version.Title).size() );
-        System.assertEquals( version.Id, parcelFactory.versionIdsByName.get(version.Title)[0] );
-        System.assertEquals( false, parcelFactory.hasparcels() );
-        System.assertEquals( 0, parcelFactory.getparcels().size() );
+        System.assertEquals( 1, parcelFactory.attachmentsByName.get(version.Title).size() );
+        System.assertEquals( false, parcelFactory.hasParcels() );
+        System.assertEquals( 0, parcelFactory.getParcels().size() );
     }
 
     @IsTest

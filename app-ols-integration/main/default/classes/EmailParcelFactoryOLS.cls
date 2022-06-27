@@ -39,10 +39,12 @@ global class EmailParcelFactoryOLS extends EmailParcelFactory {
             parcel.oweAddressId = oweAddressId; // from address
             parcel.whoId = obj.Id; // since this is a contact set the whoId
 
-            if( obj.Brochure_Key__c != null && versionIdsByName.containsKey( obj.Brochure_Key__c ) ){
-                String[] versionIds = versionIdsByName.get( obj.Brochure_Key__c );
+            if( (!String.isBlank( obj.Brochure_Key__c )) && attachmentsByName.containsKey( obj.Brochure_Key__c ) ){
+                AttachmentData[] attachments = attachmentsByName.get( obj.Brochure_Key__c );
 
-                parcel.setVersionIds(versionIds);
+                for( AttachmentData attachment : attachments ){
+                    parcel.setAttachment( attachment.filename, attachment.blobBody );
+                }                
             }
 
             parcels.add( parcel );
@@ -50,16 +52,15 @@ global class EmailParcelFactoryOLS extends EmailParcelFactory {
     }
 
     /**
-     * @name addVersionIdsByName
-     * @description loops a list and adds a verion id by a particular key value this is overrideable
-     * so that a sub class can name a different key
+     * @name addAttachmentsByName
+     * @description loops a list of versions and deconstructs it into raw attachment data
      * @param ContentVersion[] versions
      * @return void
     **/
-    global override void addVersionIdsByName( ContentVersion[] versions ){
+    global override void addAttachmentsByName( ContentVersion[] versions ){
 
         for( ContentVersion version : versions ){
-            addVersionIdByName( version, version.Brochure_Key__c );
+            addAttachmentByName( version.PathOnClient, version.VersionData, version.Brochure_Key__c );
         }
     }
 }

@@ -66,8 +66,6 @@ public class OLSTriggerHook implements TriggerHook {
         for( Contact customer : customers ){
             customer.Email_Sent__c = true;
         }
-        
-System.debug('Emails Sent To >>>' + customers);
 
         try {
 

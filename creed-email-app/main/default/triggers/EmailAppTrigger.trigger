@@ -12,8 +12,6 @@ trigger EmailAppTrigger on EmailMessage (
     after undelete
 ) {
 
-    System.debug('Emails Sent To IN TRIGGER >>>' + Trigger.new);
-
     // trigger functionality for inside the email application
     if( Trigger.isBefore ){
 

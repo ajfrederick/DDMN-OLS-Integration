@@ -5,19 +5,7 @@
  * 
  * @author Creed Interactive (Andrew Frederick) March 2022
  */
-public without sharing class OLSEmailValidation implements Schedulable {
-    
-/**
- * FIELDS
- */
-
-/**
- * CONSTRUCTERS
- */
-
-    public OLSEmailValidation(){
-
-    }
+global without sharing class OLSEmailValidation implements Schedulable {
 
 /**
  * INTERFACE METHODS
@@ -30,7 +18,7 @@ public without sharing class OLSEmailValidation implements Schedulable {
      * @param System.SchedulableContext context
      * @return none
      */
-    public void execute( System.SchedulableContext context ){
+    global void execute( System.SchedulableContext context ){
         validate();
     }
 
@@ -88,10 +76,4 @@ public without sharing class OLSEmailValidation implements Schedulable {
 
         return customers;
     }
-
-/**
- * EXCEPTION CLASSES
- */
-
-    public class EmailValidationException extends Exception {}
 }

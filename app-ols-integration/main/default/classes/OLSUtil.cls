@@ -57,7 +57,7 @@ public without sharing class OLSUtil {
      * @return none
      */
     private static void sendEmails( Contact[] customers ){
-        if( customers.isEmpty() ) return;
+        if( customers.isEmpty() ){ return; }
         
         Contact[] customersNotNE = new Contact[]{};
         Contact[] customersNE = new Contact[]{};
@@ -101,7 +101,7 @@ public without sharing class OLSUtil {
      * @return none
      */
     private static void sendEmailsNE( Contact[] customers ){
-        if( customers.isEmpty() ) return;
+        if( customers.isEmpty() ){ return; }
 
         EmailParcelFactoryOLS parcelFactory = new EmailParcelFactoryOLS( customers );
         parcelFactory.setTemplate( 'Online_Store_Customer_Welcome_NE' ); // Template is NE specific
@@ -119,8 +119,8 @@ public without sharing class OLSUtil {
      */
     private static void sendFinal( EmailParcelFactory parcelFactory, Contact[] customers ){
         ContentVersion[] versions = getContentVersions(customers);
-
-        parcelFactory.addVersionIdsByName( versions );
+        
+        parcelFactory.addAttachmentsByName( versions );
         parcelFactory.build();
 
         EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( parcelFactory );
@@ -162,6 +162,7 @@ public without sharing class OLSUtil {
             versions.addAll([SELECT
                 Id,
                 Title,
+                PathOnClient,
                 VersionData,
                 Brochure_Key__c
                     FROM ContentVersion
