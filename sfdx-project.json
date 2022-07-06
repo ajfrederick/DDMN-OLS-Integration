@@ -12,7 +12,7 @@
             "default": false,
             "package": "Creed Record Type Util",
             "versionName": "ver 1.0",
-            "versionNumber": "1.0.0.NEXT",
+            "versionNumber": "1.1.0.NEXT",
             "dependencies": [
                 {
                     "package": "Creed Exception Handler",
@@ -25,7 +25,7 @@
             "default": false,
             "package": "Creed Http Handler",
             "versionName": "ver 1.0",
-            "versionNumber": "1.0.0.NEXT"
+            "versionNumber": "1.1.0.NEXT"
         },
         {
             "path": "creed-email-app",
@@ -89,6 +89,7 @@
         "Creed Http Handler@1.0.0-1": "04t4x000000AKrUAAW",
         "Creed Http Handler@1.0.0-2": "04t4x000000AKryAAG",
         "Creed Record Type Util": "0Ho4x000000PBCACA4",
-        "Creed Record Type Util@1.0.0-1": "04t4x000000AKreAAG"
+        "Creed Record Type Util@1.0.0-1": "04t4x000000AKreAAG",
+        "Creed Http Handler@1.1.0-2": "04t4x000000AL07AAG"
     }
 }

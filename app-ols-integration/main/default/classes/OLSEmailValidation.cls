@@ -8,6 +8,12 @@
 global without sharing class OLSEmailValidation implements Schedulable {
 
 /**
+ * FEILDS
+ */
+
+    global Id testContactId {get;set;}
+
+/**
  * INTERFACE METHODS
  */
 
@@ -19,7 +25,7 @@ global without sharing class OLSEmailValidation implements Schedulable {
      * @return none
      */
     global void execute( System.SchedulableContext context ){
-        validate();
+        validate( testContactId );
     }
 
 /**
@@ -35,8 +41,8 @@ global without sharing class OLSEmailValidation implements Schedulable {
      * @return none
      */
     @future(callout=true)
-    private static void validate(){
-        Contact[] customers = getCustomers();
+    private static void validate( Id testContactId ){
+        Contact[] customers = getCustomers( testContactId );
 
         if( customers.isEmpty() ){ return; }
 
@@ -56,18 +62,33 @@ global without sharing class OLSEmailValidation implements Schedulable {
      * @param Id 
      * @return none
      */
-    private static Contact[] getCustomers(){
+    private static Contact[] getCustomers( Id testContactId ){
         Contact[] customers = new Contact[]{};
 
         try {
             
-            customers.addAll([SELECT
-                        Id,
-                        Email
-                            FROM Contact
-                            WHERE RecordTypeId = :OLSUtil.getOLSRecordTypeId()
-                            AND Email_Validated__c = false
-                            LIMIT 5000]);
+            if( testContactId == null ){
+
+                customers.addAll([SELECT
+                                    Id,
+                                    Email
+                                        FROM Contact
+                                        WHERE RecordTypeId = :OLSUtil.getOLSRecordTypeId()
+                                        AND Email_Validated__c = false
+                                        LIMIT 5000]);
+
+            } else 
+            if( testContactId != null ){
+
+                customers.addAll([SELECT
+                                    Id,
+                                    Email
+                                        FROM Contact
+                                        WHERE Id = :testContactId
+                                        AND RecordTypeId = :OLSUtil.getOLSRecordTypeId()
+                                        AND Email_Validated__c = false
+                                        LIMIT 1]);
+            }
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);

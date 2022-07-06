@@ -119,7 +119,7 @@ public without sharing class OLSUtil {
      */
     private static void sendFinal( EmailParcelFactory parcelFactory, Contact[] customers ){
         ContentVersion[] versions = getContentVersions(customers);
-        
+
         parcelFactory.addAttachmentsByName( versions );
         parcelFactory.build();
 
@@ -129,6 +129,8 @@ public without sharing class OLSUtil {
         EmailPost emailPost = new EmailPost( emailFactory );
         emailPost.addTriggerHook( new OLSTriggerHook() );
         emailPost.post();
+
+        System.debug('Outbound Email Results >>>' + emailPost.getEmailResultsOutbound());
     }
 
 /**
@@ -210,12 +212,9 @@ public without sharing class OLSUtil {
                         FROM AsyncApexJob
                         WHERE ApexClass.Name = 'OLSBounceReportJob'
                         AND JobType = 'ScheduledApex'
-                        AND 
-                        ( 
-                            Status != 'Aborted'
-                            OR Status != 'Completed'
-                            OR Status != 'Failed'
-                        )
+                        AND Status != 'Aborted'
+                        AND Status != 'Completed'
+                        AND Status != 'Failed'
                         LIMIT 1];
 
         } catch( Exception e ){
@@ -223,7 +222,7 @@ public without sharing class OLSUtil {
             handler.debug();
         }
 
-        if( job != null ){ return;}
+        if( job != null ){ return; }
 
         String jobName = 'OLS Bounce Report Email';
 
@@ -235,6 +234,9 @@ public without sharing class OLSUtil {
 
         // FOR TESTING: job for 3 minutes from now
         String threeMinutesFromNow = getThreeMinutesFromNow();
+
+        // FOR TESTING: job for 1 minutes from now
+        String oneMinuteFromNow = getMinutesFromNow(1);
 
         OLSBounceReportJob schedulable = new OLSBounceReportJob();
 
@@ -297,7 +299,7 @@ public without sharing class OLSUtil {
         Integer threeMinutesFromNow = now.minute() + 3;
         Integer hour = now.hour();
 
-        if( threeMinutesFromNow > 60 ){
+        if( threeMinutesFromNow >= 60 ){
             threeMinutesFromNow = threeMinutesFromNow - 60;
             hour = hour + 1;
         }
@@ -324,9 +326,13 @@ public without sharing class OLSUtil {
         Integer minutesFromNow = now.minute() + minutesToAdd;
         Integer hour = now.hour();
 
-        if( minutesFromNow > 60 ){
-            minutesFromNow = minutesFromNow - 60;
-            hour = hour + 1;
+        // to manage if input is greater than an hour
+        if( minutesFromNow >= 60 ){
+            Integer additionalHours = Math.round( minutesFromNow/60 );
+
+            minutesFromNow = minutesFromNow - (60 * additionalHours);
+
+            hour = hour + additionalHours;
         }
 
         String ret = now.second() + ' ';

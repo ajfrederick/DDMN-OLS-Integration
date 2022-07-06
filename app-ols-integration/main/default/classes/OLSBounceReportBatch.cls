@@ -5,13 +5,27 @@
  * 
  * @author Creed Interactive (Andrew Frederick) October 2021
  */
-public class OLSBounceReportBatch implements Database.Batchable<SObject> {
+global class OLSBounceReportBatch implements Database.Batchable<SObject>, Database.Stateful {
+
+/**
+ * INTERFACE METHODS
+ */ 
+
+    private Contact[] customers {
+        get {
+            if( customers == null ){
+                customers = new Contact[]{};
+            }
+            return customers;
+        }
+        set;
+    }
 
 /**
  * INTERFACE METHODS
  */
     
-    public Database.QueryLocator start( Database.BatchableContext context ){
+    global Database.QueryLocator start( Database.BatchableContext context ){
         String olsCustomer = OLSUtil.getOLSRecordTypeId();
 
         String q = 'SELECT ';
@@ -35,42 +49,17 @@ public class OLSBounceReportBatch implements Database.Batchable<SObject> {
         return Database.getQueryLocator(q);
     }
 
-    public void execute( Database.BatchableContext context, Contact[] customers ){
-
-        CustomEmailTemplate template = new CustomEmailTemplate( customers );
-
-        EmailParcel parcel = new EmailParcel();
-        parcel.setContent( template.subject, template.body, template.body );
-        parcel.setAttachment( template.filename, template.attachmentBody );
-
-        addToAddresses( parcel );
-
-        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( new EmailParcel[]{parcel} );
-        emailFactory.build();
-
-        EmailPost emailPost = new EmailPost( emailFactory );
-        emailPost.post();
-
-        updateCustomers( customers );
-    }
-
-    public void finish( Database.BatchableContext context ){
-
-    }
-
-/**
- * ACTION METHODS
- */
-
-    private void updateCustomers( Contact[] customers ){
-
-        for( Contact customer : customers ){
-            customer.Bounce_Reported__c = true;
-        }
+    global void execute( Database.BatchableContext context, Contact[] scopeCustomers ){
 
         try {
 
-            update customers;
+            for( Contact customer : scopeCustomers ){
+                customer.Bounce_Reported__c = true;
+            }
+
+            update scopeCustomers;
+
+            this.customers.addAll(scopeCustomers);
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
@@ -78,33 +67,52 @@ public class OLSBounceReportBatch implements Database.Batchable<SObject> {
         }
     }
 
+    global void finish( Database.BatchableContext context ){
+
+        CustomEmailTemplate template = new CustomEmailTemplate( this.customers );
+
+        EmailParcel parcel = new EmailParcel();
+        parcel.setContent( template.subject, template.body, template.body );
+        parcel.setAttachment( template.filename, template.attachmentBody );
+        parcel.ToAddresses.addAll( getToAddresses() );
+
+        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( new EmailParcel[]{parcel} );
+        emailFactory.build();
+
+        EmailPost emailPost = new EmailPost( emailFactory );
+        emailPost.post();
+    }
+
 /**
  * UTILITY METHODS
  */
 
-    private void addToAddresses( EmailParcel parcel ){
+    private String[] getToAddresses(){
+        String[] toAddresses = new String[]{};
+
         for( OLS_Bounce_Report_Email_Address__mdt record : OLS_Bounce_Report_Email_Address__mdt.getAll().values() ){
-            parcel.ToAddresses.add(record.Email__c);
+            toAddresses.add(record.Email__c);
         }
+
+        return toAddresses;
     }
 
 /**
  * CLASSES
  */
 
-    public class CustomEmailTemplate {
+    global class CustomEmailTemplate {
 
-        public String subject = 'Online Store Customer Bounce Report';
+        global String subject = 'Online Store Customer Bounce Report';
         private String body = 'Here is the bounce report for all Online Strore Customers who failed to received a brochure via email.';
 
-        public String filename {get;set;}
-        public Blob attachmentBody {get;set;}
+        global String filename {get;set;}
+        global Blob attachmentBody {get;set;}
 
-        public Contact[] customers {get;set;}
+        global Contact[] customers {get;set;}
 
-
-        public CustomEmailTemplate( Contact[] customers ){
-            this.customers = customers;
+        global CustomEmailTemplate( Contact[] customersForTemplate ){
+            this.customers = customersForTemplate;
 
             setFileName();
             setAttachmentBody();

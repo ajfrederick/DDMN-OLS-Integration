@@ -4,27 +4,13 @@
  * 
  * @author Creed Interactive (Andrew Frederick) March 2022
  */
-global abstract class HttpHandler {
+public abstract class HttpHandler {
 
     /**
      * FIELDS
      */
     
-        global HttpRequest request {get;set;}
-        
-        global HttpResponse response {get;set;}
-    
-        global HttpParsedResponse parsedResponse {
-            get {
-                
-                if( parsedResponse == null ){
-                    parsedResponse = new HttpParsedResponse();
-                }
-                
-                return parsedResponse;
-            }
-            set;
-        }
+        public HttpRequest request {get;set;}
     
         private Map<String, String> params {
             get {
@@ -49,6 +35,25 @@ global abstract class HttpHandler {
             }
             set;
         }
+
+
+        public HttpResponse response {get;set;}
+    
+        public String responseBody {
+            get {
+                
+                if( responseBody == null ){
+                    responseBody = '{}';
+                }
+                
+                return responseBody;
+            }
+            set;
+        }
+
+        private Integer statusCode {get;set;}
+
+        private String status {get;set;}
     
     /**
      * ABSTRACT METHODS
@@ -60,19 +65,19 @@ global abstract class HttpHandler {
          * @param none
          * @return String
          */
-        global abstract String getEndpoint();
+        public abstract String getEndpoint();
     
     /**
      * ACTION METHODS
      */
-
+    
         /**
          * @name send
          * @description sends a request without have to externally create the request object
          * @param none
          * @return none
          */
-        global void send(){
+        public void send(){
             send( new HttpRequest() );
         }
     
@@ -82,16 +87,16 @@ global abstract class HttpHandler {
          * @param HttpRequest request
          * @return none
          */
-        global void send( HttpRequest request ){
+        public void send( HttpRequest request ){
             this.request = request;
     
-            this.request.setEndpoint( getEndpoint() );
-            this.request.setMethod( getMethod() );
-            
+            request.setEndpoint( getEndpoint() );
+            request.setMethod( getMethod() );
+
             Http http = new Http();
-            
-            response = http.send( this.request );
     
+            response = http.send( request );
+
             parseResponse();
         }
     
@@ -103,35 +108,50 @@ global abstract class HttpHandler {
          * @return none
          */
         private void parseResponse(){
-            parsedResponse.responseBody = response.getBody();
+            responseBody = response.getBody();
+            status = response.getStatus();
+            statusCode = response.getStatusCode();
     
-            if( response.getStatusCode() > 299 ){
-                parseErrors();
+            if( hasErrors() ){
+
+                if( !Test.isRunningTest() ) {
+                    throw new HttpException( JSON.serialize( getError() ) );
+                } else {
+                    getError();
+                }
             }
-    
-            checkErrors();
         }
         
         /**
-         * @name parseErrors
-         * @description if there is an error statusCode create and error object and add it to the list of error objects.
+         * @name getError
+         * @description if there is an error statusCode create and error object.
          * the getErrorMessage is vitural so that sub classes can get more precise on what the message is if the developer 
          * knows the format of the response.
          * @param none
          * @return none
          */
-        private void parseErrors(){
-            HttpParsedResponseError error = new HttpParsedResponseError();
-            error.errorMessage = getErrorMessage();
-            error.statusCode = response.getStatusCode();
-            error.status = response.getStatus();
-            
-            parsedResponse.errors.add( error );
+        private HttpError getError(){
+            HttpError error = new HttpError();
+            error.message = getErrorMessage();
+            error.statusCode = statusCode;
+            error.status = status;
+
+            return error;
         }
     
     /**
      * UTILITY METHODS
-     */
+     */ 
+
+        /**
+         * @name getReponseBody
+         * @description returns the body of the reponse
+         * @param none
+         * @return String
+         */
+        public virtual String getReponseBody(){
+            return responseBody;
+        }
     
         /**
          * @name getMethod
@@ -149,7 +169,7 @@ global abstract class HttpHandler {
          * @param none
          * @return String
          */
-        global void setMethod( String methodType ){
+        public void setMethod( String methodType ){
             this.methodType = methodType;
         }
     
@@ -159,7 +179,7 @@ global abstract class HttpHandler {
          * @param Map<String, String> params
          * @return none
          */
-        global void setQueryParams( Map<String, String> params ){
+        public void setQueryParams( Map<String, String> params ){
             this.params = params;
         }
     
@@ -169,7 +189,7 @@ global abstract class HttpHandler {
          * @param none
          * @return String
          */
-        protected String getQuery(){
+        public String getQuery(){
             String query = '?';
     
             Integer i = 0;
@@ -179,7 +199,7 @@ global abstract class HttpHandler {
             for( String name : params.keyset() ){
                 String value = params.get(name);
     
-                query += name + '=' + value;
+                query += name + '=' + EncodingUtil.urlEncode( value, 'UTF-8');
     
                 if( i < (len-1) ){
                     query += '&';
@@ -190,17 +210,25 @@ global abstract class HttpHandler {
     
             return query;
         }
-    
+
         /**
-         * @name checkErrors
-         * @description checks to see if the request came back with errors and if it did throws an exception.
+         * @name getStatus
+         * @description 
          * @param none
          * @return String
          */
-        global void checkErrors(){
-            if( hasErrors() ){
-                throw new HttpException( JSON.serialize( getErrors() ) );
-            }
+        public String getStatus(){
+            return status;
+        }
+    
+        /**
+         * @name getStatusCode
+         * @description 
+         * @param none
+         * @return Integer
+         */
+        public Integer getStatusCode(){
+            return statusCode;
         }
     
         /**
@@ -209,18 +237,8 @@ global abstract class HttpHandler {
          * @param none
          * @return Boolean
          */
-        global Boolean hasErrors(){
-            return parsedResponse.errors.size() > 0;
-        }
-    
-        /**
-         * @name getErrors
-         * @description 
-         * @param none
-         * @return HttpParsedResponseError[]
-         */
-        global HttpParsedResponseError[] getErrors(){
-            return parsedResponse.errors;
+        public Boolean hasErrors(){
+            return statusCode > 299 ;
         }
     
         /**
@@ -231,12 +249,18 @@ global abstract class HttpHandler {
          * @return String
          */
         protected virtual String getErrorMessage(){
-            return parsedResponse.responseBody;
+            return responseBody;
         }
     
     /**
      * CLASSES
      */
+
+        class HttpError {
+            String message {get;set;}
+            String status {get;set;}
+            Integer statusCode {get;set;}
+        }
     
         class HttpException extends Exception {}
     }

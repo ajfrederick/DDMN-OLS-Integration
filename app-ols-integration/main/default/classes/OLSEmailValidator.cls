@@ -194,7 +194,7 @@ public without sharing class OLSEmailValidator {
 
             OLSEmailValidationCheckStatus statusCheck = new OLSEmailValidationCheckStatus( this );
 
-            System.schedule( apexJobName, OLSUtil.getMinutesFromNow(1), statusCheck );
+            System.schedule( apexJobName, OLSUtil.getMinutesFromNow(5), statusCheck );
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
@@ -250,7 +250,7 @@ public without sharing class OLSEmailValidator {
         }
 
         public EmailVerificationResponse getParsedResponse(){
-            return (EmailVerificationResponse) JSON.deserialize( parsedResponse.responseBody, EmailVerificationResponse.class );
+            return (EmailVerificationResponse) JSON.deserialize( responseBody, EmailVerificationResponse.class );
         }
     }
 
@@ -265,7 +265,7 @@ public without sharing class OLSEmailValidator {
         }
 
         public StatusResponse getParsedResponse(){
-            return (StatusResponse) JSON.deserialize( parsedResponse.responseBody, StatusResponse.class );
+            return (StatusResponse) JSON.deserialize( responseBody, StatusResponse.class );
         }
     }
 
@@ -280,7 +280,7 @@ public without sharing class OLSEmailValidator {
         }
 
         public RetrieveResultsResponse getParsedResponse(){
-            return (RetrieveResultsResponse) JSON.deserialize( parsedResponse.responseBody, RetrieveResultsResponse.class );
+            return (RetrieveResultsResponse) JSON.deserialize( responseBody, RetrieveResultsResponse.class );
         }
     }
 

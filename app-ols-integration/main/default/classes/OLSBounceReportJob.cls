@@ -8,6 +8,6 @@
 public class OLSBounceReportJob implements Schedulable {
     
     public void execute( System.SchedulableContext context ){
-        Database.executeBatch( new OLSBounceReportBatch() );
+        Database.executeBatch( new OLSBounceReportBatch(), 2000 );
     }
 }
