@@ -60,7 +60,7 @@ global without sharing class RecordTypeUtil {
 
             recordTypeId = recordTypeIdsByName.containsKey( name ) ? recordTypeIdsByName.get( name ) : null;
 
-            if( recordTypeId == null ){
+            if( recordTypeId == null && !Test.isRunningTest() ){
                 throw new RecordTypeException('Record Type ' + name + ' does not exist or the developer is searching for this record type on the wrong Object.');
             }
 

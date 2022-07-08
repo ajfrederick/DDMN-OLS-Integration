@@ -145,7 +145,7 @@ global class OLSBounceReportBatch implements Database.Batchable<SObject>, Databa
     
         private String getMailingAddress( Contact customer ){
             String mailingAddress = customer.MailingStreet + ' ';
-            mailingAddress += customer.MailingCity + ', ';
+            mailingAddress += customer.MailingCity + ' ';
             mailingAddress += customer.MailingState + ' ';
             mailingAddress += customer.MailingPostalCode;
     

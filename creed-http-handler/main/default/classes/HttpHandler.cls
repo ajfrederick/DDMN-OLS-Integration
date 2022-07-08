@@ -4,13 +4,13 @@
  * 
  * @author Creed Interactive (Andrew Frederick) March 2022
  */
-public abstract class HttpHandler {
+global abstract class HttpHandler {
 
     /**
      * FIELDS
      */
     
-        public HttpRequest request {get;set;}
+        global HttpRequest request {get;set;}
     
         private Map<String, String> params {
             get {
@@ -37,9 +37,9 @@ public abstract class HttpHandler {
         }
 
 
-        public HttpResponse response {get;set;}
+        global HttpResponse response {get;set;}
     
-        public String responseBody {
+        global String responseBody {
             get {
                 
                 if( responseBody == null ){
@@ -65,7 +65,7 @@ public abstract class HttpHandler {
          * @param none
          * @return String
          */
-        public abstract String getEndpoint();
+        global abstract String getEndpoint();
     
     /**
      * ACTION METHODS
@@ -77,7 +77,7 @@ public abstract class HttpHandler {
          * @param none
          * @return none
          */
-        public void send(){
+        global void send(){
             send( new HttpRequest() );
         }
     
@@ -87,7 +87,7 @@ public abstract class HttpHandler {
          * @param HttpRequest request
          * @return none
          */
-        public void send( HttpRequest request ){
+        global void send( HttpRequest request ){
             this.request = request;
     
             request.setEndpoint( getEndpoint() );
@@ -149,7 +149,7 @@ public abstract class HttpHandler {
          * @param none
          * @return String
          */
-        public virtual String getReponseBody(){
+        global virtual String getReponseBody(){
             return responseBody;
         }
     
@@ -169,7 +169,7 @@ public abstract class HttpHandler {
          * @param none
          * @return String
          */
-        public void setMethod( String methodType ){
+        global void setMethod( String methodType ){
             this.methodType = methodType;
         }
     
@@ -179,7 +179,7 @@ public abstract class HttpHandler {
          * @param Map<String, String> params
          * @return none
          */
-        public void setQueryParams( Map<String, String> params ){
+        global void setQueryParams( Map<String, String> params ){
             this.params = params;
         }
     
@@ -189,7 +189,7 @@ public abstract class HttpHandler {
          * @param none
          * @return String
          */
-        public String getQuery(){
+        global String getQuery(){
             String query = '?';
     
             Integer i = 0;
@@ -217,7 +217,7 @@ public abstract class HttpHandler {
          * @param none
          * @return String
          */
-        public String getStatus(){
+        global String getStatus(){
             return status;
         }
     
@@ -227,7 +227,7 @@ public abstract class HttpHandler {
          * @param none
          * @return Integer
          */
-        public Integer getStatusCode(){
+        global Integer getStatusCode(){
             return statusCode;
         }
     
@@ -237,7 +237,7 @@ public abstract class HttpHandler {
          * @param none
          * @return Boolean
          */
-        public Boolean hasErrors(){
+        global Boolean hasErrors(){
             return statusCode > 299 ;
         }
     

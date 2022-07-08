@@ -1,3 +1,9 @@
+/**
+ * @name HttpHandlerTest
+ * @description Test Creed Http Handler
+ * 
+ * @author Creed Interactive (Andrew Frederick) July 2022
+ */
 @isTest
 public class HttpHandlerTest {
     
