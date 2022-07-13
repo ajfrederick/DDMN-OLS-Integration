@@ -74,8 +74,9 @@ global without sharing class OLSEmailValidation implements Schedulable {
                                     Email
                                         FROM Contact
                                         WHERE RecordTypeId = :OLSUtil.getOLSRecordTypeId()
+                                        AND Email_Sent__c = true
                                         AND Email_Validated__c = false
-                                        LIMIT 5000]);
+                                        LIMIT 500]);
 
             } else 
             if( testContactId != null ){
@@ -86,6 +87,7 @@ global without sharing class OLSEmailValidation implements Schedulable {
                                         FROM Contact
                                         WHERE Id = :testContactId
                                         AND RecordTypeId = :OLSUtil.getOLSRecordTypeId()
+                                        AND Email_Sent__c = true
                                         AND Email_Validated__c = false
                                         LIMIT 1]);
             }

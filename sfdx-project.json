@@ -44,8 +44,8 @@
             "path": "app-ols-integration",
             "default": true,
             "package": "DDMN Online Store Integration",
-            "versionName": "ver 3.1",
-            "versionNumber": "3.1.0.NEXT",
+            "versionName": "ver 3.2",
+            "versionNumber": "3.2.0.NEXT",
             "dependencies": [
                 {
                     "package": "Creed Exception Handler",
@@ -78,8 +78,7 @@
         "Creed Email App@1.6.0-4": "04t4x000000AL15AAG",
         "DDMN Online Store Integration": "0Ho4x000000PBAxCAO",
         "DDMN Online Store Integration@1.3.0-1": "04t4x000000AJp5AAG",
-        "DDMN Online Store Integration@3.0.0-1": "04t4x000000AL1jAAG",
-        "DDMN Online Store Integration@3.1.0-1": "04t4x000000AL2DAAW",
+        "DDMN Online Store Integration@3.2.0-1": "04t4x000000AL2wAAG",
         "Creed Http Handler": "0Ho4x000000PBC5CAO",
         "Creed Http Handler@1.3.0-1": "04t4x000000AL1eAAG",
         "Creed Record Type Util": "0Ho4x000000PBCACA4",
