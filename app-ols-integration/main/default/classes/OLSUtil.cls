@@ -17,28 +17,6 @@ public without sharing class OLSUtil {
     public static final String OLS_CONTACT = 'Online_Store_Customer';
 
     private static final RecordTypeUtil RECORD_TYPE_UTIL = new RecordTypeUtil( new Contact() );
-
-    private static OLS_Cron_Job_Detail__mdt bounceReportCronJobDetail {get;set;}
-    private static OLS_Cron_Job_Detail__mdt emailValidationCronJobDetail {get;set;}
-
-    private static Boolean isDev {get;set;}
-
-    static {
-        
-        isDev = [SELECT isSandBox FROM Organization LIMIT 1].IsSandbox;
-
-        try {
-
-            Map<String, OLS_Cron_Job_Detail__mdt> cronJobDetails = OLS_Cron_Job_Detail__mdt.getAll();
-    
-            bounceReportCronJobDetail = cronJobDetails.get('Bounce_Report');
-            emailValidationCronJobDetail = cronJobDetails.get('Email_Validation');
-
-        } catch( Exception e ){
-            creedint.CreedExceptionHandler handler = new creedint.CreedExceptionHandler(e);
-            handler.handle();
-        }
-    }
     
 /**
  * TRIGGER METHODS
@@ -96,7 +74,8 @@ public without sharing class OLSUtil {
         sendEmailsNotNE( customersNotNE );
         sendEmailsNE( customersNE );
 
-        scheduleBounceBackReportJob();
+        OLSCronJobHelper.scheduleBounceBackReportJob();
+        OLSCronJobHelper.scheduleBounceEmailValidationJob();
     }
 
     /**
@@ -151,54 +130,11 @@ public without sharing class OLSUtil {
         EmailPost emailPost = new EmailPost( emailFactory );
         emailPost.addTriggerHook( new OLSTriggerHook() );
         emailPost.post();
-
-        System.debug('Outbound Email Results >>>' + emailPost.getEmailResultsOutbound());
     }
 
 /**
  * UTILITY METHODS
  */
-
-    /**
-     * @name sendEmails
-     * @description gets Brochure PDFs for email's attachment
-     * @param Contact[] customers
-     * @return none
-     */
-    private static ContentVersion[] getContentVersions( Contact[] customers ){
-        ContentVersion[] versions = new ContentVersion[]{};
-
-        String[] brochureKeys = new String[]{};
-
-        for( Contact customer : customers ){
-
-            if( !String.isBlank( customer.Brochure_Key__c ) ){
-                brochureKeys.add( customer.Brochure_Key__c );
-            }
-        }
-
-        try {
-
-            if( brochureKeys.isEmpty() ){
-                throw new BrochureKeyException('No brochure keys associated with these customer records.');
-            }
-
-            versions.addAll([SELECT
-                Id,
-                Title,
-                PathOnClient,
-                VersionData,
-                Brochure_Key__c
-                    FROM ContentVersion
-                    WHERE Brochure_Key__c IN :brochureKeys]);
-
-        } catch( Exception e ){
-            CreedExceptionHandler handler = new CreedExceptionHandler(e, customers);
-            handler.handle();
-        }
-
-        return versions;
-    }
 
     /**
      * @name sortOnlineStoreCustomers
@@ -216,85 +152,6 @@ public without sharing class OLSUtil {
         }
 
         return customers;
-    }
-
-    /**
-     * @name scheduleBounceBackReportJob
-     * @description schedules the job to email bounce reports to selected individuals if there isn't one already.
-     * @param none
-     * @return none
-     */
-    private static void scheduleBounceBackReportJob(){
-        AsyncApexJob job = getJob('OLSBounceReportJob');
-
-        if( job != null ){ return; }
-
-        // e.g. every wednesday = '0 0 6 ? * WED'
-        String cronExpression;
-
-        if( isDev ){    
-            cronExpression = getMinutesFromNow( (Integer) bounceReportCronJobDetail.Minutes_From_Now__c ); 
-        } else {
-            cronExpression = bounceReportCronJobDetail.Cron_Expression__c;
-        }
-
-        OLSBounceReportJob schedulable = new OLSBounceReportJob();
-
-        System.schedule(bounceReportCronJobDetail.Job_Name__c, cronExpression, schedulable);
-    }
-
-     /**
-     * @name scheduleBounceEmailValidationJob
-     * @description schedules the job to validate OLS customer emails.
-     * @param none
-     * @return none
-     */
-    public static void scheduleBounceEmailValidationJob(){
-        AsyncApexJob job = getJob('OLSEmailValidation');
-
-        if( job != null ){ return; }
-
-        // e.g. every wednesday = '0 0 6 ? * WED'
-        String cronExpression;
-
-        if( isDev ){    
-            cronExpression = getMinutesFromNow( (Integer) emailValidationCronJobDetail.Minutes_From_Now__c ); 
-        } else {
-            cronExpression = emailValidationCronJobDetail.Cron_Expression__c;
-        }
-
-        OLSEmailValidation schedulable = new OLSEmailValidation();
-
-        System.schedule(emailValidationCronJobDetail.Job_Name__c, cronExpression, schedulable);
-    }
-
-    /**
-     * @name getJob
-     * @description get job by scheduable class to see if the job already exists
-     * @param String className
-     * @return none
-     */
-    private static AsyncApexJob getJob( String className ){
-        AsyncApexJob job;
-
-        try {
-
-            job = [SELECT
-                    Id
-                        FROM AsyncApexJob
-                        WHERE ApexClass.Name = :className
-                        AND JobType = 'ScheduledApex'
-                        AND Status != 'Aborted'
-                        AND Status != 'Completed'
-                        AND Status != 'Failed'
-                        LIMIT 1];
-
-        } catch( Exception e ){
-            CreedExceptionHandler handler = new CreedExceptionHandler(e);
-            handler.debug();
-        }
-
-        return job;
     }
 
     /**
@@ -397,6 +254,51 @@ public without sharing class OLSUtil {
         ret += '?';
 
         return ret;
+    }
+
+/**
+ * QUERY METHODS
+ */
+
+    /**
+     * @name sendEmails
+     * @description gets Brochure PDFs for email's attachment
+     * @param Contact[] customers
+     * @return none
+     */
+    private static ContentVersion[] getContentVersions( Contact[] customers ){
+        ContentVersion[] versions = new ContentVersion[]{};
+
+        String[] brochureKeys = new String[]{};
+
+        for( Contact customer : customers ){
+
+            if( !String.isBlank( customer.Brochure_Key__c ) ){
+                brochureKeys.add( customer.Brochure_Key__c );
+            }
+        }
+
+        try {
+
+            if( brochureKeys.isEmpty() ){
+                throw new BrochureKeyException('No brochure keys associated with these customer records.');
+            }
+
+            versions.addAll([SELECT
+                Id,
+                Title,
+                PathOnClient,
+                VersionData,
+                Brochure_Key__c
+                    FROM ContentVersion
+                    WHERE Brochure_Key__c IN :brochureKeys]);
+
+        } catch( Exception e ){
+            CreedExceptionHandler handler = new CreedExceptionHandler(e, customers);
+            handler.handle();
+        }
+
+        return versions;
     }
 
 /**
