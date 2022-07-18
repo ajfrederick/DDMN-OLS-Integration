@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Minutes_From_Now__c</fullName>
+    <description>In development orgs this will be how many minutes for now the job should run when created by the OLS integration salesforce application.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>In development orgs this will be how many minutes for now the job should run when created by the OLS integration salesforce application.</inlineHelpText>
+    <label>Minutes From Now</label>
+    <precision>3</precision>
+    <required>true</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

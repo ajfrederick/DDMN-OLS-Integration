@@ -17,6 +17,28 @@ public without sharing class OLSUtil {
     public static final String OLS_CONTACT = 'Online_Store_Customer';
 
     private static final RecordTypeUtil RECORD_TYPE_UTIL = new RecordTypeUtil( new Contact() );
+
+    private static OLS_Cron_Job_Detail__mdt bounceReportCronJobDetail {get;set;}
+    private static OLS_Cron_Job_Detail__mdt emailValidationCronJobDetail {get;set;}
+
+    private static Boolean isDev {get;set;}
+
+    static {
+        
+        isDev = [SELECT isSandBox FROM Organization LIMIT 1].IsSandbox;
+
+        try {
+
+            Map<String, OLS_Cron_Job_Detail__mdt> cronJobDetails = OLS_Cron_Job_Detail__mdt.getAll();
+    
+            bounceReportCronJobDetail = cronJobDetails.get('Bounce_Report');
+            emailValidationCronJobDetail = cronJobDetails.get('Email_Validation');
+
+        } catch( Exception e ){
+            creedint.CreedExceptionHandler handler = new creedint.CreedExceptionHandler(e);
+            handler.handle();
+        }
+    }
     
 /**
  * TRIGGER METHODS
@@ -74,7 +96,7 @@ public without sharing class OLSUtil {
         sendEmailsNotNE( customersNotNE );
         sendEmailsNE( customersNE );
 
-        scheduleJob();
+        scheduleBounceBackReportJob();
     }
 
     /**
@@ -197,12 +219,62 @@ public without sharing class OLSUtil {
     }
 
     /**
-     * @name scheduleJob
+     * @name scheduleBounceBackReportJob
      * @description schedules the job to email bounce reports to selected individuals if there isn't one already.
      * @param none
      * @return none
      */
-    private static void scheduleJob(){
+    private static void scheduleBounceBackReportJob(){
+        AsyncApexJob job = getJob('OLSBounceReportJob');
+
+        if( job != null ){ return; }
+
+        // e.g. every wednesday = '0 0 6 ? * WED'
+        String cronExpression;
+
+        if( isDev ){    
+            cronExpression = getMinutesFromNow( (Integer) bounceReportCronJobDetail.Minutes_From_Now__c ); 
+        } else {
+            cronExpression = bounceReportCronJobDetail.Cron_Expression__c;
+        }
+
+        OLSBounceReportJob schedulable = new OLSBounceReportJob();
+
+        System.schedule(bounceReportCronJobDetail.Job_Name__c, cronExpression, schedulable);
+    }
+
+     /**
+     * @name scheduleBounceEmailValidationJob
+     * @description schedules the job to validate OLS customer emails.
+     * @param none
+     * @return none
+     */
+    public static void scheduleBounceEmailValidationJob(){
+        AsyncApexJob job = getJob('OLSEmailValidation');
+
+        if( job != null ){ return; }
+
+        // e.g. every wednesday = '0 0 6 ? * WED'
+        String cronExpression;
+
+        if( isDev ){    
+            cronExpression = getMinutesFromNow( (Integer) emailValidationCronJobDetail.Minutes_From_Now__c ); 
+        } else {
+            cronExpression = emailValidationCronJobDetail.Cron_Expression__c;
+        }
+
+        OLSEmailValidation schedulable = new OLSEmailValidation();
+
+        System.schedule(emailValidationCronJobDetail.Job_Name__c, cronExpression, schedulable);
+    }
+
+    /**
+     * @name getJob
+     * @description get job by scheduable class to see if the job already exists
+     * @param String className
+     * @return none
+     */
+    private static AsyncApexJob getJob( String className ){
         AsyncApexJob job;
 
         try {
@@ -210,7 +282,7 @@ public without sharing class OLSUtil {
             job = [SELECT
                     Id
                         FROM AsyncApexJob
-                        WHERE ApexClass.Name = 'OLSBounceReportJob'
+                        WHERE ApexClass.Name = :className
                         AND JobType = 'ScheduledApex'
                         AND Status != 'Aborted'
                         AND Status != 'Completed'
@@ -222,25 +294,7 @@ public without sharing class OLSUtil {
             handler.debug();
         }
 
-        if( job != null ){ return; }
-
-        String jobName = 'OLS Bounce Report Email';
-
-        // job for every Monday at 6am
-        String everyWeek = '0 0 6 ? * MON';
-
-        // FOR TESTING: job for every Day at 6am
-        String everyDay = '0 0 6 * * ?';
-
-        // FOR TESTING: job for 3 minutes from now
-        String threeMinutesFromNow = getThreeMinutesFromNow();
-
-        // FOR TESTING: job for 1 minutes from now
-        String oneMinuteFromNow = getMinutesFromNow(1);
-
-        OLSBounceReportJob schedulable = new OLSBounceReportJob();
-
-        System.schedule(jobName, everyWeek, schedulable);
+        return job;
     }
 
     /**

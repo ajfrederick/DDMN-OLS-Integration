@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Cron_Expression__c</fullName>
+    <description>In production this is the cron expression for when the OLS integration Salesforce application schedules a job  programmatically.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>In production this is the cron expression for when the OLS integration Salesforce application schedules a job  programmatically.</inlineHelpText>
+    <label>Cron Expression</label>
+    <length>20</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
