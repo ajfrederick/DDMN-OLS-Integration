@@ -205,6 +205,7 @@ public without sharing class OLSRestServiceHelper {
             State_Acronym__c = preEnrollment.stateAcronym,
             Current_Carrier__c = existingCoverage.carrier,
             Effective_Date__c = getEffectiveDate(),
+            Coverage_Start_Date__c = getCoverageStartDate(),
             End_Date__c = getEndDate(),
             Policy_Number__c = existingCoverage.policyNumber,
             Eligible_For_Waiting_Period_Waiver__c = getWaiverEligibility(),
@@ -356,6 +357,15 @@ public without sharing class OLSRestServiceHelper {
     }
 
     /**
+     * @name getCoverageStartDate
+     * @description returns formatted coverage start date
+     * @return Date
+     */
+    private Date getCoverageStartDate(){
+        return getDate( customer.newPolicyStartDate );
+    }
+
+    /**
      * @name getDate
      * @description this is to avoid errors if the date string from the JSON is malformed
      * @param String date
@@ -364,7 +374,7 @@ public without sharing class OLSRestServiceHelper {
     private Date getDate( String dateString ){
         Date newDate;
 
-        if( String.isBlank(dateString) ) return newDate;
+        if( String.isBlank(dateString) ){ return newDate; }
 
         try {
 
@@ -401,6 +411,7 @@ public without sharing class OLSRestServiceHelper {
         public AddressData address {get;set;}
         public String phone {get;set;}
         public String accessCode {get;set;}
+        public String newPolicyStartDate {get;set;}
         public ExistingCoverage existingCoverage {get;set;}
         public String amount {get;set;}
         public String product {get;set;}

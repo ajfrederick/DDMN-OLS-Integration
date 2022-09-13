@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OLS_Brochure</fullName>
+    <active>true</active>
+    <description>Brochure PDF that is sent out with OLS welcome emails</description>
+    <label>OLS Brochure</label>
+</RecordType>

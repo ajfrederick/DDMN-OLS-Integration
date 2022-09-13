@@ -218,8 +218,8 @@ global virtual class EmailParcelFactory {
      * @param String key
      * @return void
     **/
-    global virtual void addAttachmentByName( String filename, Blob blobBody, String key ){
-        AttachmentData attachment = new AttachmentData( filename, blobBody );
+    global virtual void addAttachmentByName( String key, ContentVersion version ){
+        AttachmentData attachment = new AttachmentData( version );
 
         if( attachmentsByName.containsKey(key) ){
             attachmentsByName.get(key).add(attachment);
@@ -237,7 +237,7 @@ global virtual class EmailParcelFactory {
     global virtual void addAttachmentsByName( ContentVersion[] versions ){
 
         for( ContentVersion version : versions ){
-            addAttachmentByName( version.PathOnClient, version.VersionData, version.Title );
+            addAttachmentByName( version.Title, version );
         }
     }
 
@@ -247,7 +247,7 @@ global virtual class EmailParcelFactory {
      * @param ContentVersion version
      * @return void
     **/
-    global void addVersionIdByName( ContentVersion version, String key ){
+    global void addVersionIdByName( String key, ContentVersion version ){
 
         if( versionIdsByName.containsKey(key) ){
             versionIdsByName.get(key).add(version.Id);
@@ -266,7 +266,7 @@ global virtual class EmailParcelFactory {
     global virtual void addVersionIdsByName( ContentVersion[] versions ){
 
         for( ContentVersion version : versions ){
-            addVersionIdByName( version, version.Title );
+            addVersionIdByName( version.Title, version );
         }
     }
 
@@ -274,14 +274,23 @@ global virtual class EmailParcelFactory {
  * CLASSES
 **/
 
+    // To convert ContentVersion to raw data. This was done to avoid sharing limits. Files can only be shared 2000 times 
+    // and the use in an email counts as a 'share'
+
     global class AttachmentData {
 
-        global String filename {get;set;}
-        global Blob blobBody {get;set;}
+        global ContentVersion version {get;set;}
 
-        global AttachmentData( String filename, Blob blobBody ){
-            this.filename = filename;
-            this.blobBody = blobBody;
+        global AttachmentData( ContentVersion version ){
+            this.version = version;
+        }
+
+        global String getFileName(){
+            return version.PathOnClient;
+        }
+
+        global Blob getBlobBody(){
+            return version.VersionData;
         }
     }
 }

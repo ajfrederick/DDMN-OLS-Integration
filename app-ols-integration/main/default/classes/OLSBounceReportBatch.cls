@@ -8,7 +8,7 @@
 global class OLSBounceReportBatch implements Database.Batchable<SObject>, Database.Stateful {
 
 /**
- * INTERFACE METHODS
+ * FIELDS
  */ 
 
     private Contact[] customers {

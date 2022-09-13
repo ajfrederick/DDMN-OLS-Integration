@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Brochure_Coverage_Start_Date__c</fullName>
+    <description>This is the coverage start date that a brochure for a certain brochure key should begin being used in circulation.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>This is the coverage start date that a brochure for a certain brochure key should begin being used in circulation.</inlineHelpText>
+    <label>Brochure Coverage Start Date</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>
