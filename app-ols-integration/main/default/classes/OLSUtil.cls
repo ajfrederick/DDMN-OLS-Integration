@@ -10,9 +10,6 @@ public without sharing class OLSUtil {
  * FIELDS
  */
 
-    private static final String FROM_ADDRESS = System.Label.OLS_Email_From_Address;
-    private static final String FROM_ADDRESS_NE = System.Label.OLS_Email_From_Address_NE;
-
     // OLS Contact Record Type developerName
     public static final String OLS_CONTACT = 'Online_Store_Customer';
 
@@ -59,77 +56,11 @@ public without sharing class OLSUtil {
     private static void sendEmails( Contact[] customers ){
         if( customers.isEmpty() ){ return; }
         
-        Contact[] customersNotNE = new Contact[]{};
-        Contact[] customersNE = new Contact[]{};
-
-        for( Contact customer : customers ){
-
-            if( customer.State_Acronym__c == 'ddne_core' ){
-                customersNE.add(customer);
-            } else {
-                customersNotNE.add(customer);
-            }
-        }
-
-        sendEmailsNotNE( customersNotNE );
-        sendEmailsNE( customersNE );
+        OLSEmailCore emailCore = new OLSEmailCore( customers );
+        emailCore.sendEmails();
 
         OLSCronJobHelper.scheduleBounceBackReportJob();
         OLSCronJobHelper.scheduleBounceEmailValidationJob();
-    }
-
-    /**
-     * @name sendEmailsNotNE
-     * @description sends emails to customers from MN and ND
-     * @param Contact[] customers
-     * @return none
-     */
-    private static void sendEmailsNotNE( Contact[] customers ){
-        if( customers.isEmpty() ) return;
-
-        EmailParcelFactoryOLS parcelFactory = new EmailParcelFactoryOLS( customers );
-        parcelFactory.setTemplate( 'Online_Store_Customer_Welcome' );
-        parcelFactory.setOrgWideEmailAddressId( FROM_ADDRESS );
-
-        sendFinal( parcelFactory, customers );
-    }
-
-    /**
-     * @name sendEmailsNE
-     * @description sends emails to customers from NE. The distinction was made to avoid confusion for NE people
-     * since there is a Delta Dental NE "branch" organization.
-     * @param Contact[] customers
-     * @return none
-     */
-    private static void sendEmailsNE( Contact[] customers ){
-        if( customers.isEmpty() ){ return; }
-
-        EmailParcelFactoryOLS parcelFactory = new EmailParcelFactoryOLS( customers );
-        parcelFactory.setTemplate( 'Online_Store_Customer_Welcome_NE' ); // Template is NE specific
-        parcelFactory.setOrgWideEmailAddressId( FROM_ADDRESS_NE ); // And From Address is NE specific
-
-        sendFinal( parcelFactory, customers );
-    }
-
-    /**
-     * @name sendFinal
-     * @description sends emails to customers from NE. The distinction was made to avoid confusion for NE people
-     * since there is a Delta Dental NE "branch" organization.
-     * @param Contact[] customers
-     * @return none
-     */
-    private static void sendFinal( EmailParcelFactory parcelFactory, Contact[] customers ){
-        ContentVersion[] versions = getContentVersions(customers);
-
-        parcelFactory.addAttachmentsByName( versions );
-        parcelFactory.build();
-
-        EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( parcelFactory );
-        emailFactory.build();
-
-        EmailPost emailPost = new EmailPost( emailFactory );
-        emailPost.addTriggerHook( new OLSTriggerHook() );
-        emailPost.post();
     }
 
 /**
@@ -257,54 +188,8 @@ public without sharing class OLSUtil {
     }
 
 /**
- * QUERY METHODS
- */
-
-    /**
-     * @name sendEmails
-     * @description gets Brochure PDFs for email's attachment
-     * @param Contact[] customers
-     * @return none
-     */
-    private static ContentVersion[] getContentVersions( Contact[] customers ){
-        ContentVersion[] versions = new ContentVersion[]{};
-
-        String[] brochureKeys = new String[]{};
-
-        for( Contact customer : customers ){
-
-            if( !String.isBlank( customer.Brochure_Key__c ) ){
-                brochureKeys.add( customer.Brochure_Key__c );
-            }
-        }
-
-        try {
-
-            if( brochureKeys.isEmpty() ){
-                throw new BrochureKeyException('No brochure keys associated with these customer records.');
-            }
-
-            versions.addAll([SELECT
-                Id,
-                Title,
-                PathOnClient,
-                VersionData,
-                Brochure_Key__c
-                    FROM ContentVersion
-                    WHERE Brochure_Key__c IN :brochureKeys]);
-
-        } catch( Exception e ){
-            CreedExceptionHandler handler = new CreedExceptionHandler(e, customers);
-            handler.handle();
-        }
-
-        return versions;
-    }
-
-/**
  * CLASSES
  */
 
     public class RecordTypeException extends Exception {}
-    public class BrochureKeyException extends Exception {}
 }

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
     <available>true</available>
-    <description>Welcome email for Online Store Customers that come through DDMN Web Apps for Nebraska contacts.</description>
+    <description>Welcome email for Online Store Customers that come through DDMN Web Apps</description>
     <encodingKey>UTF-8</encodingKey>
-    <name>Online Store Customer Welcome NE</name>
+    <name>Online Store Customer Welcome MN</name>
     <style>none</style>
     <subject>Thank you for purchasing {!Contact.Product_Purchased__c}</subject>
-    <textOnly>We&apos;re excited to welcome you to Delta Dental of Nebraska!
+    <textOnly>We&apos;re excited to welcome you to Delta Dental of Minnesota!
 
 Dear {!Contact.FirstName},
 
 We&apos;re excited to welcome you to
-Delta Dental of Nebraska!
+Delta Dental of Minnesota!
 
 You have made a great choice in dental coverage. Attached is your certificate of coverage* for your records.
 
@@ -32,13 +32,15 @@ ID Cards: ID cards can be downloaded and printed from the Member Portal.
 
 The Power of Smile™!
 
-Learn about current topics and trends in dentistry and the importance of oral health as it relates to overall health.  Access The Power of Smile™ oral health library at www.DeltaDentalNE.org
+Your benefits include a FREE subscription to The Power of Smile™ blog. Learn about current topics and trends in dentistry and the importance of oral health as it relates to overall health from our team of experts.
 
-Thank you for choosing Delta Dental of Nebraska and allowing us to help protect your smile!
+Visithttps//www.DeltaDentalMN.org/blog-sign-up to sign up and access over 100 articles on the importance of oral health from infants to adults.
+
+Thank you for choosing Delta Dental of Minnesota and allowing us to help protect your smile!
 
 Sincerely,
 
-Delta Dental of Nebraska
+Delta Dental of Minnesota
 
 Please do not reply to this email. This email is sent from a mailbox that does not accept replies
 

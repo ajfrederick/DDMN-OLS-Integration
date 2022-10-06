@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Email_Template_Name__c</fullName>
+    <description>The developer name of the email template for which ever state the OLS customer resides in.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>The developer name of the email template for which ever state the OLS customer resides in.</inlineHelpText>
+    <label>Email Template Name</label>
+    <length>150</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

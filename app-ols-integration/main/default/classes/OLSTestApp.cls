@@ -14,7 +14,7 @@ public with sharing class OLSTestApp {
         RestRequest req = new RestRequest();
         RestResponse res = new RestResponse();
 
-        OLSRestServiceHelper.ClientSideCustomer customer = getClientSideCustomer('MN');
+        OLSRestServiceHelper.ClientSideCustomer customer = getClientSideCustomer('ddmn_core');
         
         req.requestURI = 'services/apexrest/creedint/CreateOnlineStoreCustomer';
         req.httpMethod = 'POST';
@@ -40,7 +40,7 @@ public with sharing class OLSTestApp {
                             FirstName,
                             Email
                                 FROM Contact
-                                WHERE CAID__c = :customer.preEnrollment.caid];
+                                WHERE Email = :customer.email];
 
         System.assertEquals( 1, contacts.size() );
 
@@ -57,7 +57,7 @@ public with sharing class OLSTestApp {
         RestRequest req = new RestRequest();
         RestResponse res = new RestResponse();
 
-        OLSRestServiceHelper.ClientSideCustomer customer = getClientSideCustomer('NE');
+        OLSRestServiceHelper.ClientSideCustomer customer = getClientSideCustomer('ddne_core');
         
         req.requestURI = 'services/apexrest/creedint/CreateOnlineStoreCustomer';
         req.httpMethod = 'POST';
@@ -83,7 +83,7 @@ public with sharing class OLSTestApp {
                             FirstName,
                             Email
                                 FROM Contact
-                                WHERE CAID__c = :customer.preEnrollment.caid];
+                                WHERE Email = :customer.email];
 
         System.assertEquals( 1, contacts.size() );
 
@@ -100,7 +100,7 @@ public with sharing class OLSTestApp {
         RestRequest req = new RestRequest();
         RestResponse res = new RestResponse();
 
-        OLSRestServiceHelper.ClientSideCustomer customer = getClientSideCustomer('MN');
+        OLSRestServiceHelper.ClientSideCustomer customer = getClientSideCustomer('ddmn_core');
         
         req.requestURI = 'services/apexrest/creedint/CreateOnlineStoreCustomerUnsuccessful';
         req.httpMethod = 'POST';
@@ -126,7 +126,7 @@ public with sharing class OLSTestApp {
                             FirstName,
                             Email
                                 FROM Contact
-                                WHERE CAID__c = :customer.preEnrollment.caid];
+                                WHERE Email = :customer.email];
 
         System.assertEquals( 1, contacts.size() );
 
@@ -319,6 +319,7 @@ public with sharing class OLSTestApp {
     }
 
     private static OLSRestServiceHelper.ClientSideCustomer getClientSideCustomer( String stateAcronym ){
+       
         OLSRestServiceHelper.AddressData address = new OLSRestServiceHelper.AddressData();
         address.addressLine1 = '3 Do Street';
         address.addressLine2 = 'Unit 1';
@@ -328,21 +329,44 @@ public with sharing class OLSTestApp {
 
         OLSRestServiceHelper.PaymentDetails paymentDetails = new OLSRestServiceHelper.PaymentDetails();
         paymentDetails.paymentSuccessful = 'true';
+        paymentDetails.paymentSuccessful2 = null;
         paymentDetails.paymentType = 'CC';
-        paymentDetails.customerId = 'customerId1';
-        paymentDetails.transactionId = 'tranId1';
-        paymentDetails.transactionDate = '11/12/20';
-        paymentDetails.paymentAuthNumber = '12345';
-        paymentDetails.bankAccountType = 'Checking';
+        paymentDetails.customerId = 'CC123';
+        paymentDetails.customerId2 = null;
+        paymentDetails.transactionId = '';
+        paymentDetails.transactionDate = '9/30/2022';
+        paymentDetails.paymentAuthNumber = '';
+        paymentDetails.bankAccountType = '';
         paymentDetails.paymentFrequency = 'Monthly';
-        paymentDetails.callingApplication = 'webappsui';
-        paymentDetails.paymentErrorMessage = 'none';
+        paymentDetails.callingApplication = 'roosevelt-shopping-ui';
+        paymentDetails.paymentErrorMessage = '';
+
+        OLSRestServiceHelper.PlanDetails planDetails = new OLSRestServiceHelper.PlanDetails();
+        planDetails.marketingName = 'Elite 1000';
+        planDetails.generatedName = 'ND Plan Elite 1000 Dental Only';
+        planDetails.brochureUrl = 'https://www.deltadentalmn.org/library/2022_DDND_Elite1000.pdf';
+        planDetails.amount = '$35.50';
+        planDetails.paymentFrequency = 'Monthly';
+        planDetails.productId = '1332';
+        planDetails.clientId = '3550';
+        planDetails.subClientId = '1500';
+        planDetails.productKey = 'DDND-INDI-ELITE1';
+        planDetails.productEffectiveDate = '01/01/2022';
+        planDetails.accessCode = '6659';
 
         OLSRestServiceHelper.PreEnrollment preEnrollment = new OLSRestServiceHelper.PreEnrollment();
-        preEnrollment.status = 'good';
-        preEnrollment.stateAcronym = stateAcronym;
-        preEnrollment.preEnrollmentId = 'id543';
-        preEnrollment.caid = 'caid98432';
+        preEnrollment.customerId = 'CC937859238';
+        preEnrollment.preEnrollmentId = '1900293';
+        preEnrollment.preEnrollProductId = '1332';
+        preEnrollment.merchantOid = '';
+        preEnrollment.encPreEnrollmentMemberId = '';
+        preEnrollment.auditUsername = '';
+        preEnrollment.auditApplicationName = '';
+        preEnrollment.hash = '';
+        preEnrollment.timeStamp = '';
+        preEnrollment.formattedDate = '';
+        preEnrollment.applicationName = stateAcronym;
+        preEnrollment.planDetails = planDetails;
 
         OLSRestServiceHelper.Enrollment enrollment = new OLSRestServiceHelper.Enrollment();
         enrollment.status = 'good';
@@ -358,22 +382,22 @@ public with sharing class OLSTestApp {
         existingCoverage.lengthOfPriorCoverage = '18 days';
 
         OLSRestServiceHelper.ClientSideCustomer customer = new OLSRestServiceHelper.ClientSideCustomer();
-        customer.firstName = 'Crazy New Test';
-        customer.lastName = 'Customer';
-        customer.email = 'me@test.com';
+        customer.agentNumber = 'X45TrL11';
+        customer.firstName = 'Jabber';
+        customer.lastName = 'Testing';
+        customer.email = 'example@gmail.com';
+        customer.ssn = '199674643';
+        customer.phone = '6124038141';
+        customer.dateOfBirth = '03/05/1996';
+        customer.gender = 'M';
+        customer.coverageType = 'myself';
         customer.address = address;
-        customer.phone = '222-234-5487';
-        customer.accessCode = 'testcode';
+        customer.newPolicyStartDate = '11/01/2022';
         customer.existingCoverage = existingCoverage;
-        customer.amount = '$87.33';
-        customer.product = 'Test Product';
-        customer.brochureKey = 'Test_Brochure_Key';
-        customer.brochureUrl = 'www.Test_Brochure_URL.io';
         customer.preEnrollment = preEnrollment;
-        customer.postBackUrl = 'www.postback.io';
         customer.paymentDetails = paymentDetails;
         customer.enrollment = enrollment;
-        
+
         return customer;
     }   
 }

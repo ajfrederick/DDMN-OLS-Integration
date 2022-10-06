@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>These settings will help determine, based on state, which what assets (e.g. template, from address, etc.) to use within welcome emails.</description>
+    <label>OLS Welcome Email Setting</label>
+    <pluralLabel>OLS Welcome Email Setting</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

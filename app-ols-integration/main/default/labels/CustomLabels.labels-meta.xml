@@ -7,18 +7,4 @@
         <shortDescription>OLS Email Bcc Address</shortDescription>
         <value>smileinsurance@deltadentalmn.org</value>
     </labels>
-    <labels>
-        <fullName>OLS_Email_From_Address</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>OLS Email From Address</shortDescription>
-        <value>individualandfamilyplanwelcome@deltadentalmn.org</value>
-    </labels>
-    <labels>
-        <fullName>OLS_Email_From_Address_NE</fullName>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>OLS Email From Address NE</shortDescription>
-        <value>individualandfamilyplanwelcome@deltadentalne.org</value>
-    </labels>
 </CustomLabels>

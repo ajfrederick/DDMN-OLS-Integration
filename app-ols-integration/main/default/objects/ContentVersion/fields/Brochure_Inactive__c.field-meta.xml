@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Brochure_Inactive__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>For OLS welcome email brochures. If Inactive this Brochure will not be used in system generated welcome emails.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>If Inactive this Brochure will not be used in system generated welcome emails.</inlineHelpText>
+    <label>Brochure Inactive</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -270,6 +270,8 @@ global virtual class EmailParcelFactory {
         }
     }
 
+
+
 /**
  * CLASSES
 **/
@@ -281,8 +283,18 @@ global virtual class EmailParcelFactory {
 
         global ContentVersion version {get;set;}
 
+        // DEPRECATED can be deleted ANYTIME AFTER 9/19/2022
+        global String filename {get;set;}
+        global Blob blobBody {get;set;}
+
         global AttachmentData( ContentVersion version ){
             this.version = version;
+        }
+
+         // DEPRECATED can be deleted ANYTIME AFTER 9/19/2022
+        global AttachmentData( String filename, Blob blobBody ){
+            this.filename = filename;
+            this.blobBody = blobBody;
         }
 
         global String getFileName(){
@@ -291,6 +303,43 @@ global virtual class EmailParcelFactory {
 
         global Blob getBlobBody(){
             return version.VersionData;
+        }
+    }
+
+/**
+ * DEPRECTATED METHODS: CAN BE DELETED ANYTIME AFTER 9/19/2022
+ */
+
+    /**
+     * @name addAttachmentByName
+     * @description adds an  attachment id by a particular key value
+     * @param String filename
+     * @param String base64Body
+     * @param String key
+     * @return void
+    **/
+    global virtual void addAttachmentByName( String filename, Blob blobBody, String key ){
+        AttachmentData attachment = new AttachmentData( filename, blobBody );
+
+        if( attachmentsByName.containsKey(key) ){
+            attachmentsByName.get(key).add(attachment);
+        } else {
+            attachmentsByName.put(key, new AttachmentData[]{attachment});
+        }
+    }
+
+    /**
+     * @name addVersionIdByName
+     * @description adds a version id by a particular key value
+     * @param ContentVersion version
+     * @return void
+    **/
+    global void addVersionIdByName( ContentVersion version, String key ){
+
+        if( versionIdsByName.containsKey(key) ){
+            versionIdsByName.get(key).add(version.Id);
+        } else {
+            versionIdsByName.put(key, new String[]{version.Id});
         }
     }
 }

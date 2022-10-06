@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
  <meta charset="utf-8" />
- <title>We're excited to welcome you to Delta Dental of Nebraska!</title>
+ <title>We're excited to welcome you to Delta Dental of Minnesota serving North Dakota!</title>
  <style>
     body { font-family: Arial, Verdana, "Times New Roman"; letter-spacing: 1px;}
     h1{font-weight: normal; font-size: 1.8rem; margin-bottom: -10px; margin-top: 0px}
@@ -32,7 +32,7 @@
   <tbody>
    <tr>
         <td width="22%">
-            <img src="https://images.ctfassets.net/ax0p9zmerlq3/6vtmElKZiCFzHvkZYNwrBL/0ab9552ea1c00ad2127e02c67f64d40d/deltalwelcomelogo-ne.jpg" alt="Delta MC Brand Logo" />
+            <img src="https://images.ctfassets.net/ax0p9zmerlq3/2ANk8geh3Sp1wu0mWpofFW/3a7a02e6d4bc95059b76c81f9c6ee062/deltalwelcomelogo.jpg" alt="Delta MC Brand Logo" />
         </td>
         <td></td>
    </tr>
@@ -50,7 +50,7 @@
    </tr>
     <tr>
         <td>
-            <h1>We're excited to welcome you to<br /> Delta Dental of Nebraska!</h1>
+            <h1>We're excited to welcome you to<br /> Delta Dental of Minnesota serving North Dakota!</h1>
             <p>You have made a great choice in dental coverage. Attached is your certificate of coverage* for your records.</p>
         </td>
    </tr>
@@ -79,7 +79,7 @@
              <!-- Inline Table -->
              <table cellpadding="0" cellspacing="0">
                 <tr>
-                    <td width="185"><a title="Register here" href="https://www.memberportal.com/mp/ne/registration"><img src="https://images.ctfassets.net/ax0p9zmerlq3/4pmUKD6Yl4sTw9Z6xj96Tg/4157dfe3b080ea9c2c6a2a98f46ab419/welcome-register-btn.jpg" alt="Register Here" /></a></td>
+                    <td width="185"><a title="Register here" href="https://www.memberportal.com/mp/mn/registration"><img src="https://images.ctfassets.net/ax0p9zmerlq3/4pmUKD6Yl4sTw9Z6xj96Tg/4157dfe3b080ea9c2c6a2a98f46ab419/welcome-register-btn.jpg" alt="Register Here" /></a></td>
                     <td width="255"><a title="How to Register guide"href="https://www.deltadentalmn.org/library/delta-dental-member-portal-how-to-register.pdf"><img src="https://images.ctfassets.net/ax0p9zmerlq3/7FgumxdYl69aSQ0gzZgYbn/42d76fbb7041c97a48b22647495269ba/welcome-guide-btn.jpg" alt="How to Register Guide" /></a></td>
                 </tr>
 
@@ -98,12 +98,14 @@
         <td>
             <h2>The Power of Smile&trade;!</h2>
 
-            <p>Learn about current topics and trends in dentistry and the importance of oral health as it relates to overall health.  Access The Power of Smile&trade; oral health library at <a href="https://www.deltadenalne.org/">www.DeltaDentalNE.org</a></p>
+            <p>Your benefits include a FREE subscription to The Power of Smile&trade; blog. Learn about current topics and trends in dentistry and the importance of oral health as it relates to overall health from our team of experts.</p>
 
-            <p>Thank you for choosing Delta Dental of Nebraska and allowing us to help protect your smile!<br /></p>
+            <p>Visit<a title="Sign up to The Power of Smile blog" href="https://www.deltadentalmn.org/blog-sign-up?utm_source=Email&utm_medium=welcome-email-link&utm_campaign=ols-welcome">https//www.DeltaDentalMN.org/blog-sign-up</a> to sign up and access over 100 articles on the importance of oral health from infants to adults.</p>
+
+            <p>Thank you for choosing Delta Dental of Minnesota and allowing us to help protect your smile!<br /></p>
 
             <p>Sincerely,<br /></p>
-            <p>Delta Dental of Nebraska</p>
+            <p>Delta Dental of Minnesota serving North Dakota</p>
         </td>
    </tr>
   </tbody>

@@ -61,11 +61,13 @@ global class EmailParcelFactoryOLS extends EmailParcelFactory {
     /**
      * @name addAttachmentToParcel
      * @description adds an attachment to parcel. checks the coverage start date and grabs the most recent brochure IF the start date
-     * is also later then today's date.
+     * is also later then the OLS Customer new policy start date.
      * @param EmailParcel parcel
      * @return void
     **/
     private void addAttachmentToParcel( Contact obj, EmailParcel parcel ){
+
+        AttachmentData[] attachments;
 
         try {
 
@@ -73,34 +75,70 @@ global class EmailParcelFactoryOLS extends EmailParcelFactory {
                 throw new AttachmentException('OLS Contact did not come with a Brochure Key');
             } else
             if( !attachmentsByName.containsKey( obj.Brochure_Key__c ) ){
-                throw new AttachmentException('Brochure not found for the key provided for OLS Contact');
+                throw new AttachmentException('Brochure not found for the brochure key provided for OLS Contact');
             }
             
-            AttachmentData attachmentToUse;
-
-            for( AttachmentData newAttachment : attachmentsByName.get( obj.Brochure_Key__c ) ){
-
-                if( attachmentToUse == null || isAttachmentToUse( attachmentToUse, newAttachment, obj ) ){
-                    attachmentToUse = newAttachment;
-                }
-            }  
+            attachments = attachmentsByName.get( obj.Brochure_Key__c );
             
-            parcel.setAttachment( attachmentToUse.getFileName(), attachmentToUse.getBlobBody() );
+            AttachmentData currentAttachment;
+
+            for( AttachmentData newAttachment : attachments ){
+                currentAttachment = useNewAttachment( currentAttachment, newAttachment, obj );
+            }
+
+            // this is in the case where there was 1 attachment found but start date is null. This hopefully won't ever happen
+            // as the start date is required on the page layout now but it's possible. Let's not have it be a show stopper.
+            if( currentAttachment == null && attachments.size() == 1 ){
+                currentAttachment = attachments[0];
+            } else
+            // if there was no attachment found because there was 0 files for the key or if there were 2 or more found but every start date was null
+            if( currentAttachment == null ){
+                throw new AttachmentException('No Brochure PDF found for OLS Contact email attachment. Most likely due to File\'s Brochure Coverage Start Date.');
+            } 
+            
+            parcel.setAttachment( currentAttachment.getFileName(), currentAttachment.getBlobBody() );
 
         } catch( Exception e ){
+
             CreedExceptionHandler handler = new CreedExceptionHandler( e, new SObject[]{obj} );
+
+            // if we have possible files for attachments let's send them in the error email.
+            if( attachments != null && !attachments.isEmpty() ){
+
+                ContentVersion[] versions = new ContentVersion[]{};
+
+                for( AttachmentData attachment : attachments ){
+                    versions.add( attachment.version );
+                }
+
+                handler.addMessage('Here are the possible attachments that were found to be used: ' + JSON.serialize(versions));
+            }
+
             handler.handle();
         }
     }
 
     /**
-     * @name checkAttachments
+     * @name useNewAttachment
      * @description if the new attachment coverage start date is greater or equal to the contact coverage start date && check if this is the newest possible version
      * @param EmailParcel parcel
      * @return void
     **/
-    private Boolean isAttachmentToUse( AttachmentData attachmentToUse, AttachmentData newAttachment, Contact obj ){
-        return newAttachment.version.Brochure_Coverage_Start_Date__c >= obj.Coverage_Start_Date__c && newAttachment.version.Brochure_Coverage_Start_Date__c >= attachmentToUse.version.Brochure_Coverage_Start_Date__c;
+    private AttachmentData useNewAttachment( AttachmentData currentAttachment, AttachmentData newAttachment, Contact obj ){
+        
+        // return the current attachment if there is no coverage start date for the new attachment or if it is at a future point 
+        // to the new policy start date for the OLS customer
+        if( newAttachment.version.Brochure_Coverage_Start_Date__c == null || newAttachment.version.Brochure_Coverage_Start_Date__c > obj.Coverage_Start_Date__c ){ 
+            return currentAttachment; 
+        }
+
+        // if we made it this far set the current attachment if we don't have it yet OR if we do compare it with a possible new one
+        // if the new one is newer than the old one then use the new one.
+        if( currentAttachment == null || newAttachment.version.Brochure_Coverage_Start_Date__c > currentAttachment.version.Brochure_Coverage_Start_Date__c ){
+            currentAttachment = newAttachment;
+        }
+        
+        return currentAttachment;
     }
 
     class AttachmentException extends Exception {}

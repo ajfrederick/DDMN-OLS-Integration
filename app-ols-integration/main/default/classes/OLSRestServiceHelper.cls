@@ -30,7 +30,9 @@ public without sharing class OLSRestServiceHelper {
  */
     private AddressData address {
         get {
-            if( address == null ) address = new AddressData();
+            if( address == null ){
+                address = new AddressData();
+            }
             return address;
         }
         set;
@@ -38,7 +40,9 @@ public without sharing class OLSRestServiceHelper {
 
     private ExistingCoverage existingCoverage {
         get {
-            if( existingCoverage == null ) existingCoverage = new ExistingCoverage();
+            if( existingCoverage == null ){ 
+                existingCoverage = new ExistingCoverage();
+            }
             return existingCoverage;
         }
         set;
@@ -46,7 +50,9 @@ public without sharing class OLSRestServiceHelper {
 
     private PaymentDetails paymentDetails {
         get {
-            if( paymentDetails == null ) paymentDetails = new PaymentDetails();
+            if( paymentDetails == null ){
+                paymentDetails = new PaymentDetails();
+            }
             return paymentDetails;
         }
         set;
@@ -54,22 +60,36 @@ public without sharing class OLSRestServiceHelper {
 
     private PreEnrollment preEnrollment {
         get {
-            if( preEnrollment == null ) preEnrollment = new PreEnrollment();
+            if( preEnrollment == null ){
+                preEnrollment = new PreEnrollment();
+            }
             return preEnrollment;
+        }
+        set;
+    }
+
+    private PlanDetails planDetails {
+        get {
+            if( planDetails == null ){
+                planDetails = new PlanDetails();
+            }
+            return planDetails;
         }
         set;
     }
 
     private Enrollment enrollment {
         get {
-            if( enrollment == null ) enrollment = new Enrollment();
+            if( enrollment == null ){
+                enrollment = new Enrollment();
+            }
             return enrollment;
         }
         set;
     }
 
     // let's just grab the record type id once to be referenced here
-    private static final Id olsContact = OLSUtil.getOLSRecordTypeId();
+    private static final Id OLS_CONTACT = OLSUtil.getOLSRecordTypeId();
 
 /**
 * CONSTRUCTOR
@@ -110,6 +130,7 @@ public without sharing class OLSRestServiceHelper {
         this.existingCoverage = customer.existingCoverage;
         this.paymentDetails = customer.paymentDetails;
         this.preEnrollment = customer.preEnrollment;
+        this.planDetails = this.preEnrollment.planDetails;
         this.enrollment = customer.enrollment;
     }
 
@@ -125,6 +146,7 @@ public without sharing class OLSRestServiceHelper {
         this.existingCoverage = customer.existingCoverage;
         this.paymentDetails = customer.paymentDetails;
         this.preEnrollment = customer.preEnrollment;
+        this.planDetails = this.preEnrollment.planDetails;
         this.enrollment = customer.enrollment;
     }
 
@@ -154,11 +176,10 @@ public without sharing class OLSRestServiceHelper {
         Contact contact = getBaseContact();
 
         contact.Payment_Successful__c = paymentSuccessful;
-        contact.CAID__c = preEnrollment.caid;
         contact.Initial_Payment_Amount__c = getAmount();
-        contact.Brochure_Key__c = customer.brochureKey;
-        contact.Brochure_URL__c = customer.brochureUrl;
-        contact.Customer_Id__c = paymentDetails.customerId;
+        contact.Brochure_Key__c = planDetails.productKey;
+        contact.Brochure_URL__c = planDetails.brochureUrl;
+        contact.Customer_Id__c = preEnrollment.customerId;
         contact.Payment_Type__c = paymentDetails.paymentType;
         contact.Payment_Frequency__c = paymentDetails.paymentFrequency;
 
@@ -191,7 +212,7 @@ public without sharing class OLSRestServiceHelper {
      */
     public Contact getBaseContact(){
         return new Contact(
-            RecordTypeId = olsContact,
+            RecordTypeId = OLS_CONTACT,
             FirstName = customer.firstName,
             LastName = customer.lastName,
             Email = customer.email,
@@ -200,9 +221,9 @@ public without sharing class OLSRestServiceHelper {
             MailingCity = address.city,
             MailingState = address.state,
             MailingPostalCode = address.zip,
-            Product_Purchased__c = customer.product,
-            CAID__c = preEnrollment.caid,
-            State_Acronym__c = preEnrollment.stateAcronym,
+            Product_Purchased__c = planDetails.generatedName,
+            CAID__c = getCAID(preEnrollment.customerId),
+            State_Acronym__c = preEnrollment.applicationName,
             Current_Carrier__c = existingCoverage.carrier,
             Effective_Date__c = getEffectiveDate(),
             Coverage_Start_Date__c = getCoverageStartDate(),
@@ -210,7 +231,9 @@ public without sharing class OLSRestServiceHelper {
             Policy_Number__c = existingCoverage.policyNumber,
             Eligible_For_Waiting_Period_Waiver__c = getWaiverEligibility(),
             Days_Since_End_Of_Prior_Coverage__c = getDaysSinceEndOfPriorCoverage(),
-            Length_Of_Prior_Coverage__c = getLengthOfPriorCoverage()
+            Length_Of_Prior_Coverage__c = getLengthOfPriorCoverage(),
+            Group_Number__c = planDetails.clientId,
+            Sub_Client_Id__c = planDetails.subClientId
         );
     }
 
@@ -241,7 +264,7 @@ public without sharing class OLSRestServiceHelper {
                                     AND FirstName = :customer.firstName
                                     AND LastName = :customer.lastName
                                     AND Payment_Successful__c = false
-                                    AND RecordTypeId = :olsContact
+                                    AND RecordTypeId = :OLS_CONTACT
                                     AND CAID__c != null]);
 
         } catch( Exception e ){
@@ -277,7 +300,7 @@ public without sharing class OLSRestServiceHelper {
      * @return Decimal
      */
     private Decimal getAmount(){
-        String amount = customer.amount != null ? customer.amount.replace('$','') : '0';
+        String amount = planDetails.amount != null ? planDetails.amount.replace('$','') : '0';
 
         return isDecimal(amount) ? Decimal.valueOf(amount) : null;
     }
@@ -376,9 +399,18 @@ public without sharing class OLSRestServiceHelper {
 
         if( String.isBlank(dateString) ){ return newDate; }
 
+        // date format from client is MM/DD/YYYY
+        String yearString = dateString.subStringAfterLast('/');
+        String monthString = dateString.subStringBefore('/');
+        String dayString = dateString.subStringBetween('/', '/');
+
+        Integer yearInt = isInteger(yearString) ? Integer.valueOf(yearString) : null;
+        Integer monthInt = isInteger(monthString) ? Integer.valueOf(monthString) : null;
+        Integer dayInt = isInteger(dayString) ? Integer.valueOf(dayString) : null;
+
         try {
 
-            newDate = Date.valueOf(dateString);
+            newDate = Date.newInstance(yearInt, monthInt, dayInt);
 
         } catch( Exception e ){
             CreedExceptionHandler handler = new CreedExceptionHandler(e);
@@ -398,6 +430,16 @@ public without sharing class OLSRestServiceHelper {
         return existingCoverage.waitingPeriodWaiverEligible == 'true' ? true : false;
     }
 
+    /**
+     * @name getCAID
+     * @description the caid is devrived from the CustomerId on the payment details object by removing the CC from the beginning of its value
+     * @param String customerId
+     * @return String
+     */
+    private String getCAID( String customerId ){
+        return customerId != null ? customerId.replace( 'CC', '' ) : null;
+    }
+
 /**
 * CLASSES
 */
@@ -405,20 +447,19 @@ public without sharing class OLSRestServiceHelper {
     // These are the exact formats we are expecting for a customer object from the DDMN WebApps Online Store
     
     public class ClientSideCustomer {
+        public String agentNumber {get;set;}
         public String firstName {get;set;}
         public String lastName {get;set;}
         public String email {get;set;}
-        public AddressData address {get;set;}
+        public String ssn {get;set;}
         public String phone {get;set;}
-        public String accessCode {get;set;}
+        public String dateOfBirth {get;set;}
+        public String gender {get;set;}
+        public String coverageType {get;set;}
+        public AddressData address {get;set;}
         public String newPolicyStartDate {get;set;}
         public ExistingCoverage existingCoverage {get;set;}
-        public String amount {get;set;}
-        public String product {get;set;}
-        public String brochureKey {get;set;}
-        public String brochureUrl {get;set;}
         public PreEnrollment preEnrollment {get;set;}
-        public String postBackUrl {get;set;}
         public PaymentDetails paymentDetails {get;set;}
         public Enrollment enrollment {get;set;}
     }
@@ -443,8 +484,10 @@ public without sharing class OLSRestServiceHelper {
 
     public class PaymentDetails {
         public String paymentSuccessful {get;set;}
+        public String paymentSuccessful2 {get;set;}
         public String paymentType {get;set;}
-        public String customerId {get;set;}
+        public String customerId {get;set;} // remove 'CC' from this gets you caid
+        public String customerId2 {get;set;}
         public String transactionId {get;set;}
         public String transactionDate {get;set;}
         public String paymentAuthNumber {get;set;}
@@ -455,10 +498,32 @@ public without sharing class OLSRestServiceHelper {
     }
 
     public class PreEnrollment {
-        public String status {get;set;}
-        public String stateAcronym {get;set;}
+        public String customerId {get;set;}
         public String preEnrollmentId {get;set;}
-        public String caid {get;set;}
+        public String preEnrollProductId {get;set;}
+        public String merchantOid {get;set;}
+        public String encPreEnrollmentMemberId {get;set;}
+        public String auditUsername {get;set;}
+        public String auditApplicationName {get;set;}
+        public String hash {get;set;}
+        public String timeStamp {get;set;}
+        public String formattedDate {get;set;}
+        public String applicationName {get;set;} // this used to be the "state acronym"
+        public PlanDetails planDetails {get;set;}
+    }
+
+    public class PlanDetails {
+        public String marketingName {get;set;}
+        public String generatedName {get;set;}
+        public String brochureUrl {get;set;}
+        public String amount {get;set;}
+        public String paymentFrequency {get;set;}
+        public String productId {get;set;}
+        public String clientId {get;set;} // Group Number
+        public String subClientId {get;set;}
+        public String productKey {get;set;}
+        public String productEffectiveDate {get;set;}
+        public String accessCode {get;set;}
     }
 
     public class Enrollment {
