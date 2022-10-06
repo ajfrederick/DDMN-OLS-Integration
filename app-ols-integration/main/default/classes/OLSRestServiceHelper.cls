@@ -352,6 +352,8 @@ public without sharing class OLSRestServiceHelper {
      * @return Boolean
      */
     private Boolean isInteger( String numberString ){
+        if( numberString == null ){ return false; }
+        
         String isIntRegEx = '^[-+]?\\d+$';
 
         Pattern intPattern = Pattern.compile( isIntRegEx );

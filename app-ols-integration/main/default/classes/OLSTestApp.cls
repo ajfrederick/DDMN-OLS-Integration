@@ -375,8 +375,8 @@ public with sharing class OLSTestApp {
         OLSRestServiceHelper.ExistingCoverage existingCoverage = new OLSRestServiceHelper.ExistingCoverage();
         existingCoverage.carrier = 'BCBS';
         existingCoverage.policyNumber = 'policy111222';
-        existingCoverage.effectiveDate = '2016-12-29';
-        existingCoverage.endDate = '2021-09-02';
+        existingCoverage.effectiveDate = '12/29/2016';
+        existingCoverage.endDate = '12/30/2022';
         existingCoverage.waitingPeriodWaiverEligible = 'true';
         existingCoverage.daysSinceEndOfPriorCoverage = '23 days';
         existingCoverage.lengthOfPriorCoverage = '18 days';
