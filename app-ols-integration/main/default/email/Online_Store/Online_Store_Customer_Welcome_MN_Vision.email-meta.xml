@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Welcome email for Online Store Customers that come through DDMN Web Apps with Vision Products</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Online Store Customer Welcome MN Vision</name>
+    <style>none</style>
+    <subject>Thank you for purchasing {!Contact.Product_Purchased__c}</subject>
+    <textOnly>We&apos;re excited to welcome you to Delta Dental of Minnesota!
+
+Dear {!Contact.FirstName},
+
+We&apos;re excited to welcome you to Delta
+Dental of Minnesota and DeltaVision®!
+
+You have made a great choice in dental and vision coverage.  Attached are your certificates of coverage* for your records.
+
+Delta Dental Member Portal
+
+Access your benefits information 24/7
+
+Find a Provider
+View Coverage
+View Claims
+Sign up for an electronic Explanation of Benefits
+
+Payment: Payments are typically collected on the 5th of every month.
+
+ID Cards: ID cards can be downloaded and printed from the Member Portal.
+
+
+
+DeltaVision® Member Portal
+
+Access your benefits information 24/7
+
+Find an eye doctor
+View Coverage
+View Claims
+Know Before You Go (KBYG) for cost estimates prior to your eye appointment and more
+
+Payment: Payments are typically collected on the 5th of every month.
+
+ID Cards: ID cards can be downloaded and printed from the Member Portal.
+
+
+
+The Power of Smile™!
+
+Your benefits include a FREE subscription to The Power of Smile™ blog. Learn about current topics and trends in dentistry and the importance of oral health as it relates to overall health from our team of experts.
+
+Visit https//www.DeltaDentalMN.org/blog-sign-up to sign up and access over 100 articles on the importance of oral health from infants to adults.
+
+Thank you for choosing Delta Dental of Minnesota and allowing us to help protect your smile and your eyes!
+
+Sincerely,
+
+Delta Dental of Minnesota
+
+Please do not reply to this email. This email is sent from a mailbox that does not accept replies
+
+*Certificate of coverage: A policy you receive from Delta Dental that explains your benefit coverage in detail</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

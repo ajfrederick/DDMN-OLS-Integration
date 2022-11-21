@@ -75,7 +75,7 @@ global class EmailParcelFactoryOLS extends EmailParcelFactory {
                 throw new AttachmentException('OLS Contact did not come with a Brochure Key');
             } else
             if( !attachmentsByName.containsKey( obj.Brochure_Key__c ) ){
-                throw new AttachmentException('Brochure not found for the brochure key provided for OLS Contact');
+                throw new AttachmentException('Brochure not found for OLS Contact. Brochure key that was provided: ' + obj.Brochure_Key__c );
             }
             
             attachments = attachmentsByName.get( obj.Brochure_Key__c );

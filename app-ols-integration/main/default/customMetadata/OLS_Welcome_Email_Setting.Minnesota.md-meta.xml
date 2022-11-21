@@ -11,6 +11,10 @@
         <value xsi:type="xsd:string">individualandfamilyplanwelcome@deltadentalmn.org</value>
     </values>
     <values>
+        <field>Multiple_Products_Sold__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
         <field>Supplied_State_Acronym__c</field>
         <value xsi:type="xsd:string">ddmn_core</value>
     </values>

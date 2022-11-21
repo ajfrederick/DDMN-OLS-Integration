@@ -55,7 +55,7 @@ public without sharing class OLSUtil {
      */
     private static void sendEmails( Contact[] customers ){
         if( customers.isEmpty() ){ return; }
-        
+
         OLSEmailCore emailCore = new OLSEmailCore( customers );
         emailCore.sendEmails();
 
@@ -127,7 +127,9 @@ public without sharing class OLSUtil {
      * @return Boolean
      */
     public static Boolean isOnlineStoreCustomer( Contact customer ){
-        return getRecordTypeId('Online_Store_Customer') != null && customer.RecordTypeId == getRecordTypeId('Online_Store_Customer');
+        Id olsContact = getOLSRecordTypeId();
+
+        return olsContact != null && customer.RecordTypeId == olsContact;
     }
 
     /**

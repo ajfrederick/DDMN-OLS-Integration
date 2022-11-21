@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>This is to help the OLS app decide certain pathways based on the product that was sold to the customer. (e.g. if vision was sold use a vision email template.)</description>
+    <label>OLS Product Setting</label>
+    <pluralLabel>OLS Product Settings</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

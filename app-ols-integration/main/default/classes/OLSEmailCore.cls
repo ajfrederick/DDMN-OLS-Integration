@@ -20,29 +20,47 @@ public without sharing class OLSEmailCore {
         set;
     }
 
-    private Map<String, Contact[]> customersByStateAcronym {
+    private Map<String, Contact[]> customersByTemplateName {
         get {
-            if( customersByStateAcronym == null ){
-                customersByStateAcronym = new Map<String, Contact[]>();
+            if( customersByTemplateName == null ){
+                customersByTemplateName = new Map<String, Contact[]>();
             }
-            return customersByStateAcronym;
+            return customersByTemplateName;
+        }
+        set;
+    }
+
+    private Map<String, String> fromAddressesByTemplateName {
+        get {
+            if( fromAddressesByTemplateName == null ){
+                fromAddressesByTemplateName = new Map<String, String>();
+            }
+            return fromAddressesByTemplateName;
         }
         set;
     }
 
     // Custom Metadata Type to determine what assets (e.g. Template, Org Wide Address for from adress, etc.) to use in welcom email
-    private static Map<String, OLS_Welcome_Email_Setting__mdt> emailSettingsByState;
+    private static Map<String, OLS_Welcome_Email_Setting__mdt> emaialSettingsByState = new Map<String, OLS_Welcome_Email_Setting__mdt>();
+
+    private static String[] products = new String[]{};
 
     static {
 
-        emailSettingsByState = new Map<String, OLS_Welcome_Email_Setting__mdt>();
-
         try {
 
-            OLS_Welcome_Email_Setting__mdt[] settings = OLS_Welcome_Email_Setting__mdt.getAll().values();
+            OLS_Welcome_Email_Setting__mdt[] emailSettings = OLS_Welcome_Email_Setting__mdt.getAll().values();
 
-            for( OLS_Welcome_Email_Setting__mdt setting : settings ){
-                emailSettingsByState.put( setting.Supplied_State_Acronym__c, setting );
+            for( OLS_Welcome_Email_Setting__mdt setting : emailSettings ){
+                emaialSettingsByState.put( setting.Supplied_State_Acronym__c, setting );
+            }
+
+            OLS_Product_Setting__mdt[] productSettings = OLS_Product_Setting__mdt.getAll().values();
+
+            for( OLS_Product_Setting__mdt setting : productSettings ){
+                if( setting.isActive__c ){
+                    products.add( setting.Product_Name__c );
+                }
             }
 
         } catch( Exception e ){
@@ -60,14 +78,7 @@ public without sharing class OLSEmailCore {
     public OLSEmailCore( Contact[] customers ){
         this.customers = customers;
 
-        for( Contact customer : customers ){
-
-            if( customersByStateAcronym.containsKey( customer.State_Acronym__c ) ){
-                customersByStateAcronym.get( customer.State_Acronym__c ).add( customer );
-            } else {
-                customersByStateAcronym.put( customer.State_Acronym__c, new Contact[]{ customer } );
-            }
-        }
+        setCustomersByTemplateName();
     }
 
 /**
@@ -86,14 +97,10 @@ public without sharing class OLSEmailCore {
         try {
 
             EmailParcel[] parcels = getParcels();
-
-            if( parcels.isEmpty() ){
-                throw new StateAcronymException( STATE_ACRONYM_ERROR );
-            }
     
             EmailFactoryOutbound emailFactory = new EmailFactoryOutbound( parcels );
             emailFactory.build();
-    
+
             EmailPost emailPost = new EmailPost( emailFactory );
             emailPost.addTriggerHook( new OLSTriggerHook() );
             emailPost.post();
@@ -109,6 +116,58 @@ public without sharing class OLSEmailCore {
  */
 
     /**
+     * @name setCustomersByTemplateName
+     * @description loops through all the settings by state and grabs an customers by state. Puts the customers into an Email App parcel factory then
+     * extracts the parcels fromt the factory for emailing.
+     * @param none
+     * @return none
+     */
+    private void setCustomersByTemplateName(){
+
+        try{
+
+            for( Contact customer : customers ){
+
+                OLS_Welcome_Email_Setting__mdt setting = emaialSettingsByState.get( customer.State_Acronym__c );
+
+                if( setting == null ){
+                    throw new TemplateException( STATE_ACRONYM_ERROR );
+                }
+    
+                String templateName = setting.Email_Template_Name__c;
+    
+                // if the brochure key contains a product above. let's augment the template name to include the product and we'll name the email templates accordingly
+
+                if( setting.Multiple_Products_Sold__c ){
+
+                    for( String product : products ){
+                        if( customer.Brochure_Key__c.containsIgnoreCase( product ) && !String.isBlank(templateName) ){
+                            templateName += '_' + product;
+                            break;
+                        }
+                    }
+                } 
+
+                if( String.isBlank(templateName) ){
+                    throw new TemplateException( 'No template name found for this OLS contact in OLSEmailCore.cls: ' + JSON.serialize(customer) );
+                }
+                
+                fromAddressesByTemplateName.put( templateName, setting.From_Address__c );
+
+                if( customersByTemplateName.containsKey( templateName ) ){
+                    customersByTemplateName.get( templateName ).add( customer );
+                } else {
+                    customersByTemplateName.put( templateName, new Contact[]{ customer } );
+                }
+            }
+
+        } catch( Exception e ){
+            CreedExceptionHandler handler = new CreedExceptionHandler( e , customers );
+            handler.handle();
+        }
+    }
+
+    /**
      * @name getParcels
      * @description loops through all the settings by state and grabs an customers by state. Puts the customers into an Email App parcel factory then
      * extracts the parcels fromt the factory for emailing.
@@ -121,18 +180,13 @@ public without sharing class OLSEmailCore {
 
         EmailParcel[] parcels = new EmailParcel[]{};
 
-        for( String stateAcronym : emailSettingsByState.keySet() ){
+        for( String templateName : customersByTemplateName.keySet() ){
 
-            // if we don't have any customers for a state set in settings then move on!
-            if( !customersByStateAcronym.containsKey(stateAcronym) ){ continue; }
-
-            OLS_Welcome_Email_Setting__mdt setting = emailSettingsByState.get(stateAcronym);
-
-            Contact[] customersToUse = customersByStateAcronym.get(stateAcronym);
+            Contact[] customersToUse = customersByTemplateName.get(templateName);
 
             EmailParcelFactoryOLS parcelFactory = new EmailParcelFactoryOLS( customersToUse );
-            parcelFactory.setTemplate( setting.Email_Template_Name__c );
-            parcelFactory.setOrgWideEmailAddressId( setting.From_Address__c );
+            parcelFactory.setTemplate( templateName );
+            parcelFactory.setOrgWideEmailAddressId( fromAddressesByTemplateName.get(templateName) );
             parcelFactory.addAttachmentsByName( versions );
             parcelFactory.build();
 
@@ -194,5 +248,5 @@ public without sharing class OLSEmailCore {
  */
 
     public class BrochureKeyException extends Exception {}
-    public class StateAcronymException extends Exception {}
+    public class TemplateException extends Exception {}
 }
