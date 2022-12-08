@@ -44,7 +44,7 @@
             "path": "app-ols-integration",
             "default": true,
             "package": "DDMN Online Store Integration",
-            "versionName": "ver 3.6",
+            "versionName": "ver 3.7",
             "versionNumber": "3.7.0.NEXT",
             "dependencies": [
                 {
