@@ -4,8 +4,8 @@
             "path": "creed-exception-handler",
             "default": false,
             "package": "Creed Exception Handler",
-            "versionName": "ver 1.2",
-            "versionNumber": "1.2.0.NEXT"
+            "versionName": "ver 1.3",
+            "versionNumber": "1.3.0.NEXT"
         },
         {
             "path": "creed-record-type-util",
@@ -72,7 +72,7 @@
     "sourceApiVersion": "52.0",
     "packageAliases": {
         "Creed Exception Handler": "0Ho4x000000PBA9CAO",
-        "Creed Exception Handler@1.2.0-1": "04t4x0000006szqAAA",
+        "Creed Exception Handler@1.3.0-1": "04t4x0000006szvAAA",
         "Creed Email App": "0Ho4x000000PBBHCA4",
         "Creed Email App@2.0.0-2": "04t4x0000006sGTAAY",
         "DDMN Online Store Integration": "0Ho4x000000PBAxCAO",
