@@ -13,35 +13,36 @@ global class CreedExceptionHandler {
     // System exception
     private Exception ex {get;set;}
 
-    // email address to send error details to
-    private static final String creedAddress = 'salesforceteam@creedinteractive.com';
-
     // org name for email subject and body
-    private static String orgName = '';
+    private static final String ORG_NAME = [SELECT InstanceName FROM Organization LIMIT 1].InstanceName;
 
-    static {
-        try {
-            orgName = [SELECT InstanceName FROM Organization LIMIT 1].InstanceName;
-        } catch( Exception e ){
-
-        }
-    }
-
-    // optional append a message
-    private String appendedMessage {get;set;}
+    private static final Creed_Exception_Handler_Email__mdt[] REGISTERED_RECIPIENTS = Creed_Exception_Handler_Email__mdt.getAll().values();
 
     private String[] recipientAddresses {
+
         get {
-            if( recipientAddresses == null ) recipientAddresses = new String[]{};
+
+            if( recipientAddresses == null ){
+                recipientAddresses = new String[]{};
+
+                for( Creed_Exception_Handler_Email__mdt registeredRecipient : REGISTERED_RECIPIENTS ){
+                    recipientAddresses.add( registeredRecipient.To_Address__c );
+                }
+            }
             return recipientAddresses;
         }
         set;
     }
 
+    // optional append a message
+    private String appendedMessage {get;set;}
+
     // a list of sobjects to derive error info for email
     private SObject[] errorRecords {
         get {
-            if( errorRecords == null ) errorRecords = new SObject[]{};
+            if( errorRecords == null ){
+                errorRecords = new SObject[]{};
+            }
             return errorRecords;
         }
         set;
@@ -108,12 +109,10 @@ global class CreedExceptionHandler {
     global void email(){
         Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 
-        recipientAddresses.add(creedAddress);
-
         String body = getMessageBody( ex );
 
         message.setHtmlBody( body );
-        message.setSubject( 'Caught Apex Exception in org: ' + orgName );
+        message.setSubject( 'Caught Apex Exception in org: ' + ORG_NAME );
         message.setToAddresses( recipientAddresses );
 
         message.setSaveAsActivity( false );
@@ -163,7 +162,7 @@ global class CreedExceptionHandler {
      * @return String
     **/
     private String getMessageBody( Exception e ){
-        String message = 'Hello! Unfortunately a caught exception has ocurred in ' + orgName + '\'s org. See details below.<br/><br/>';
+        String message = 'Hello! Unfortunately a caught exception has ocurred in ' + ORG_NAME + '\'s org. See details below.<br/><br/>';
 
         message += getUserDetails() + '<br/><br/>';
         message += getExceptionDetails( e );
